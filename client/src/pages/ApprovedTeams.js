@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import {
   TextField,
@@ -18,11 +18,21 @@ import {
 } from "@mui/material";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import axios from "axios";
 
 const ApprovedTeams = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [openRowData,setOpenRowData]=useState(false);
   const [tableName, setTableName] = useState("");
   const [tables, setTables] = useState([]);
+  const [rowData, setRowData] = useState({
+    numberOfResources: "",
+    role: "",
+    availability: "",
+    duration: ""
+  });
+  const [selectedTableIndex, setSelectedTableIndex] = useState(null);
+
 
   const handleChange = (event) => {
     setTableName(event.target.value);
@@ -43,18 +53,75 @@ const ApprovedTeams = () => {
       setOpenModal(false);
     }
   };
-
-  const handleAddRow = (index) => {
-    const newRow = {
-      numberOfResources: "",
-      role: "",
-      availability: "",
-      duration: "",
-    };
-    const updatedTables = [...tables];
-    updatedTables[index].data.push(newRow);
-    setTables(updatedTables);
+  
+  const handleChangeRow = (event, field) => {
+    const { value } = event.target;
+    setRowData(prevRowData => ({
+      ...prevRowData,
+      [field]: value
+    }));
   };
+  
+  const handleRowOpenModal = (index) => {
+    setSelectedTableIndex(index); // Update selectedTableIndex
+    setOpenRowData(true);
+  };
+
+  const handleRowCloseModal = () => {
+    setOpenRowData(false);
+  };
+  const handleSelectTable = (index) => {
+    setSelectedTableIndex(index);
+  };
+
+  const handleCreateRow = () => {
+    if (
+      rowData.numberOfResources.trim() !== "" &&
+      rowData.role.trim() !== "" &&
+      rowData.availability.trim() !== "" &&
+      rowData.duration.trim() !== ""
+    ) {
+      // Check if selectedTableIndex is valid
+      if (
+        selectedTableIndex !== null &&
+        selectedTableIndex !== undefined &&
+        selectedTableIndex >= 0 &&
+        selectedTableIndex < tables.length
+      ) {
+        const updatedTables = [...tables];
+        updatedTables[selectedTableIndex].data.push(rowData);
+        setTables(updatedTables);
+        setRowData({
+          numberOfResources: "",
+          role: "",
+          availability: "",
+          duration: ""
+        });
+        setOpenRowData(false);
+      } else {
+        console.error("Invalid selectedTableIndex:", selectedTableIndex);
+      }
+    }
+  };
+  
+  
+  
+  // Function to fetch all moms
+  const fetchTeams = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/approvedteams"); // Make a GET request to fetch all moms
+      setTableName(response.data); // Update state with the fetched moms
+      setRowData(response.data)
+      console.log(response.data)
+    } catch (error) {
+      console.error("Error fetching moms:", error);
+    }
+  };
+
+  // Fetch moms when the component mounts
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   return (
     <Layout>
@@ -100,6 +167,7 @@ const ApprovedTeams = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
+                
                 {table.data.map((row, rowIndex) => (
                   <TableRow key={rowIndex}>
                     <TableCell>{row.numberOfResources}</TableCell>
@@ -122,10 +190,48 @@ const ApprovedTeams = () => {
               onClick={() => handleAddRow(index)}
             /> */}
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <IconButton onClick={() => handleAddRow(index)}>
+              <IconButton onClick={() => handleRowOpenModal(index)}>
                 <AddCircleOutlineIcon />
               </IconButton>
+              
             </div>
+            <Dialog open={openRowData} onClose={handleRowCloseModal}>
+          <DialogTitle>Enter Data</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth>
+              <TextField
+                label="Number of Resources"
+                value={rowData.numberOfResources}
+                onChange={(event) => handleChangeRow(event, "numberOfResources")}
+              />
+              <TextField
+                label="Role"
+                value={rowData.role}
+                onChange={(event) => handleChangeRow(event, "role")}
+              />
+              <TextField
+                label="Availability %"
+                value={rowData.availability}
+                onChange={(event) => handleChangeRow(event, "availability")}
+              />
+              <TextField
+                label="Duration"
+                value={rowData.duration}
+                onChange={(event) => handleChangeRow(event, "duration")}
+              />
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleRowCloseModal}>Cancel</Button>
+            <Button
+              onClick={handleCreateRow}
+              color="primary"
+              variant="contained"
+            >
+              Create Table
+            </Button>
+          </DialogActions>
+        </Dialog>
           </div>
         ))}
       </div>

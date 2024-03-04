@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import Layout from '../Layout';
+import React, { useEffect, useState } from "react";
+import Layout from "../Layout";
+import axios from "axios";
 import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button, InputLabel } from '@mui/material';
 
 const Resources = () => {
@@ -19,16 +20,65 @@ const Resources = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setResources([...resources, formData]);
-    setFormData({
-      resourceName: '',
-      role: '',
-      startDate: '',
-      endDate: '',
-      comment: ''
-    });
+    // setResources([...resources, formData]);
+    // setFormData({
+    //   resourceName: '',
+    //   role: '',
+    //   startDate: '',
+    //   endDate: '',
+    //   comment: ''
+    // });
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/resources",
+        formData
+      );
+      setResources([...resources, response.data]);
+      console.log("Resources submitted:", response.data);
+      
+      setFormData({
+        resourceName: '',
+        role: '',
+        startDate: '',
+        endDate: '',
+        comment: ''
+      });
+    } catch (error) {
+      console.error("Error submitting Resources:", error);
+    }
+  };
+
+  // Function to fetch all resources
+  const fetchResources = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/resources"); // Make a GET request to fetch all moms
+      setResources(response.data); // Update state with the fetched moms
+    } catch (error) {
+      console.error("Error fetching Resources:", error);
+    }
+  };
+
+  // Fetch resources when the component mounts
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  //delete
+  const handleDelete = async (_id) => {
+    try {
+      if (!_id) {
+        console.error("Resources _id is undefined or null");
+        return;
+      }
+
+      await axios.delete(`http://localhost:8080/api/resources/${_id}`);
+      setResources(resources.filter((resource) => resource._id !== _id));
+      console.log("resource deleted with _id:", _id);
+    } catch (error) {
+      console.error("resource deleting Update:", error);
+    }
   };
 
   return (
@@ -102,6 +152,8 @@ const Resources = () => {
                 <TableCell>Start Date</TableCell>
                 <TableCell>End Date</TableCell>
                 <TableCell>Comment</TableCell>
+                <TableCell>Edit</TableCell>
+                <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
             
@@ -120,6 +172,22 @@ const Resources = () => {
                   <TableCell>{resource.startDate}</TableCell>
                   <TableCell>{resource.endDate}</TableCell>
                   <TableCell>{resource.comment}</TableCell>
+                  <TableCell>
+                      <Button
+                        color="primary"
+                        // onClick={() => handleEdit(mom._id)}
+                      >
+                        Edit
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        color="error"
+                        onClick={() => handleDelete(resource._id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
                 </TableRow>
               ))}
             </TableBody>

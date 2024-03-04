@@ -107,12 +107,11 @@ const Moms = () => {
         return;
       }
 
-      // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/moms/${_id}`);
       setmoms(moms.filter((mom) => mom._id !== _id));
-      console.log("Feedback deleted with _id:", _id);
+      console.log("MoM deleted with _id:", _id);
     } catch (error) {
-      console.error("Error deleting feedback:", error);
+      console.error("Error deleting Mom:", error);
     }
   };
 
