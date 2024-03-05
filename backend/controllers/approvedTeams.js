@@ -51,20 +51,7 @@ export const updateTeam = async (req, res) => {
   }
 };
 
-// // Delete a team
-// export const deleteTeam = async (req, res) => {
-//   try {
-//     const team = await ApprovedTeams.findById(req.params.id);
-//     if (!team) {
-//       res.status(404).json({ message: "Team not found" });
-//       return;
-//     }
-//     await team.remove();
-//     res.json({ message: "Team deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+
 
 //delete
 export const deleteTeam = async (req, res) => {
@@ -84,10 +71,48 @@ export const deleteTeam = async (req, res) => {
   }
 };
 
+// Create a new table title
+// router.post('/tables', async (req, res) => {
+  export const tablename = async (req, res) => {
+  try {
+    const { title } = req.body;
+    const newTable = new ApprovedTeams({ title });
+    await newTable.save();
+    res.status(201).json({ id: newTable._id });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add data to a table
+// router.post('/tables/:tableId/data', async (req, res) => {
+  export const teamResources = async (req, res) => {
+  try {
+    const { tableId } = req.params;
+    const { PhaseNumber, teamResources } = req.body;
+    
+    // Find the table by ID
+    const table = await ApprovedTeams.findById(tableId);
+    if (!table) {
+      return res.status(404).json({ message: 'Table not found' });
+    }
+    
+    // Add the data to the table
+    table.data.push({ PhaseNumber, teamResources });
+    await table.save();
+    
+    res.status(200).json({ message: 'Data added to table' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export default {
   getAllTeams,
   getTeamById,
   createTeam,
   updateTeam,
   deleteTeam,
+  tablename,
+  teamResources
 };

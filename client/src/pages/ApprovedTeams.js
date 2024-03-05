@@ -21,6 +21,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import axios from "axios";
 
 const ApprovedTeams = () => {
+  const [teams, setTeams] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openRowData,setOpenRowData]=useState(false);
   const [tableName, setTableName] = useState("");
@@ -105,138 +106,167 @@ const ApprovedTeams = () => {
   };
   
   
-  
   // Function to fetch all moms
   const fetchTeams = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/approvedteams"); // Make a GET request to fetch all moms
-      setTableName(response.data); // Update state with the fetched moms
-      setRowData(response.data)
+      setTeams(response.data);
       console.log(response.data)
     } catch (error) {
       console.error("Error fetching moms:", error);
     }
   };
 
-  // Fetch moms when the component mounts
   useEffect(() => {
     fetchTeams();
   }, []);
 
+
+
   return (
     <Layout>
-      <div>
-        <h1>Approved Teams</h1>
-        <Button variant="contained" color="primary" onClick={handleOpenModal}>
-          Add Approved Team
-        </Button>
-
-        <Dialog open={openModal} onClose={handleCloseModal}>
-          <DialogTitle>Create Table</DialogTitle>
-          <DialogContent>
-            <FormControl fullWidth>
-              <TextField
-                label="Table Name"
-                value={tableName}
-                onChange={handleChange}
-              />
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button
-              onClick={handleCreateTable}
-              color="primary"
-              variant="contained"
-            >
-              Create Table
+      <Grid container spacing={2}>
+        <Grid item xs={10} sx={{marginLeft : 5}} >
+          
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+          <Grid item>
+              {tables.length === 0 ? (
+                <h1>No teams</h1>
+              ) : (
+                <h1>Teams</h1>
+              )}
+          </Grid>
+          <Grid item>
+            <Button variant="contained" color="primary" onClick={handleOpenModal}>
+              Add Team
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Grid>
+        </Grid>
 
-        {tables.map((table, index) => (
-          <div key={index}>
-            <h3>{table.name}</h3>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>No. Of Resources</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Availability %</TableCell>
-                  <TableCell>Duration</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                
-                {table.data.map((row, rowIndex) => (
-                  <TableRow key={rowIndex}>
-                    <TableCell>{row.numberOfResources}</TableCell>
-                    <TableCell>{row.role}</TableCell>
-                    <TableCell>{row.availability}</TableCell>
-                    <TableCell>{row.duration}</TableCell>
+          <Dialog open={openModal} onClose={handleCloseModal}>
+            <DialogTitle>Create Table</DialogTitle>
+            <DialogContent>
+              <FormControl fullWidth>
+                <TextField
+                  label="Table Name"
+                  value={tableName}
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal}>Cancel</Button>
+              <Button
+                onClick={handleCreateTable}
+                color="primary"
+                variant="contained"
+              >
+                Create Table
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {tables.map((table, index) => (
+            <div key={index}>
+              <h3>{table.name}</h3>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>No. Of Resources</TableCell>
+                    <TableCell>Role</TableCell>
+                    <TableCell>Availability %</TableCell>
+                    <TableCell>Duration</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {/* <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleAddRow(index)}
-            >
-              Add Row
-            </Button> */}
-            {/* <AddCircleOutlineIcon
-              color="primary"
-              onClick={() => handleAddRow(index)}
-            /> */}
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <IconButton onClick={() => handleRowOpenModal(index)}>
-                <AddCircleOutlineIcon />
-              </IconButton>
-              
+                </TableHead>
+                <TableBody>
+                  {table.data.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      <TableCell>{row.numberOfResources}</TableCell>
+                      <TableCell>{row.role}</TableCell>
+                      <TableCell>{row.availability}</TableCell>
+                      <TableCell>{row.duration}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <IconButton onClick={() => handleRowOpenModal(index)}>
+                  <AddCircleOutlineIcon />
+                </IconButton>
+              </div>
+              <Dialog open={openRowData} onClose={handleRowCloseModal}>
+                <DialogTitle>Enter Data</DialogTitle>
+                <DialogContent>
+                  <FormControl fullWidth>
+                    <TextField
+                      label="Number of Resources"
+                      value={rowData.numberOfResources}
+                      onChange={(event) => handleChangeRow(event, "numberOfResources")}
+                    />
+                    <TextField
+                      label="Role"
+                      value={rowData.role}
+                      onChange={(event) => handleChangeRow(event, "role")}
+                    />
+                    <TextField
+                      label="Availability %"
+                      value={rowData.availability}
+                      onChange={(event) => handleChangeRow(event, "availability")}
+                    />
+                    <TextField
+                      label="Duration"
+                      value={rowData.duration}
+                      onChange={(event) => handleChangeRow(event, "duration")}
+                    />
+                  </FormControl>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleRowCloseModal}>Cancel</Button>
+                  <Button
+                    onClick={handleCreateRow}
+                    color="primary"
+                    variant="contained"
+                  >
+                    Create Table
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </div>
-            <Dialog open={openRowData} onClose={handleRowCloseModal}>
-          <DialogTitle>Enter Data</DialogTitle>
-          <DialogContent>
-            <FormControl fullWidth>
-              <TextField
-                label="Number of Resources"
-                value={rowData.numberOfResources}
-                onChange={(event) => handleChangeRow(event, "numberOfResources")}
-              />
-              <TextField
-                label="Role"
-                value={rowData.role}
-                onChange={(event) => handleChangeRow(event, "role")}
-              />
-              <TextField
-                label="Availability %"
-                value={rowData.availability}
-                onChange={(event) => handleChangeRow(event, "availability")}
-              />
-              <TextField
-                label="Duration"
-                value={rowData.duration}
-                onChange={(event) => handleChangeRow(event, "duration")}
-              />
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleRowCloseModal}>Cancel</Button>
-            <Button
-              onClick={handleCreateRow}
-              color="primary"
-              variant="contained"
-            >
-              Create Table
-            </Button>
-          </DialogActions>
-        </Dialog>
+          ))}
+        </Grid>
+        <Grid item xs={10} sx={{marginLeft : 5}} >
+          <div style={{ borderTop: "1px solid #ccc", paddingTop: "20px" }}>
+            {teams.map((team, index) => (
+              <div key={index}>
+                <h2>Phase Number: {team.PhaseNumber}</h2>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>No. Of Resources</TableCell>
+                      <TableCell>Role</TableCell>
+                      <TableCell>Availability %</TableCell>
+                      <TableCell>Duration</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {team.teamResources.map((resource, resourceIndex) => (
+                      <TableRow key={resourceIndex}>
+                        <TableCell>{resource.numberOfResources}</TableCell>
+                        <TableCell>{resource.role}</TableCell>
+                        <TableCell>{resource.availability}</TableCell>
+                        <TableCell>{resource.duration}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </Grid>
+      </Grid>
     </Layout>
   );
 };
+
 
 export default ApprovedTeams;
