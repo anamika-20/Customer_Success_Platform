@@ -10,6 +10,6 @@ Install dependencies: npm install
 2. Role-Based Management and Registration/Login with Microsoft using Auth0:
 
 ## Technologies Used - 
-### Frontend: React.js, Material-UI
-### Backend: Node.js, Express.js, MongoDB
+Frontend: React.js, Material-UI
+Backend: Node.js, Express.js, MongoDB
 
