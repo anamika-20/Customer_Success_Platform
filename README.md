@@ -13,3 +13,21 @@ Install dependencies: npm install
 Frontend: React.js, Material-UI
 Backend: Node.js, Express.js, MongoDB
 
+## Credentials for different Roles - 
+### Admin :
+Username: admin@gmail.com
+Password: Admin@gmail
+
+### Auditor :
+Username: auditor@gmail.com
+Password: Auditor@gmail
+
+### Project Manager :
+Username: projectmanager@gmail.com
+Password: Projectmanager@gmail
+
+### Client :
+Username: client@gmail.com
+Password: Client@gmail
+
+PS : The default login Role is "Client"
