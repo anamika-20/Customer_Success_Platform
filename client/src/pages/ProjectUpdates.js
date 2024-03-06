@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import Layout from '../Layout';
-import { Grid, Paper, TextField, Button, InputLabel } from '@mui/material';
+import React, { useState } from "react";
+import Layout from "../Layout";
+import { Grid, Paper, TextField, Button, InputLabel } from "@mui/material";
 
 const ProjectUpdates = () => {
   const [updates, setUpdates] = useState([]);
   const [formData, setFormData] = useState({
-    projectDetails: '',
-    date: '',
-    generalUpdates: ''
+    projectDetails: "",
+    date: "",
+    generalUpdates: "",
   });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -21,9 +21,9 @@ const ProjectUpdates = () => {
     e.preventDefault();
     setUpdates([...updates, formData]);
     setFormData({
-      projectDetails: '',
-      date: '',
-      generalUpdates: ''
+      projectDetails: "",
+      date: "",
+      generalUpdates: "",
     });
   };
 
@@ -63,7 +63,9 @@ const ProjectUpdates = () => {
               fullWidth
               sx={{ mb: 2 }}
             />
-            <Button variant="contained" type="submit">Submit</Button>
+            <Button variant="contained" type="submit">
+              Submit
+            </Button>
           </form>
         </Paper>
       </Grid>

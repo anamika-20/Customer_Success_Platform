@@ -1,14 +1,15 @@
-import { Router } from "express";
-// import {
-//   registerUser,
-//   authUser,
-//   allUsers,
-// } from "../controllers/userControllers";
-// import { protect } from "../middleware/authMiddleware";
+import express from "express";
+import userControllers from "../controllers/userControllers.js";
+import checkAdmin from "../middlewares/client-admin.js";
+import pkg from "express-openid-connect";
+const { requiresAuth } = pkg;
 
-const router = Router();
+const router = express.Router();
 
-router.route("/").post(registerUser).get(protect, allUsers);
-router.route("/login").post(authUser);
+// Destructure the controller functions
+const { userDetails } = userControllers;
+
+// Routes
+router.get("/user-info", requiresAuth, userDetails);
 
 export default router;

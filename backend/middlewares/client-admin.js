@@ -2,12 +2,26 @@ import User from "../Schemas/User.js";
 
 export default async function checkAdmin(req, res, next) {
   try {
-    const email = "anamikatiwary20@gmail.com";
+    if (!req.oidc.isAuthenticated()) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const { email } = req.oidc.user;
     const user = await User.findOne({ email });
-    if (!user) return next();
-    if (user.role === "admin") next();
-    else res.send("You're not an admin bro");
-  } catch (e) {
-    res.send(e);
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    const { role } = user;
+
+    if (!role || role !== "admin") {
+      return res.status(403).send("You're not an admin");
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error in checkAdmin middleware:", error);
+    res.status(500).send("Internal Server Error");
   }
 }

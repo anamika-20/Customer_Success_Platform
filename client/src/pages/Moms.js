@@ -13,16 +13,28 @@ import {
   TextField,
   Button,
   InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 
 const Moms = () => {
-  const [moms, setmoms] = useState([]);
+  const [moms, setMoms] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
     duration: "",
     momLink: "",
     comments: "",
   });
+  const [editFormData, setEditFormData] = useState({
+    _id: null,
+    date: "",
+    duration: "",
+    momLink: "",
+    comments: "",
+  });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -31,35 +43,24 @@ const Moms = () => {
     });
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   setmoms([...moms, formData]);
-  //   setFormData({
-  //     date: "",
-  //     duration: "",
-  //     momLink: "",
-  //     comment: "",
-  //   });
-  // };
+  const handleEdit = (mom) => {
+    setEditFormData(mom);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setFeedback([...feedback, formData]);
-    // setFormData({
-    //   feedbackType: "",
-    //   dateReceived: "",
-    //   detailedFeedback: "",
-    //   actionTaken: "",
-    //   closureDate: "",
-    // });
     try {
       const response = await axios.post(
         "http://localhost:8080/api/moms",
         formData
       );
-      setmoms([...moms, response.data]);
+      setMoms([...moms, response.data]);
       console.log("MoM submitted:", response.data);
-      // Optionally, you can reset the form after successful submission
       setFormData({
         date: "",
         duration: "",
@@ -71,54 +72,48 @@ const Moms = () => {
     }
   };
 
-  // Function to fetch all moms
-  const fetchMoms = async () => {
+  const handleSaveEdit = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/moms"); // Make a GET request to fetch all moms
-      setmoms(response.data); // Update state with the fetched moms
+      await axios.patch(
+        `http://localhost:8080/api/moms/${editFormData._id}`,
+        editFormData
+      );
+      console.log("MoM edited:", editFormData);
+      setEditDialogOpen(false);
+      setMoms(
+        moms.map((item) =>
+          item._id === editFormData._id ? editFormData : item
+        )
+      );
     } catch (error) {
-      console.error("Error fetching moms:", error);
+      console.error("Error editing MoM:", error);
     }
   };
-
-  // Fetch moms when the component mounts
-  useEffect(() => {
-    fetchMoms();
-  }, []);
-
-  // const handleSaveEdit = async (_id) => {
-  //   try {
-  //     // Send PATCH request to update the feedback item on the server
-  //     await axios.patch(
-  //       `http://localhost:8080/api/moms/${mom._id}`,
-  //       editFormData
-  //     );
-  //     console.log("MoMs edited:", editFormData);
-  //     setEditDialogOpen(false);
-  //   } catch (error) {
-  //     console.error("Error editing feedback:", error);
-  //   }
-  // };
 
   const handleDelete = async (_id) => {
     try {
-      if (!_id) {
-        console.error("MoM _id is undefined or null");
-        return;
-      }
-
-      // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/moms/${_id}`);
-      setmoms(moms.filter((mom) => mom._id !== _id));
-      console.log("Feedback deleted with _id:", _id);
+      setMoms(moms.filter((mom) => mom._id !== _id));
+      console.log("MoM deleted with _id:", _id);
     } catch (error) {
-      console.error("Error deleting feedback:", error);
+      console.error("Error deleting MoM:", error);
     }
   };
 
+  useEffect(() => {
+    const fetchMoms = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/moms");
+        setMoms(response.data);
+      } catch (error) {
+        console.error("Error fetching moms:", error);
+      }
+    };
+    fetchMoms();
+  }, []);
+
   return (
     <Layout>
-      {/* Form */}
       <Grid item xs={12}>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
@@ -127,7 +122,7 @@ const Moms = () => {
               id="date"
               name="date"
               type="date"
-              value={formData.date}
+              value={formData.date.split("T")[0]}
               onChange={handleChange}
               fullWidth
               sx={{ mb: 2 }}
@@ -150,7 +145,6 @@ const Moms = () => {
               fullWidth
               sx={{ mb: 2 }}
             />
-
             <InputLabel htmlFor="comments">Comment</InputLabel>
             <TextField
               id="comments"
@@ -169,7 +163,6 @@ const Moms = () => {
         </Paper>
       </Grid>
 
-      {/* Table */}
       <Grid item xs={12}>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
           <Table>
@@ -177,52 +170,110 @@ const Moms = () => {
               <TableRow>
                 <TableCell>Date</TableCell>
                 <TableCell>Duration</TableCell>
-                <TableCell>Mom Link</TableCell>
+                <TableCell>MoM Link</TableCell>
                 <TableCell>Comment</TableCell>
                 <TableCell>Edit</TableCell>
                 <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
 
-            {!moms || moms.length === 0 ? (
-              <TableBody>
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    No moms have been added
+            <TableBody>
+              {moms.map((mom, index) => (
+                <TableRow key={index}>
+                  <TableCell>{mom.date.split("T")[0]}</TableCell>
+                  <TableCell>{mom.duration}</TableCell>
+                  <TableCell>{mom.momLink}</TableCell>
+                  <TableCell>{mom.comments}</TableCell>
+                  <TableCell>
+                    <Button color="primary" onClick={() => handleEdit(mom)}>
+                      Edit
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button color="error" onClick={() => handleDelete(mom._id)}>
+                      Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
-              </TableBody>
-            ) : (
-              <TableBody>
-                {moms.map((mom, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{mom.date}</TableCell>
-                    <TableCell>{mom.duration}</TableCell>
-                    <TableCell>{mom.momLink}</TableCell>
-                    <TableCell>{mom.comments}</TableCell>
-                    <TableCell>
-                      <Button
-                        color="primary"
-                        // onClick={() => handleEdit(mom._id)}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="error"
-                        onClick={() => handleDelete(mom._id)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            )}
+              ))}
+            </TableBody>
           </Table>
         </TableContainer>
       </Grid>
+
+      <Dialog
+        open={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Edit MoM</DialogTitle>
+        <DialogContent>
+          <InputLabel htmlFor="date">Date</InputLabel>
+          <TextField
+            id="date"
+            name="date"
+            type="date"
+            value={editFormData.date.split("T")[0]}
+            onChange={(e) =>
+              setEditFormData({
+                ...editFormData,
+                date: e.target.value,
+              })
+            }
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <InputLabel htmlFor="duration">Duration</InputLabel>
+          <TextField
+            id="duration"
+            name="duration"
+            value={editFormData.duration}
+            onChange={(e) =>
+              setEditFormData({
+                ...editFormData,
+                duration: e.target.value,
+              })
+            }
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <InputLabel htmlFor="momLink">MoM Link</InputLabel>
+          <TextField
+            id="momLink"
+            name="momLink"
+            value={editFormData.momLink}
+            onChange={(e) =>
+              setEditFormData({
+                ...editFormData,
+                momLink: e.target.value,
+              })
+            }
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <InputLabel htmlFor="comments">Comment</InputLabel>
+          <TextField
+            id="comments"
+            name="comments"
+            multiline
+            rows={4}
+            value={editFormData.comments}
+            onChange={(e) =>
+              setEditFormData({
+                ...editFormData,
+                comments: e.target.value,
+              })
+            }
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Cancel</Button>
+          <Button onClick={handleSaveEdit}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 };

@@ -1,7 +1,7 @@
 import express from "express";
 import pkg from "express-openid-connect";
 import cors from "cors";
-import mongoose from "mongoose";
+import mongoose, { get } from "mongoose";
 import dotenv from "dotenv";
 import User from "../backend/Schemas/User.js";
 import connectDB from "./config/db.js";
@@ -10,6 +10,7 @@ import momsRouter from "../backend/routes/momsRouter.js";
 import resourcesRouter from "../backend/routes/resourcesRouter.js";
 import projectUpdatesRouter from "../backend/routes/projectUpdatesRouter.js";
 import approvedTeamsRouter from "../backend/routes/approvedTeamsRouter.js";
+import userRouter from "../backend/routes/userRoutes.js";
 import checkAdmin from "./middlewares/client-admin.js";
 // import { findOne, create, find } from "../models/userModel";
 
@@ -55,10 +56,14 @@ const config = {
 // The `auth` router attaches /login, /logout
 // and /callback routes to the baseURL
 app.use(auth(config));
-app.get("/user-info", async (req, res) => {
-  const userInfo = await req.oidc.fetchUserInfo();
-  res.json(userInfo);
-});
+// app.get("/user-info", async (req, res) => {
+//   try {
+//     const userInfo = await req.oidc.fetchUserInfo();
+//     res.json(userInfo);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 // Middleware
 app.use(express.json());
@@ -69,8 +74,27 @@ app.use("/api", momsRouter);
 app.use("/api", resourcesRouter);
 app.use("/api", projectUpdatesRouter);
 app.use("/api", approvedTeamsRouter);
+app.use("/user", userRouter);
 
+app.get("/user-info", async (req, res) => {
+  try {
+    res.json({ data: req.oidc.user });
+    return;
+    if (req.oidc.isAuthenticated()) {
+      const { email } = req.oidc.user;
+      const user = await User.findOne({ email });
+      return res.json({ data: user, status: "loggedin" });
+    } else {
+      return res.json({ status: "loggedout" });
+    }
+  } catch (error) {
+    return res.send(error);
+  }
+});
 // req.oidc.isAuthenticated is provided from the auth router
+app.get("/to-home", async (req, res) => {
+  return res.redirect("http://localhost:3000/");
+});
 app.get("/", async (req, res) => {
   // console.log({ res }, { req });
   try {
@@ -86,30 +110,28 @@ app.get("/", async (req, res) => {
       const userExists = await User.findOne({ email });
 
       if (userExists) {
-        if (userExists.role === "admin") {
-          req.role = "admin";
-          return res.send(res.redirect("http://localhost:3000/"));
-        }
         res.status(400);
-        return res.send("User Alreday Exists");
+        return res.redirect("http://localhost:3000/");
       }
       const user = await User.create({ email });
       if (user) {
-        returnres.status(201).json({
-          email: user.email,
-        });
+        return res
+          .status(201)
+          .json({
+            email: user.email,
+          })
+          .redirect("http://localhost:3000/");
       }
       res.status(400);
       return res.send("Failed to create user");
+    } else {
+      return res.redirect("http://localhost:3000/");
     }
-    return res.send("Logged out");
   } catch (error) {
     return res.send(error);
   }
 });
-app.get("/logout", (req, res) => {
-  res.oidc.logout();
-});
+
 app.listen(8080, function () {
   console.log("Listening on http://localhost:8080");
 });
@@ -169,7 +191,3 @@ app.listen(8080, function () {
 // // //    useNewUrlParser: true,
 // // //    useUnifiedTopology: true
 // // // });
-
-app.get("/", (req, res) => {
-  res.send("Hello from the Node.js backend!");
-});

@@ -60,6 +60,7 @@ const ClientFeedback = () => {
         actionTaken: "",
         closureDate: "",
       });
+      setFeedback([...feedback, response.data]);
     } catch (error) {
       console.error("Error submitting feedback:", error);
     }
@@ -93,8 +94,14 @@ const ClientFeedback = () => {
   });
 
   const handleEdit = (feedbackItem) => {
-    setEditFormData(feedbackItem);
-    console.log(feedbackItem);
+    setEditFormData({
+      _id: feedbackItem._id,
+      feedbackType: feedbackItem.feedbackType,
+      dateReceived: feedbackItem.dateReceived,
+      detailedFeedback: feedbackItem.detailedFeedback,
+      actionTaken: feedbackItem.actionTaken,
+      closureDate: feedbackItem.closureDate,
+    });
     setEditDialogOpen(true);
   };
 
@@ -110,14 +117,19 @@ const ClientFeedback = () => {
   //     console.error("Error editing feedback:", error);
   //   }
   // };
-  const handleSaveEdit = async (_id) => {
+  const handleSaveEdit = async () => {
     try {
       // Send PATCH request to update the feedback item on the server
       await axios.patch(
-        `http://localhost:8080/api/clientfeedback/${feedback._id}`,
+        `http://localhost:8080/api/clientfeedback/${editFormData._id}`,
         editFormData
       );
       console.log("Feedback edited:", editFormData);
+      setFeedback(
+        feedback.map((item) =>
+          item._id === editFormData._id ? editFormData : item
+        )
+      );
       setEditDialogOpen(false);
     } catch (error) {
       console.error("Error editing feedback:", error);
@@ -134,6 +146,7 @@ const ClientFeedback = () => {
       // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/clientfeedback/${_id}`);
       console.log("Feedback deleted with _id:", _id);
+      setFeedback(feedback.filter((item) => item._id !== _id));
     } catch (error) {
       console.error("Error deleting feedback:", error);
     }
@@ -232,14 +245,18 @@ const ClientFeedback = () => {
                 {feedback.map((feedBackItem, index) => (
                   <TableRow key={index}>
                     <TableCell>{feedBackItem.feedbackType}</TableCell>
-                    <TableCell>{feedBackItem.dateReceived}</TableCell>
+                    <TableCell>
+                      {feedBackItem.dateReceived.split("T")[0]}
+                    </TableCell>
                     <TableCell>{feedBackItem.detailedFeedback}</TableCell>
                     <TableCell>{feedBackItem.actionTaken}</TableCell>
-                    <TableCell>{feedBackItem.closureDate}</TableCell>
+                    <TableCell>
+                      {feedBackItem.closureDate.split("T")[0]}
+                    </TableCell>
                     <TableCell>
                       <Button
                         color="primary"
-                        onClick={() => handleEdit(feedBackItem._id)}
+                        onClick={() => handleEdit(feedBackItem)}
                       >
                         Edit
                       </Button>
@@ -255,26 +272,12 @@ const ClientFeedback = () => {
                         <label>FeedBack Type</label>
                         <TextField
                           id="feedbackType"
-                          label="Feedback Type"
+                          name="feedbackType"
                           value={editFormData.feedbackType}
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              feedbackType: e.target.value,
-                            })
-                          }
-                          fullWidth
-                          sx={{ mb: 2 }}
-                        />
-                        <label>Date Recieved</label>
-                        <TextField
-                          id="dateReceived"
-                          type="date"
-                          value={editFormData.dateReceived}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData,
-                              dateReceived: e.target.value,
+                              feedbackType: e.target.value, // Corrected field name
                             })
                           }
                           fullWidth
@@ -290,6 +293,24 @@ const ClientFeedback = () => {
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
+                              detailedFeedback: e.target.value, // Corrected field name
+                            })
+                          }
+                          fullWidth
+                          sx={{ mb: 2 }}
+                        />
+                        <label>Date Recieved</label>
+                        <TextField
+                          id="dateReceived"
+                          type="date"
+                          value={
+                            editFormData.dateReceived
+                              ? editFormData.dateReceived.split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
                               dateReceived: e.target.value,
                             })
                           }
@@ -299,33 +320,37 @@ const ClientFeedback = () => {
                         <label>Action Taken</label>
                         <TextField
                           id="actionTaken"
-                          label="actionTaken"
                           multiline
                           rows={4}
-                          value={editFormData.dateReceived}
+                          value={editFormData.actionTaken}
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              actionTaken: e.target.value,
+                              actionTaken: e.target.value, // Corrected field name
                             })
                           }
                           fullWidth
                           sx={{ mb: 2 }}
                         />
-                        <label>Closure</label>
+                        <label>Closure Date</label>
                         <TextField
-                          id="closure"
+                          id="closureDate" // Corrected field id
                           type="date"
-                          value={editFormData.closure}
+                          value={
+                            editFormData.closureDate
+                              ? editFormData.closureDate.split("T")[0]
+                              : ""
+                          }
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              dateReceived: e.target.value,
+                              closureDate: e.target.value, // Corrected field name
                             })
                           }
                           fullWidth
                           sx={{ mb: 2 }}
                         />
+
                         {/* Add other fields as needed */}
                       </DialogContent>
                       <DialogActions>
