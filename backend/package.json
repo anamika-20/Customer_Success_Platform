@@ -24,6 +24,7 @@
     "nodemon": "^3.1.0",
     "passport": "^0.7.0",
     "passport-auth0": "^1.4.4",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "react-router-redux": "^4.0.8"
   }
 }

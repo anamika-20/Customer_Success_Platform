@@ -156,6 +156,7 @@ const ClientFeedback = () => {
     <Layout>
       {/* Form */}
       <Grid item xs={12}>
+      <h2>Client Feedback</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>

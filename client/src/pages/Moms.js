@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
@@ -92,11 +93,17 @@ const Moms = () => {
 
   const handleDelete = async (_id) => {
     try {
+      if (!_id) {
+        console.error("MoM _id is undefined or null");
+        return;
+      }
+
+      // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/moms/${_id}`);
       setMoms(moms.filter((mom) => mom._id !== _id));
-      console.log("MoM deleted with _id:", _id);
+      console.log("Feedback deleted with _id:", _id);
     } catch (error) {
-      console.error("Error deleting MoM:", error);
+      console.error("Error deleting feedback:", error);
     }
   };
 
@@ -115,6 +122,7 @@ const Moms = () => {
   return (
     <Layout>
       <Grid item xs={12}>
+      <h2>Minutes of Meeting</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="date">Date</InputLabel>

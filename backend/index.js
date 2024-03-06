@@ -11,7 +11,7 @@ import resourcesRouter from "../backend/routes/resourcesRouter.js";
 import projectUpdatesRouter from "../backend/routes/projectUpdatesRouter.js";
 import approvedTeamsRouter from "../backend/routes/approvedTeamsRouter.js";
 import userRouter from "../backend/routes/userRoutes.js";
-import checkAdmin from "./middlewares/client-admin.js";
+import checkAdmin from "./middlewares/check-admin.js";
 // import { findOne, create, find } from "../models/userModel";
 
 dotenv.config();
@@ -53,6 +53,7 @@ const config = {
   secret: "zaaFDXNprscd0Gnq7YAUjCA-WY6qIPe7S_Fa5ItrQgQsP-z1deSHHbl94jqmr_jW",
 };
 
+
 // The `auth` router attaches /login, /logout
 // and /callback routes to the baseURL
 app.use(auth(config));
@@ -76,21 +77,21 @@ app.use("/api", projectUpdatesRouter);
 app.use("/api", approvedTeamsRouter);
 app.use("/user", userRouter);
 
-app.get("/user-info", async (req, res) => {
-  try {
-    res.json({ data: req.oidc.user });
-    return;
-    if (req.oidc.isAuthenticated()) {
-      const { email } = req.oidc.user;
-      const user = await User.findOne({ email });
-      return res.json({ data: user, status: "loggedin" });
-    } else {
-      return res.json({ status: "loggedout" });
-    }
-  } catch (error) {
-    return res.send(error);
-  }
-});
+// app.get("/user-info", async (req, res) => {
+//   try {
+//     res.json({ data: req.oidc.user });
+//     return;
+//     if (req.oidc.isAuthenticated()) {
+//       const { email } = req.oidc.user;
+//       const user = await User.findOne({ email });
+//       return res.json({ data: user, status: "loggedin" });
+//     } else {
+//       return res.json({ status: "loggedout" });
+//     }
+//   } catch (error) {
+//     return res.send(error);
+//   }
+// });
 // req.oidc.isAuthenticated is provided from the auth router
 app.get("/to-home", async (req, res) => {
   return res.redirect("http://localhost:3000/");

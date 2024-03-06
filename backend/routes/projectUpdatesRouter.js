@@ -1,6 +1,5 @@
 import express from "express";
 import ProjectUpdatesController from "../controllers/projectUpdates.js";
-import checkAdmin from "../middlewares/client-admin.js";
 
 const router = express.Router();
 

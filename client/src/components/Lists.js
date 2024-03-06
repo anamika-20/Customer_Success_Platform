@@ -42,7 +42,7 @@ const Lists = () => {
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
-      <ListItemText primary="Resources CRUD (Manager)" />
+      <ListItemText primary="Resources" />
     </ListItemButton>
 
     <ListItemButton onClick={() => navigate('/clientfeedback')}>
