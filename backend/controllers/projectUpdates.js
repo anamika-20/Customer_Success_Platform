@@ -63,8 +63,6 @@ export const deleteProjectUpdates = async (req, res) => {
     if (!update) {
       return res.status(404).json({ message: "ProjectUpdates not found" });
     }
-
-    // Delete the document using deleteOne method
     await ProjectUpdates.deleteOne({ _id: req.params.id });
 
     return res.json({ message: "Deleted ProjectUpdates" });

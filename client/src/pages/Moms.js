@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
@@ -98,7 +97,6 @@ const Moms = () => {
         return;
       }
 
-      // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/moms/${_id}`);
       setMoms(moms.filter((mom) => mom._id !== _id));
       console.log("Feedback deleted with _id:", _id);
@@ -122,7 +120,7 @@ const Moms = () => {
   return (
     <Layout>
       <Grid item xs={12}>
-      <h2>Minutes of Meeting</h2>
+        <h2>Minutes of Meeting</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="date">Date</InputLabel>

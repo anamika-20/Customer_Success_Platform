@@ -69,7 +69,6 @@ export const deleteMoms = async (req, res) => {
       return res.status(404).json({ message: "Moms not found" });
     }
 
-    // Delete the document using deleteOne method
     await Moms.deleteOne({ _id: req.params.id });
 
     return res.json({ message: "Deleted Moms" });

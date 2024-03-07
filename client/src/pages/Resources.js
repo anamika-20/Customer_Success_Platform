@@ -120,7 +120,7 @@ const Resources = () => {
     <Layout>
       {/* Form */}
       <Grid item xs={12}>
-      <h2>Resources</h2>
+        <h2>Resources</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="resourceName">Resource Name</InputLabel>
@@ -179,7 +179,6 @@ const Resources = () => {
         </Paper>
       </Grid>
 
-      {/* Table */}
       <Grid item xs={12}>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
           <Table>
@@ -236,7 +235,6 @@ const Resources = () => {
         </TableContainer>
       </Grid>
 
-      {/* Edit Dialog */}
       <Dialog
         open={editDialogOpen}
         onClose={handleCloseEditDialog}

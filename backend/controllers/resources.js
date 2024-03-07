@@ -75,7 +75,6 @@ export const deleteResources = async (req, res) => {
       return res.status(404).json({ message: "resources not found" });
     }
 
-    // Delete the document using deleteOne method
     await Resources.deleteOne({ _id: req.params.id });
 
     return res.json({ message: "Deleted resources" });

@@ -35,6 +35,7 @@ export const createClientFeedback = async (req, res) => {
   }
 };
 
+//update
 export const updateClientFeedback = async (req, res) => {
   try {
     const feedback = await ClientFeedback.findById(req.params.id);
@@ -72,7 +73,6 @@ export const deleteClientFeedback = async (req, res) => {
       return res.status(404).json({ message: "Client feedback not found" });
     }
 
-    // Delete the document using deleteOne method
     await ClientFeedback.deleteOne({ _id: req.params.id });
 
     return res.json({ message: "Deleted client feedback" });

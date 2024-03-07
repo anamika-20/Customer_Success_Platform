@@ -5,7 +5,6 @@ const teamResourceSchema = new mongoose.Schema({
   role: String,
   availability: String,
   duration: Number,
-  //id
 });
 
 const approvedTeamsSchema = new mongoose.Schema({
@@ -16,5 +15,3 @@ const approvedTeamsSchema = new mongoose.Schema({
 const ApprovedTeams = mongoose.model("ApprovedTeams", approvedTeamsSchema);
 
 export default ApprovedTeams;
-
-

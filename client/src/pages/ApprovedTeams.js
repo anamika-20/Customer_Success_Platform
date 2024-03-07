@@ -15,19 +15,24 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ApprovedTeams = () => {
   const [teams, setTeams] = useState([]);
-  const [phaseNumber, setPhaseNumber] = useState('');
-  const [tableData, setTableData] = useState([{ numberOfResources: '', role: '', availability: '', duration: '' }]);
+  const [phaseNumber, setPhaseNumber] = useState("");
+  const [tableData, setTableData] = useState([
+    { numberOfResources: "", role: "", availability: "", duration: "" },
+  ]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editedTeam, setEditedTeam] = useState(null); // State to store the edited team data
-  const [errorMessage, setErrorMessage] = useState('');
+  const [editedTeam, setEditedTeam] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddRow = () => {
-    setTableData([...tableData, { numberOfResources: '', role: '', availability: '', duration: '' }]);
+    setTableData([
+      ...tableData,
+      { numberOfResources: "", role: "", availability: "", duration: "" },
+    ]);
   };
 
   const handleInputChange = (index, event) => {
@@ -46,48 +51,53 @@ const ApprovedTeams = () => {
 
   const handleSave = () => {
     for (const row of tableData) {
-      if (!row.numberOfResources || !row.role || !row.availability || !row.duration) {
-        setErrorMessage('Please fill in all fields.');
+      if (
+        !row.numberOfResources ||
+        !row.role ||
+        !row.availability ||
+        !row.duration
+      ) {
+        setErrorMessage("Please fill in all fields.");
         return;
       }
     }
 
-    const teamResources = tableData.map(row => ({
+    const teamResources = tableData.map((row) => ({
       numberOfResources: row.numberOfResources,
       role: row.role,
       availability: row.availability,
-      duration: row.duration
+      duration: row.duration,
     }));
 
     if (editedTeam) {
-      // If team is being edited, send PATCH request
-      axios.patch(`http://localhost:8080/api/approvedteams/${editedTeam._id}`, {
-        PhaseNumber: phaseNumber,
-        teamResources: teamResources
-      })
-      .then(response => {
-        console.log('Team updated successfully:', response.data);
-        setOpenDialog(false); // Close the dialog upon successful save
-        setEditedTeam(null);
-        fetchTeams(); // Fetch teams again to update the list
-      })
-      .catch(error => {
-        console.error('Failed to update team:', error);
-      });
+      axios
+        .patch(`http://localhost:8080/api/approvedteams/${editedTeam._id}`, {
+          PhaseNumber: phaseNumber,
+          teamResources: teamResources,
+        })
+        .then((response) => {
+          console.log("Team updated successfully:", response.data);
+          setOpenDialog(false);
+          setEditedTeam(null);
+          fetchTeams();
+        })
+        .catch((error) => {
+          console.error("Failed to update team:", error);
+        });
     } else {
-      // If no team is being edited, send POST request
-      axios.post("http://localhost:8080/api/approvedteams", {
-        PhaseNumber: phaseNumber,
-        teamResources: teamResources
-      })
-      .then(response => {
-        console.log('Team saved successfully:', response.data);
-        setOpenDialog(false); // Close the dialog upon successful save
-        fetchTeams(); // Fetch teams again to update the list
-      })
-      .catch(error => {
-        console.error('Failed to save team:', error);
-      });
+      axios
+        .post("http://localhost:8080/api/approvedteams", {
+          PhaseNumber: phaseNumber,
+          teamResources: teamResources,
+        })
+        .then((response) => {
+          console.log("Team saved successfully:", response.data);
+          setOpenDialog(false);
+          fetchTeams();
+        })
+        .catch((error) => {
+          console.error("Failed to save team:", error);
+        });
     }
   };
 
@@ -108,9 +118,11 @@ const ApprovedTeams = () => {
 
   const fetchTeams = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/approvedteams");
+      const response = await axios.get(
+        "http://localhost:8080/api/approvedteams"
+      );
       setTeams(response.data);
-      console.log(response.data)
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching teams:", error);
     }
@@ -123,9 +135,11 @@ const ApprovedTeams = () => {
   return (
     <Layout>
       <Grid item container>
-        <Grid item xs={10} sx={{marginLeft : 5}} >
-        <h2>Approved Teams</h2>
-          <Button variant="contained" onClick={() => setOpenDialog(true)}>Add Phase Data</Button>
+        <Grid item xs={10} sx={{ marginLeft: 5 }}>
+          <h2>Approved Teams</h2>
+          <Button variant="contained" onClick={() => setOpenDialog(true)}>
+            Add Phase Data
+          </Button>
           <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
             <DialogTitle>Enter Table Data</DialogTitle>
             <DialogContent>
@@ -194,28 +208,33 @@ const ApprovedTeams = () => {
                   ))}
                 </TableBody>
               </Table>
-              {errorMessage && (
-                <p style={{ color: 'red' }}>{errorMessage}</p>
-              )}
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </DialogContent>
             <DialogActions>
-              <Button variant="contained" onClick={handleAddRow}>Add Row</Button>
-              <Button variant="contained" onClick={handleSave}>Save</Button>
+              <Button variant="contained" onClick={handleAddRow}>
+                Add Row
+              </Button>
+              <Button variant="contained" onClick={handleSave}>
+                Save
+              </Button>
             </DialogActions>
           </Dialog>
-          
-          <Grid item xs={10} sx={{marginLeft : 5}} >
+
+          <Grid item xs={10} sx={{ marginLeft: 5 }}>
             <div style={{ borderTop: "1px solid #ccc", paddingTop: "20px" }}>
               {teams.map((team, index) => (
                 <div key={index}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
                     <h2>Phase Number: {team.PhaseNumber}</h2>
                     <Button onClick={() => handleEdit(team)}>
-                      <EditIcon style={{ marginLeft: '10px' }} />
+                      <EditIcon style={{ marginLeft: "10px" }} />
                     </Button>
                     <Button>
-                      <DeleteIcon style={{ marginLeft: '10px' }}  color="error"
-                             onClick={() => handleDelete(team._id)}/>
+                      <DeleteIcon
+                        style={{ marginLeft: "10px" }}
+                        color="error"
+                        onClick={() => handleDelete(team._id)}
+                      />
                     </Button>
                   </div>
                   <Table>

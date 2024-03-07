@@ -1,36 +1,27 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
-import { Grid, Paper, TextField, Button, InputLabel } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import { Grid, Paper, TextField, Button, InputLabel } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ProjectUpdates = () => {
   const [updates, setUpdates] = useState([]);
   const [formData, setFormData] = useState({
-    date: '',
-    generalUpdates: ''
+    date: "",
+    generalUpdates: "",
   });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setFeedback([...feedback, formData]);
-    // setFormData({
-    //   feedbackType: "",
-    //   dateReceived: "",
-    //   detailedFeedback: "",
-    //   actionTaken: "",
-    //   closureDate: "",
-    // });
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/projectupdates",
@@ -38,27 +29,27 @@ const ProjectUpdates = () => {
       );
       setUpdates([...updates, response.data]);
       console.log("Updates submitted:", response.data);
-      // Optionally, you can reset the form after successful submission
+
       setFormData({
-      date: '',
-      generalUpdates: ''
+        date: "",
+        generalUpdates: "",
       });
     } catch (error) {
       console.error("Error submitting Updates:", error);
     }
   };
 
-   // Function to fetch all ProjectUpdates
-   const fetchProjectUpdates = async () => {
+  const fetchProjectUpdates = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/projectupdates"); // Make a GET request to fetch all moms
-      setUpdates(response.data); // Update state with the fetched moms
+      const response = await axios.get(
+        "http://localhost:8080/api/projectupdates"
+      );
+      setUpdates(response.data);
     } catch (error) {
       console.error("Error fetching Updates:", error);
     }
   };
 
-  // Fetch ProjectUpdates when the component mounts
   useEffect(() => {
     fetchProjectUpdates();
   }, []);
@@ -83,7 +74,7 @@ const ProjectUpdates = () => {
     <Layout>
       {/* Form */}
       <Grid item xs={12}>
-      <h2>Project Updates</h2>
+        <h2>Project Updates</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="date">Date</InputLabel>
@@ -107,7 +98,9 @@ const ProjectUpdates = () => {
               fullWidth
               sx={{ mb: 2 }}
             />
-            <Button variant="contained" type="submit">Submit</Button>
+            <Button variant="contained" type="submit">
+              Submit
+            </Button>
           </form>
         </Paper>
       </Grid>
@@ -118,15 +111,18 @@ const ProjectUpdates = () => {
           <h2>Older Updates</h2>
           {updates.map((update, index) => (
             <div key={index}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <h3>Date: {update.date}</h3>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <h3>Date: {update.date.split("T")[0]}</h3>
                 <Button>
-                <EditIcon style={{ marginLeft: '10px' }} />
+                  <EditIcon style={{ marginLeft: "10px" }} />
                 </Button>
                 <Button>
-                <DeleteIcon style={{ marginLeft: '10px' }}  color="error"
-                        onClick={() => handleDelete(update._id)} />
-                        </Button>
+                  <DeleteIcon
+                    style={{ marginLeft: "10px" }}
+                    color="error"
+                    onClick={() => handleDelete(update._id)}
+                  />
+                </Button>
               </div>
               <p>General Updates: {update.generalUpdates}</p>
             </div>
@@ -134,8 +130,6 @@ const ProjectUpdates = () => {
           {updates.length === 0 && <p>No updates yet.</p>}
         </Paper>
       </Grid>
-
-
     </Layout>
   );
 };

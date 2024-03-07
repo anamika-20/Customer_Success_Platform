@@ -1,12 +1,7 @@
-import React from 'react';
-import Layout from '../Layout';
-import Chart from '../components/Chart';
-import Orders from '../components/Orders';
-import { Grid, Paper } from '@mui/material';
-import axios from 'axios';
+import React from "react";
+import Layout from "../Layout";
 
 const Dashboard = () => {
-  
   // axios.get('http://localhost:8080/user/user-info')
   // .then(response => {
   //   const data = response.data;
@@ -20,26 +15,9 @@ const Dashboard = () => {
   //   console.error('Error fetching user role:', error);
   // });
 
-
   return (
     <Layout>
-      {/* <Grid item xs={12} md={8} lg={12}>
-        <Paper
-          sx={{
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            height: 240,
-          }}
-        >
-          <Chart />
-        </Paper>
-      </Grid>
-      <Grid item xs={12}>
-        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-          <Orders />
-        </Paper>
-      </Grid> */}
+      <div>Dashboard</div>
     </Layout>
   );
 };

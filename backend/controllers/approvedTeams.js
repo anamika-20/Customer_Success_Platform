@@ -1,5 +1,5 @@
 import ApprovedTeams from "../Schemas/ApprovedTeams.js";
-import { push as RouterPush } from 'react-router-redux';
+// import { push as RouterPush } from 'react-router-redux';
 
 // Get all teams
 export const getAllTeams = async (req, res) => {
@@ -36,7 +36,6 @@ export const createTeam = async (req, res) => {
   }
 };
 
-
 // Update an existing team
 export const updateTeam = async (req, res) => {
   try {
@@ -71,12 +70,10 @@ export const deleteTeam = async (req, res) => {
   }
 };
 
-  
-
 export default {
   getAllTeams,
   getTeamById,
   createTeam,
   updateTeam,
-  deleteTeam
+  deleteTeam,
 };

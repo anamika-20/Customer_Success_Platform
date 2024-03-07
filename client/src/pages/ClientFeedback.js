@@ -38,21 +38,13 @@ const ClientFeedback = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setFeedback([...feedback, formData]);
-    // setFormData({
-    //   feedbackType: "",
-    //   dateReceived: "",
-    //   detailedFeedback: "",
-    //   actionTaken: "",
-    //   closureDate: "",
-    // });
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/clientfeedback",
         formData
       );
       console.log("Feedback submitted:", response.data);
-      // Optionally, you can reset the form after successful submission
       setFormData({
         feedbackType: "",
         dateReceived: "",
@@ -65,8 +57,6 @@ const ClientFeedback = () => {
       console.error("Error submitting feedback:", error);
     }
   };
-
-  // const [feedback, setFeedback] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,17 +99,8 @@ const ClientFeedback = () => {
     setEditDialogOpen(false);
   };
 
-  // const handleEdit = async (_id) => {
-  //   try {
-  //     // Implement your PATCH request logic here
-  //     console.log("Edit button clicked for feedback with _id:", _id);
-  //   } catch (error) {
-  //     console.error("Error editing feedback:", error);
-  //   }
-  // };
   const handleSaveEdit = async () => {
     try {
-      // Send PATCH request to update the feedback item on the server
       await axios.patch(
         `http://localhost:8080/api/clientfeedback/${editFormData._id}`,
         editFormData
@@ -143,7 +124,6 @@ const ClientFeedback = () => {
         return;
       }
 
-      // Implement your DELETE request logic here
       await axios.delete(`http://localhost:8080/api/clientfeedback/${_id}`);
       console.log("Feedback deleted with _id:", _id);
       setFeedback(feedback.filter((item) => item._id !== _id));
@@ -156,7 +136,7 @@ const ClientFeedback = () => {
     <Layout>
       {/* Form */}
       <Grid item xs={12}>
-      <h2>Client Feedback</h2>
+        <h2>Client Feedback</h2>
         <Paper sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
             <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
@@ -278,7 +258,7 @@ const ClientFeedback = () => {
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              feedbackType: e.target.value, // Corrected field name
+                              feedbackType: e.target.value,
                             })
                           }
                           fullWidth
@@ -294,7 +274,7 @@ const ClientFeedback = () => {
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              detailedFeedback: e.target.value, // Corrected field name
+                              detailedFeedback: e.target.value,
                             })
                           }
                           fullWidth
@@ -327,7 +307,7 @@ const ClientFeedback = () => {
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              actionTaken: e.target.value, // Corrected field name
+                              actionTaken: e.target.value,
                             })
                           }
                           fullWidth
@@ -335,7 +315,7 @@ const ClientFeedback = () => {
                         />
                         <label>Closure Date</label>
                         <TextField
-                          id="closureDate" // Corrected field id
+                          id="closureDate"
                           type="date"
                           value={
                             editFormData.closureDate
@@ -345,14 +325,12 @@ const ClientFeedback = () => {
                           onChange={(e) =>
                             setEditFormData({
                               ...editFormData,
-                              closureDate: e.target.value, // Corrected field name
+                              closureDate: e.target.value,
                             })
                           }
                           fullWidth
                           sx={{ mb: 2 }}
                         />
-
-                        {/* Add other fields as needed */}
                       </DialogContent>
                       <DialogActions>
                         <Button onClick={handleCloseEditDialog}>Cancel</Button>
