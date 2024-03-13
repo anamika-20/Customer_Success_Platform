@@ -7,6 +7,8 @@ import ClientFeedback from "./pages/ClientFeedback";
 import Moms from "./pages/Moms";
 import ProjectUpdates from "./pages/ProjectUpdates";
 import Login from "./components/Login";
+import ProjectDetails from "./pages/ProjectDetails";
+
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/project" element={<ProjectDetails />} />
         <Route path="/approvedteams" element={<ApprovedTeams />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/clientfeedback" element={<ClientFeedback />} />

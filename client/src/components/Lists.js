@@ -24,6 +24,14 @@ const Lists = () => {
       <ListItemText primary="Dashboard" />
     </ListItemButton>
 
+    
+    <ListItemButton onClick={() => navigate('/project')}>
+      <ListItemIcon>
+        <SystemSecurityUpdateGoodIcon />
+      </ListItemIcon>
+      <ListItemText primary="Project" />
+    </ListItemButton>
+
     <ListItemButton onClick={() => navigate('/projectupdates')}>
       <ListItemIcon>
         <SystemSecurityUpdateGoodIcon />
