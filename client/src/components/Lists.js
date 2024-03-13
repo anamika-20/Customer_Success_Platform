@@ -43,6 +43,20 @@ const Lists = () => {
         <ListItemText primary="Approved Teams" />
       </ListItemButton>
 
+      <ListItemButton onClick={() => navigate("/project")}>
+        <ListItemIcon>
+          <SystemSecurityUpdateGoodIcon />
+        </ListItemIcon>
+        <ListItemText primary="Project" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/projectupdates")}>
+        <ListItemIcon>
+          <SystemSecurityUpdateGoodIcon />
+        </ListItemIcon>
+        <ListItemText primary="Project Updates" />
+      </ListItemButton>
+
       <ListItemButton onClick={() => navigate("/resources")}>
         <ListItemIcon>
           <PeopleIcon />

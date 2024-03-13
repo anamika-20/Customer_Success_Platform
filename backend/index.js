@@ -10,6 +10,7 @@ import momsRouter from "../backend/routes/momsRouter.js";
 import resourcesRouter from "../backend/routes/resourcesRouter.js";
 import projectUpdatesRouter from "../backend/routes/projectUpdatesRouter.js";
 import approvedTeamsRouter from "../backend/routes/approvedTeamsRouter.js";
+import projectRoutes from "../backend/routes/projectRoutes.js";
 import userRouter from "../backend/routes/userRoutes.js";
 
 dotenv.config();
@@ -64,6 +65,7 @@ app.use("/api", momsRouter);
 app.use("/api", resourcesRouter);
 app.use("/api", projectUpdatesRouter);
 app.use("/api", approvedTeamsRouter);
+app.use("/api", projectRoutes);
 app.use("/user", userRouter);
 
 app.get("/", async (req, res) => {

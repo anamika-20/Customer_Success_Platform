@@ -1,4 +1,4 @@
-import ClientFeedback from "../Schemas/ClientFeedback.js";
+import ClientFeedback from "../schemas/ClientFeedback.js";
 
 // Get all client feedback
 export const getAllClientFeedback = async (req, res) => {

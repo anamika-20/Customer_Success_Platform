@@ -1,4 +1,4 @@
-import User from "../Schemas/User.js";
+// import User from "../schemas/User.js";
 
 export default async function checkAdmin(req, res, next) {
   // try {

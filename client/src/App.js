@@ -10,6 +10,7 @@ import AddUser from "./pages/AddUser";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { Button, Toolbar, Typography } from "@mui/material";
+import ProjectDetails from "./pages/ProjectDetails";
 
 function App() {
   const { user, isAuthenticated, isLoading, loginWithRedirect, logout } =
@@ -36,6 +37,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/adduser" element={<AddUser />} />
+        <Route path="/project" element={<ProjectDetails />} />
         <Route path="/approvedteams" element={<ApprovedTeams />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/clientfeedback" element={<ClientFeedback />} />
