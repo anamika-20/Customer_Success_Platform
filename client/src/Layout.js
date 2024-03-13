@@ -17,8 +17,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Lists from "./components/Lists";
-import { Button } from "@mui/material";
+import { Avatar, Button, StyledBadge, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const drawerWidth = 240;
 
@@ -69,20 +70,7 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme();
 
 const Layout = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      console.log({ document });
-      console.log(document.cookies);
-      const appSessionCookie = document.cookie
-        .split(";")
-        .find((cookie) => cookie.trim().startsWith("appSession="));
-      setIsLoggedIn(!!appSessionCookie);
-    };
-
-    checkLoginStatus();
-  }, []);
+  const { user, logout } = useAuth0();
   const [open, setOpen] = useState(true);
 
   const toggleDrawer = () => {
@@ -129,27 +117,28 @@ const Layout = ({ children }) => {
             >
               Dashboard
             </Typography>
-            {isLoggedIn ? (
+            <Toolbar
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: [2],
+              }}
+            >
+              <Tooltip title={user?.email}>
+                <Avatar alt={user?.email} src={user?.picture}>
+                  {user?.email[0]}
+                </Avatar>
+              </Tooltip>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => {
-                  window.location.href = "http://localhost:8080/logout";
-                }}
+                onClick={() =>
+                  logout({ logoutParams: { returnTo: window.location.origin } })
+                }
               >
                 Logout
               </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  window.location.href = "http://localhost:8080/login";
-                }}
-              >
-                Login
-              </Button>
-            )}
+            </Toolbar>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
