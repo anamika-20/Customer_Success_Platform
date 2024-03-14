@@ -12,6 +12,7 @@ import projectUpdatesRouter from "../backend/routes/projectUpdatesRouter.js";
 import approvedTeamsRouter from "../backend/routes/approvedTeamsRouter.js";
 import projectRoutes from "../backend/routes/projectRoutes.js";
 import userRouter from "../backend/routes/userRoutes.js";
+import downloadFeature from "../backend/controllers/downloadFeature.js"
 
 dotenv.config();
 connectDB();
@@ -59,6 +60,11 @@ app.use(cors());
 //   res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, OPTIONS, GET");
 //   next();
 // });
+
+//route
+// DOWNLOAD ALL CONTENT
+app.get("/download-pdf/:project_id", downloadFeature);
+
 // Routes
 app.use("/api", clientFeedbackRouter);
 app.use("/api", momsRouter);

@@ -38,6 +38,10 @@ const ProjectSchema = new mongoose.Schema({
   approvedTeams: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ApprovedTeams'
+  }],
+  moms: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MoM'
   }]
 },
 { timestamps: true });

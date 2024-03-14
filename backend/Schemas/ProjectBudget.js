@@ -1,19 +1,15 @@
 import mongoose from "mongoose";
 
-const momSchema = new mongoose.Schema({
-  date: {
-    type: Date,
+const BudgetSchema = new mongoose.Schema({
+  projectType: {
+    type: String,
     required: true
   },
   duration: {
     type: String,
     required: true
   },
-  momLink: {
-    type: String,
-    required: true
-  },
-  comments: {
+  budgetedHours: {
     type: String,
     required: true
   },
@@ -24,6 +20,6 @@ const momSchema = new mongoose.Schema({
   }},
   { timestamps: true });
 
-const MoM = mongoose.model("MoM", momSchema);
+const ProjectBudget = mongoose.model("ProjectBudget", BudgetSchema);
 
-export default MoM;
+export default ProjectBudget;
