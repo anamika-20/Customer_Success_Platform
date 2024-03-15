@@ -1,4 +1,4 @@
-import Resources from "../schemas/Resources.js";
+import Resources from "../Schemas/Resources.js";
 
 // Get all resources
 export const getAllResources = async (req, res) => {

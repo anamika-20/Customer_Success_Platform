@@ -29,6 +29,13 @@ const Lists = () => {
         <ListItemText primary="AddUser" />
       </ListItemButton>
 
+      <ListItemButton onClick={() => navigate("/project")}>
+        <ListItemIcon>
+          <SystemSecurityUpdateGoodIcon />
+        </ListItemIcon>
+        <ListItemText primary="Project" />
+      </ListItemButton>
+
       <ListItemButton onClick={() => navigate("/projectupdates")}>
         <ListItemIcon>
           <SystemSecurityUpdateGoodIcon />
@@ -41,13 +48,6 @@ const Lists = () => {
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Approved Teams" />
-      </ListItemButton>
-
-      <ListItemButton onClick={() => navigate("/project")}>
-        <ListItemIcon>
-          <SystemSecurityUpdateGoodIcon />
-        </ListItemIcon>
-        <ListItemText primary="Project" />
       </ListItemButton>
 
       <ListItemButton onClick={() => navigate("/projectupdates")}>
@@ -77,6 +77,64 @@ const Lists = () => {
         </ListItemIcon>
         <ListItemText primary="Minutes of Meetings" />
       </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Audit History" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Version History" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Project Budget" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Sprint Detail" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Risk Profiling" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Escalation Matrices" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Phases" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/approvedteams")}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="StakeHolders" />
+      </ListItemButton>
+
+
     </>
   );
 };
