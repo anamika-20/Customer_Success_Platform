@@ -11,6 +11,15 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { Button, Toolbar, Typography } from "@mui/material";
 import ProjectDetails from "./pages/ProjectDetails";
+import AuditHistory from "./components/AuditHistory.js";
+import VersionHistory from "./components/VersionHistory.js"
+import ProjectBudget from "./components/ProjectBudget.js"
+import SprintDetail from "./components/SprintDetail"
+import Risk from "./components/Risk"
+import Escalation from "./components/Escalation"
+import Phases from "./components/Phases"
+import StakeHolders from "./components/StakeHolders"
+
 
 function App() {
   const { user, isAuthenticated, isLoading, loginWithRedirect, logout } =
@@ -43,6 +52,14 @@ function App() {
         <Route path="/clientfeedback" element={<ClientFeedback />} />
         <Route path="/moms" element={<Moms />} />
         <Route path="/projectupdates" element={<ProjectUpdates />} />
+        <Route path="/audithistory" element={<AuditHistory />} />
+        <Route path="/versionhistory" element={<VersionHistory />} />
+        <Route path="/projectbudget" element={<ProjectBudget />} />
+        <Route path="/sprintdetail" element={<SprintDetail />} />
+        <Route path="/risk" element={<Risk />} />
+        <Route path="/escalationmatrices" element={<Escalation />} />
+        <Route path="/phases" element={<Phases />} />
+        <Route path="/stakeholders" element={<StakeHolders />} />
       </Routes>
     </Router>
   ) : (

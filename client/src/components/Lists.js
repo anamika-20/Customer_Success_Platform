@@ -78,56 +78,56 @@ const Lists = () => {
         <ListItemText primary="Minutes of Meetings" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/audithistory")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Audit History" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/versionhistory")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Version History" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/projectbudget")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Project Budget" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/sprintdetail")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Sprint Detail" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/risk")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Risk Profiling" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/escalationmatrices")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Escalation Matrices" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/phases")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="Phases" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/approvedteams")}>
+      <ListItemButton onClick={() => navigate("/stakeholders")}>
         <ListItemIcon>
           <GroupsIcon />
         </ListItemIcon>
