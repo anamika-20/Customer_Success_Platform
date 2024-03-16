@@ -64,6 +64,19 @@ const ProjectDetails = () => {
           <Grid item xs={12}>
             <TextField
               fullWidth
+              id="project_scope"
+              name="project_scope"
+              label="Project Scope"
+              value={formData.project_desc}
+              onChange={handleChange}
+              variant="outlined"
+              multiline
+              rows={2}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
               id="project_manager"
               name="project_manager"
               label="Project Manager"

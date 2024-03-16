@@ -1,19 +1,27 @@
 import mongoose from "mongoose";
 
-const momSchema = new mongoose.Schema({
+const AuditHistorySchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true
   },
-  duration: {
+  reviewedBy: {
     type: String,
     required: true
   },
-  momLink: {
+  status : {
     type: String,
     required: true
   },
-  comments: {
+  reviewedSection : {
+    type: String,
+    required: true
+  },
+  comments : {
+    type: String,
+    required: true
+  },
+  actionItem : {
     type: String,
     required: true
   },
@@ -24,6 +32,6 @@ const momSchema = new mongoose.Schema({
   }},
   { timestamps: true });
 
-const MoM = mongoose.model("MoM", momSchema);
+const AuditHistory = mongoose.model("AuditHistory", AuditHistorySchema);
 
-export default MoM;
+export default AuditHistory;

@@ -13,6 +13,11 @@ const ProjectSchema = new mongoose.Schema({
       type: String,
       required: true
   },
+  techstack: {
+    type: String,
+    enum: ['Backend', 'Frontend', 'Mobile App', 'Database', 'Infrastructure and Services'],
+    required: true
+  },
   projectManager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -38,85 +43,72 @@ const ProjectSchema = new mongoose.Schema({
   approvedTeams: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ApprovedTeams'
-  }]
+  }],
+  moms: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MoM'
+  }],
+project_budget: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ProjectBudget",
+    },
+],
+risk_profiling: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RiskProfiling",
+    },
+],
+project_phases: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Phases",
+    },
+],
+sprint_detail: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SprintDetail",
+    },
+],
+stakeholders: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Stakeholders",
+    },
+],
+audit_history: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AuditHistory",
+    },
+],
+financial_matrix: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "FinancialEscalationMatrix",
+    },
+],
+operational_matrix: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OperationalEscalationMatrix",
+    },
+],
+technical_matrix: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "TechnicalEscalationMatrix",
+    },
+],
+version_history: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "VersionHistory",
+    },
+],
 },
 { timestamps: true });
-//     project_scope: {
-//       type: String,
-//       required: true,
-//     },
-//     project_stack: {
-//       type: String,
-//       required: true,
-//     },
-//     project_status: {
-//       type: String,
-//     },
-//     project_manager: {
-//       type: String,
-//     },
-//     project_budget: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "Budget",
-//       },
-//     ],
-//     project_risks: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "Risk",
-//       },
-//     ],
-//     project_phases: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "Phase",
-//       },
-//     ],
-//     project_sprints: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "Sprint",
-//       },
-//     ],
-//     project_stackholder: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "StackHolder",
-//       },
-//     ],
-//     project_audit_history: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "AuditHistory",
-//       },
-//     ],
-//     project_operational_matrix: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "OperationalMatrix",
-//       },
-//     ],
-//     project_financial_matrix: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "FinancialMatrix",
-//       },
-//     ],
-//     project_technical_matrix: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "TechnicalMatrix",
-//       },
-//     ],
-//     project_version_history: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "VersionHistory",
-//       },
-//     ],
-//   },
-//   { timestamps: true }
-// );
 const Project = mongoose.model("Project", ProjectSchema);
 export default Project;
