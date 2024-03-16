@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-
 const Dashboard = () => {
   // const getUserData = async () => {
   //   try {
@@ -27,22 +26,32 @@ const Dashboard = () => {
   // useEffect(() => {
   //   getUserData();
   // }, []);
-  const { user, isAuthenticated, isLoading } = useAuth0();
-
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } =
+    useAuth0();
   const [userRole, setUserRole] = useState("");
-  const checkUserRole = async (email) => {
-    try {
-      const response = await axios.get("http://localhost:8080/user/getRole", {
-        params: { email },
-      });
-      setUserRole(response.data.role);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
   useEffect(() => {
-    checkUserRole(user?.email);
-  }, []);
+    const checkUserRole = async (email) => {
+      try {
+        const token = await getAccessTokenSilently({
+          audience: "http://localhost:8080/",
+        });
+        console.log(token);
+        const response = await axios.get("http://localhost:8080/user/getRole", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { email },
+        });
+        setUserRole(response.data.role);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (isAuthenticated) {
+      checkUserRole(user?.email);
+    }
+  }, [getAccessTokenSilently, isAuthenticated, user]);
 
   if (isLoading) {
     return <div>Loading ...</div>;
