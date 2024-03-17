@@ -17,8 +17,11 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ApprovedTeams = () => {
+  const { user, isLoading } = useAuth0();
+  const [role, setRole] = useState(null);
   const [teams, setTeams] = useState([]);
   const [phaseNumber, setPhaseNumber] = useState("");
   const [tableData, setTableData] = useState([
@@ -131,15 +134,28 @@ const ApprovedTeams = () => {
   useEffect(() => {
     fetchTeams();
   }, []);
-
+  const getRole = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/getRole?email=${user?.email}`
+      );
+      if (response.data.role === "Does not Exists") setRole(null);
+      else setRole(response.data.role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+  if (!isLoading) getRole();
   return (
     <Layout>
       <Grid item container>
         <Grid item xs={10} sx={{ marginLeft: 5 }}>
           <h2>Approved Teams</h2>
-          <Button variant="contained" onClick={() => setOpenDialog(true)}>
-            Add Phase Data
-          </Button>
+          {(role === "projectmanager" || role === "admin") && (
+            <Button variant="contained" onClick={() => setOpenDialog(true)}>
+              Add Phase Data
+            </Button>
+          )}
           <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
             <DialogTitle>Enter Table Data</DialogTitle>
             <DialogContent>
@@ -226,16 +242,20 @@ const ApprovedTeams = () => {
                 <div key={index}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <h2>Phase Number: {team.PhaseNumber}</h2>
-                    <Button onClick={() => handleEdit(team)}>
-                      <EditIcon style={{ marginLeft: "10px" }} />
-                    </Button>
-                    <Button>
-                      <DeleteIcon
-                        style={{ marginLeft: "10px" }}
-                        color="error"
-                        onClick={() => handleDelete(team._id)}
-                      />
-                    </Button>
+                    {(role === "projectmanager" || role === "admin") && (
+                      <Button onClick={() => handleEdit(team)}>
+                        <EditIcon style={{ marginLeft: "10px" }} />
+                      </Button>
+                    )}
+                    {(role === "projectmanager" || role === "admin") && (
+                      <Button>
+                        <DeleteIcon
+                          style={{ marginLeft: "10px" }}
+                          color="error"
+                          onClick={() => handleDelete(team._id)}
+                        />
+                      </Button>
+                    )}
                   </div>
                   <Table>
                     <TableHead>

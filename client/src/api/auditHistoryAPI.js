@@ -1,8 +1,8 @@
 // api/auditHistory.js
 
-import axios from 'axios';
+import axios from "axios";
 
-const baseUrl = 'http://localhost:8080/api/auditHistory';
+const baseUrl = "http://localhost:8080/api/auditHistory";
 
 export const getAllAuditHistory = async () => {
   try {
@@ -21,7 +21,6 @@ export const getAuditHistoryById = async (id) => {
     throw new Error(`Error fetching audit history by ID: ${error.message}`);
   }
 };
-
 export const createAuditHistory = async (formData) => {
   try {
     const response = await axios.post(baseUrl, formData);

@@ -37,6 +37,17 @@ const corsOptions = {
 // // Apply middleware
 app.use(cors());
 
+// const { auth, requiresAuth } = pkg;
+// const config = {
+//   authRequired: false,
+//   auth0Logout: true,
+//   baseURL: "http://localhost:8080",
+//   clientID: "2Nhg3Eyp2oxOGJmlqSaSeS9qpmzJcQSI",
+//   issuerBaseURL: "https://dev-3esj1ci31pl5sjji.us.auth0.com",
+//   // secret: "6b25b374101d391f0ea072d7bd2d908b0f25098893ace5ddca10e2a37630d2db",
+//   secret: "zaaFDXNprscd0Gnq7YAUjCA-WY6qIPe7S_Fa5ItrQgQsP-z1deSHHbl94jqmr_jW",
+// };
+
 // DOWNLOAD ALL CONTENT
 app.get("/download-pdf/:project_id", downloadFeature);
 app.use("/user", userRouter);

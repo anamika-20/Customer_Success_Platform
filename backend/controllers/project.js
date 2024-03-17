@@ -1,4 +1,5 @@
 import Project from "../Schemas/Project.js";
+import User from "../Schemas/User.js";
 
 // Get all projects
 export const getAllProjects = async (req, res) => {
@@ -65,6 +66,19 @@ export const deleteProject = async (req, res) => {
     return res.status(500).json({ message: "Failed to delete project" });
   }
 };
+export const getProjectByUserEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.mail });
+    if (user) {
+      const projects = await Project.find({
+        $or: [{ client: user }, { projectManager: user }],
+      });
+      res.json(projects);
+    } else res.json("not a valid user");
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // Export all functions as an object
 export default {
@@ -72,5 +86,6 @@ export default {
   getProjectById,
   createProject,
   updateProject,
-  deleteProject
+  deleteProject,
+  getProjectByUserEmail,
 };

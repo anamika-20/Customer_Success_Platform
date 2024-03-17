@@ -18,8 +18,11 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Resources = () => {
+  const { user, isLoading } = useAuth0();
+  const [role, setRole] = useState(null);
   const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
     resourceName: "",
@@ -105,7 +108,18 @@ const Resources = () => {
   useEffect(() => {
     fetchResources();
   }, []);
-
+  const getRole = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/getRole?email=${user?.email}`
+      );
+      if (response.data.role === "Does not Exists") setRole(null);
+      else setRole(response.data.role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+  if (!isLoading) getRole();
   const handleDelete = async (_id) => {
     try {
       await axios.delete(`http://localhost:8080/api/resources/${_id}`);
@@ -119,65 +133,67 @@ const Resources = () => {
   return (
     <Layout>
       {/* Form */}
-      <Grid item xs={12}>
-        <h2>Resources</h2>
-        <Paper sx={{ p: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <InputLabel htmlFor="resourceName">Resource Name</InputLabel>
-            <TextField
-              id="resourceName"
-              name="resourceName"
-              value={formData.resourceName}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="role">Role</InputLabel>
-            <TextField
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="startDate">Start Date</InputLabel>
-            <TextField
-              id="startDate"
-              name="startDate"
-              type="date"
-              value={formData.startDate.split("T")[0]}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="endDate">End Date</InputLabel>
-            <TextField
-              id="endDate"
-              name="endDate"
-              type="date"
-              value={formData.endDate.split("T")[0]}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="comment">Comment</InputLabel>
-            <TextField
-              id="comment"
-              name="comment"
-              multiline
-              rows={4}
-              value={formData.comment}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Paper>
-      </Grid>
+      {(role === "projectmanager" || role === "admin") && (
+        <Grid item xs={12}>
+          <h2>Resources</h2>
+          <Paper sx={{ p: 2 }}>
+            <form onSubmit={handleSubmit}>
+              <InputLabel htmlFor="resourceName">Resource Name</InputLabel>
+              <TextField
+                id="resourceName"
+                name="resourceName"
+                value={formData.resourceName}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="role">Role</InputLabel>
+              <TextField
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="startDate">Start Date</InputLabel>
+              <TextField
+                id="startDate"
+                name="startDate"
+                type="date"
+                value={formData.startDate.split("T")[0]}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="endDate">End Date</InputLabel>
+              <TextField
+                id="endDate"
+                name="endDate"
+                type="date"
+                value={formData.endDate.split("T")[0]}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="comment">Comment</InputLabel>
+              <TextField
+                id="comment"
+                name="comment"
+                multiline
+                rows={4}
+                value={formData.comment}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+            </form>
+          </Paper>
+        </Grid>
+      )}
 
       <Grid item xs={12}>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
@@ -213,6 +229,7 @@ const Resources = () => {
                     <TableCell>{resource.comment}</TableCell>
                     <TableCell>
                       <Button
+                        disabled={role !== "projectmanager" && role !== "admin"}
                         color="primary"
                         onClick={() => handleEdit(resource)}
                       >
@@ -221,6 +238,7 @@ const Resources = () => {
                     </TableCell>
                     <TableCell>
                       <Button
+                        disabled={role !== "projectmanager" && role !== "admin"}
                         color="error"
                         onClick={() => handleDelete(resource._id)}
                       >

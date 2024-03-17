@@ -18,8 +18,11 @@ import {
   DialogActions,
   Dialog,
 } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ClientFeedback = () => {
+  const { user, isLoading } = useAuth0();
+  const [role, setRole] = useState(null);
   const [feedback, setFeedback] = useState([]);
   const [formData, setFormData] = useState({
     feedbackType: "",
@@ -72,6 +75,18 @@ const ClientFeedback = () => {
 
     fetchData();
   }, []);
+  const getRole = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/getRole?email=${user?.email}`
+      );
+      if (response.data.role === "Does not Exists") setRole(null);
+      else setRole(response.data.role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+  if (!isLoading) getRole();
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -134,71 +149,72 @@ const ClientFeedback = () => {
 
   return (
     <Layout>
+      <h2>Client Feedback</h2>
       {/* Form */}
-      <Grid item xs={12}>
-        <h2>Client Feedback</h2>
-        <Paper sx={{ p: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
-            <TextField
-              id="feedbackType"
-              name="feedbackType"
-              value={formData.feedbackType}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="dateReceived">Date Received</InputLabel>
-            <TextField
-              id="dateReceived"
-              name="dateReceived"
-              type="date"
-              value={formData.dateReceived}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="detailedFeedback">
-              Detailed Feedback
-            </InputLabel>
-            <TextField
-              id="detailedFeedback"
-              name="detailedFeedback"
-              multiline
-              rows={4}
-              value={formData.detailedFeedback}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="actionTaken">Action Taken</InputLabel>
-            <TextField
-              id="actionTaken"
-              name="actionTaken"
-              multiline
-              rows={4}
-              value={formData.actionTaken}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
-            <TextField
-              id="closureDate"
-              name="closureDate"
-              type="date"
-              value={formData.closureDate}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Paper>
-      </Grid>
-
+      {(role === "client" || role === "admin") && (
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <form onSubmit={handleSubmit}>
+              <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
+              <TextField
+                id="feedbackType"
+                name="feedbackType"
+                value={formData.feedbackType}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="dateReceived">Date Received</InputLabel>
+              <TextField
+                id="dateReceived"
+                name="dateReceived"
+                type="date"
+                value={formData.dateReceived}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="detailedFeedback">
+                Detailed Feedback
+              </InputLabel>
+              <TextField
+                id="detailedFeedback"
+                name="detailedFeedback"
+                multiline
+                rows={4}
+                value={formData.detailedFeedback}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="actionTaken">Action Taken</InputLabel>
+              <TextField
+                id="actionTaken"
+                name="actionTaken"
+                multiline
+                rows={4}
+                value={formData.actionTaken}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
+              <TextField
+                id="closureDate"
+                name="closureDate"
+                type="date"
+                value={formData.closureDate}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+            </form>
+          </Paper>
+        </Grid>
+      )}
       <Grid item xs={12}>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
           <Table>
@@ -236,6 +252,7 @@ const ClientFeedback = () => {
                     </TableCell>
                     <TableCell>
                       <Button
+                        disabled={role !== "admin"}
                         color="primary"
                         onClick={() => handleEdit(feedBackItem)}
                       >
@@ -339,6 +356,7 @@ const ClientFeedback = () => {
                     </Dialog>
                     <TableCell>
                       <Button
+                        disabled={role !== "admin"}
                         color="error"
                         onClick={() => handleDelete(feedBackItem._id)}
                       >

@@ -17,5 +17,20 @@ const fetchProfile = async () => {
     throw error;
   }
 };
+const getRole = async (email) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/user/getRole?email=${email}`,
+      {
+        method: "GET",
+        credentials: "include", // Important: Include credentials for cross-origin requests
+      }
+    );
+    if (response.data.role === "Does not Exists") return null;
+    return response.data.role;
+  } catch (error) {
+    console.error("Error fetching role:", error);
+  }
+};
 
-export { fetchProfile };
+export { fetchProfile, getRole };

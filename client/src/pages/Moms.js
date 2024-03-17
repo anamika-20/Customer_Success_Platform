@@ -18,8 +18,11 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Moms = () => {
+  const { user, isLoading } = useAuth0();
+  const [role, setRole] = useState(null);
   const [moms, setMoms] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -116,58 +119,72 @@ const Moms = () => {
     };
     fetchMoms();
   }, []);
+  const getRole = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/getRole?email=${user?.email}`
+      );
+      if (response.data.role === "Does not Exists") setRole(null);
+      else setRole(response.data.role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+  if (!isLoading) getRole();
 
   return (
     <Layout>
-      <Grid item xs={12}>
-        <h2>Minutes of Meeting</h2>
-        <Paper sx={{ p: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <InputLabel htmlFor="date">Date</InputLabel>
-            <TextField
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date.split("T")[0]}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="duration">Duration</InputLabel>
-            <TextField
-              id="duration"
-              name="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="momLink">MoM Link</InputLabel>
-            <TextField
-              id="momLink"
-              name="momLink"
-              value={formData.momLink}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="comments">Comment</InputLabel>
-            <TextField
-              id="comments"
-              name="comments"
-              multiline
-              rows={4}
-              value={formData.comments}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Paper>
-      </Grid>
+      <h2>Minutes of Meeting</h2>
+      {(role === "projectmanager" || role === "admin") && (
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <form onSubmit={handleSubmit}>
+              <InputLabel htmlFor="date">Date</InputLabel>
+              <TextField
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date.split("T")[0]}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="duration">Duration</InputLabel>
+              <TextField
+                id="duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="momLink">MoM Link</InputLabel>
+              <TextField
+                id="momLink"
+                name="momLink"
+                value={formData.momLink}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="comments">Comment</InputLabel>
+              <TextField
+                id="comments"
+                name="comments"
+                multiline
+                rows={4}
+                value={formData.comments}
+                onChange={handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+            </form>
+          </Paper>
+        </Grid>
+      )}
 
       <Grid item xs={12}>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
@@ -191,12 +208,20 @@ const Moms = () => {
                   <TableCell>{mom.momLink}</TableCell>
                   <TableCell>{mom.comments}</TableCell>
                   <TableCell>
-                    <Button color="primary" onClick={() => handleEdit(mom)}>
+                    <Button
+                      disabled={role !== "admin"}
+                      color="primary"
+                      onClick={() => handleEdit(mom)}
+                    >
                       Edit
                     </Button>
                   </TableCell>
                   <TableCell>
-                    <Button color="error" onClick={() => handleDelete(mom._id)}>
+                    <Button
+                      disabled={role !== "admin"}
+                      color="error"
+                      onClick={() => handleDelete(mom._id)}
+                    >
                       Delete
                     </Button>
                   </TableCell>

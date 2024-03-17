@@ -4,8 +4,11 @@ import axios from "axios";
 import { Grid, Paper, TextField, Button, InputLabel } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ProjectUpdates = () => {
+  const { user, isLoading } = useAuth0();
+  const [role, setRole] = useState(null);
   const [updates, setUpdates] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -54,6 +57,18 @@ const ProjectUpdates = () => {
     fetchProjectUpdates();
   }, []);
 
+  const getRole = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/getRole?email=${user?.email}`
+      );
+      if (response.data.role === "Does not Exists") setRole(null);
+      else setRole(response.data.role);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+  if (!isLoading) getRole();
   //delete
   const handleDelete = async (_id) => {
     try {
@@ -71,66 +86,77 @@ const ProjectUpdates = () => {
   };
 
   return (
-    <Layout>
-      {/* Form */}
-      <Grid item xs={12}>
+    !isLoading && (
+      <Layout>
         <h2>Project Updates</h2>
-        <Paper sx={{ p: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <InputLabel htmlFor="date">Date</InputLabel>
-            <TextField
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="generalUpdates">General Updates</InputLabel>
-            <TextField
-              id="generalUpdates"
-              name="generalUpdates"
-              multiline
-              rows={4}
-              value={formData.generalUpdates}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Paper>
-      </Grid>
+        {(role === "projectmanager" || role === "admin") && (
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2 }}>
+              <form onSubmit={handleSubmit}>
+                <InputLabel htmlFor="date">Date</InputLabel>
+                <TextField
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="generalUpdates">
+                  General Updates
+                </InputLabel>
+                <TextField
+                  id="generalUpdates"
+                  name="generalUpdates"
+                  multiline
+                  rows={4}
+                  value={formData.generalUpdates}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <Button variant="contained" type="submit">
+                  Submit
+                </Button>
+              </form>
+            </Paper>
+          </Grid>
+        )}
 
-      {/* Display Updates */}
-      <Grid item xs={12}>
-        <Paper sx={{ p: 2, mt: 4 }}>
-          <h2>Older Updates</h2>
-          {updates.map((update, index) => (
-            <div key={index}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <h3>Date: {update.date.split("T")[0]}</h3>
-                <Button>
-                  <EditIcon style={{ marginLeft: "10px" }} />
-                </Button>
-                <Button>
-                  <DeleteIcon
-                    style={{ marginLeft: "10px" }}
-                    color="error"
-                    onClick={() => handleDelete(update._id)}
-                  />
-                </Button>
+        {/* Display Updates */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, mt: 4 }}>
+            <h2>Older Updates</h2>
+            {updates.map((update, index) => (
+              <div key={index}>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <h3>Date: {update.date.split("T")[0]}</h3>
+                  {console.log(role)}
+                  {(role === "projectmanager" || role === "admin") && (
+                    <Button>
+                      <EditIcon style={{ marginLeft: "10px" }} />
+                    </Button>
+                  )}
+
+                  {(role === "projectmanager" || role === "admin") && (
+                    <Button>
+                      <DeleteIcon
+                        style={{ marginLeft: "10px" }}
+                        color="error"
+                        onClick={() => handleDelete(update._id)}
+                      />
+                    </Button>
+                  )}
+                </div>
+                <p>General Updates: {update.generalUpdates}</p>
               </div>
-              <p>General Updates: {update.generalUpdates}</p>
-            </div>
-          ))}
-          {updates.length === 0 && <p>No updates yet.</p>}
-        </Paper>
-      </Grid>
-    </Layout>
+            ))}
+            {updates.length === 0 && <p>No updates yet.</p>}
+          </Paper>
+        </Grid>
+      </Layout>
+    )
   );
 };
 
