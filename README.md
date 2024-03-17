@@ -6,8 +6,10 @@ Navigate to the project directory: cd your-project-directory
 Install dependencies: npm install
 
 ## Features -
-1. 5 CRUD Operations: (Approved Team, Resources, Client Feedback, Project updates, MoMs of client meetings)
-2. Role-Based Management and Registration/Login with Microsoft using Auth0:
+1. 15 Section CRUD
+2. Role Based Management
+3. Email Notification System
+4. Export As Document Feature
 
 ## Technologies Used - 
 Frontend: React.js, Material-UI
