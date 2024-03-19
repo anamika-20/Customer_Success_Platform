@@ -88,9 +88,9 @@ const ProjectUpdates = () => {
   return (
     !isLoading && (
       <Layout>
-        <h2>Project Updates</h2>
         {(role === "projectmanager" || role === "admin") && (
           <Grid item xs={12}>
+            <h2>Project Updates</h2>
             <Paper sx={{ p: 2 }}>
               <form onSubmit={handleSubmit}>
                 <InputLabel htmlFor="date">Date</InputLabel>

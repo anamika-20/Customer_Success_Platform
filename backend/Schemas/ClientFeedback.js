@@ -21,11 +21,12 @@ const clientFeedbackSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-    required: true
-  }},
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  //   required: true
+  // }
+},
   {
   timestamps: true // Enable timestamps
 });

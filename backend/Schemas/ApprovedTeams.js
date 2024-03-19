@@ -28,11 +28,12 @@ const approvedTeamsSchema = new mongoose.Schema({
     type: [teamResourceSchema],
     required: true
   },
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-    required: true
-  }},
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  //   required: true
+  // }
+},
 
 {
   timestamps: true // Enable timestamps

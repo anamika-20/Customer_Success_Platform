@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const resourceSchema = new mongoose.Schema({
-  projectName: {
-    type: String,
-    required: true
-  },
+  // projectName: {
+  //   type: String,
+  //   required: true
+  // },
   resourceName: {
     type: String,
     required: true
@@ -24,11 +24,13 @@ const resourceSchema = new mongoose.Schema({
   comment: {
     type: String,
     required: true
-  },project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-    required: true
-  }},
+  },
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  //   required: true
+  // }
+},
   {
   timestamps: true 
 });

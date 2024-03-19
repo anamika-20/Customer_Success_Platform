@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const stakeholdersSchema = new mongoose.Schema({
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-  },
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  // },
   title: {
     type: String,
     required: true

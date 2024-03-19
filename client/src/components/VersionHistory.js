@@ -47,7 +47,7 @@ const VersionHistory = () => {
     revisionDate: "",
     approvalDate: "",
     approvedBy: "",
-    project_id: "",
+    // project_id: "",
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -218,7 +218,7 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <FormControl fullWidth sx={{ mb: 2 }}>
+                  {/* <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="project-id-label">Project ID</InputLabel>
                     <Select
                       labelId="project-id-label"
@@ -233,7 +233,7 @@ const VersionHistory = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                   <Button variant="contained" type="submit">
                     Submit
                   </Button>
@@ -255,7 +255,7 @@ const VersionHistory = () => {
                     <TableCell>Revision Date</TableCell>
                     <TableCell>Approval Date</TableCell>
                     <TableCell>Approved By</TableCell>
-                    <TableCell>Project ID</TableCell>
+                    {/* <TableCell>Project ID</TableCell> */}
                     <TableCell>Edit</TableCell>
                     <TableCell>Delete</TableCell>
                   </TableRow>
@@ -275,7 +275,7 @@ const VersionHistory = () => {
                         {history.approvalDate.split("T")[0]}
                       </TableCell>
                       <TableCell>{history.approvedBy}</TableCell>
-                      <TableCell>{history.project_id}</TableCell>
+                      {/* <TableCell>{history.project_id}</TableCell> */}
                       <TableCell>
                         <Button
                           disabled={
@@ -420,7 +420,7 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <FormControl fullWidth sx={{ mb: 2 }}>
+                  {/* <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="edit-project-id-label">
                       Project ID
                     </InputLabel>
@@ -442,7 +442,7 @@ const VersionHistory = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                 </form>
               </DialogContent>
               <DialogActions>

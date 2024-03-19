@@ -31,7 +31,7 @@ const Risk = () => {
   const [role, setRole] = useState(null);
   const [riskProfiles, setRiskProfiles] = useState([]);
   const [formData, setFormData] = useState({
-    project_id: "",
+    // project_id: "",
     riskType: "",
     description: "",
     severity: "",
@@ -84,7 +84,7 @@ const Risk = () => {
       const newRiskProfile = await createRiskProfiling(formData);
       setRiskProfiles([...riskProfiles, newRiskProfile]);
       setFormData({
-        project_id: "",
+        // project_id: "",
         riskType: "",
         description: "",
         severity: "",
@@ -104,7 +104,7 @@ const Risk = () => {
     );
     setEditItemId(id);
     setEditFormData({
-      project_id: riskProfileToEdit.project_id,
+      // project_id: riskProfileToEdit.project_id,
       riskType: riskProfileToEdit.riskType,
       description: riskProfileToEdit.description,
       severity: riskProfileToEdit.severity,
@@ -123,7 +123,7 @@ const Risk = () => {
         if (profile._id === editItemId) {
           return {
             ...profile,
-            project_id: editFormData.project_id,
+            // project_id: editFormData.project_id,
             riskType: editFormData.riskType,
             description: editFormData.description,
             severity: editFormData.severity,
@@ -165,14 +165,14 @@ const Risk = () => {
               <h2>Add Risks</h2>
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
-                  <TextField
+                  {/* <TextField
                     name="project_id"
                     label="Project ID"
                     value={formData.project_id}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
+                  /> */}
                   <TextField
                     name="riskType"
                     label="Risk Type"
@@ -305,7 +305,7 @@ const Risk = () => {
             <DialogTitle>Edit Risk Profile</DialogTitle>
             <DialogContent>
               <form onSubmit={handleSaveEdit}>
-                <TextField
+                {/* <TextField
                   name="project_id"
                   label="Project ID"
                   value={editFormData.project_id}
@@ -317,7 +317,7 @@ const Risk = () => {
                   }
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                /> */}
                 <TextField
                   name="riskType"
                   label="Risk Type"

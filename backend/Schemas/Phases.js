@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const phasesMilestonesSchema = new mongoose.Schema({
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-    required: true
-  },
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  //   required: true
+  // },
   title: {
     type: String,
     required: true

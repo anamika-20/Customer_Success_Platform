@@ -44,7 +44,7 @@ const AuditHistory = () => {
     reviewedSection: "",
     comments: "",
     actionItem: "",
-    project_id: "",
+    // project_id: "",
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -230,7 +230,7 @@ const AuditHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <FormControl fullWidth sx={{ mb: 2 }}>
+                  {/* <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="project-id-label">Project ID</InputLabel>
                     <Select
                       labelId="project-id-label"
@@ -245,7 +245,7 @@ const AuditHistory = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                   <Button variant="contained" type="submit">
                     Submit
                   </Button>
@@ -266,7 +266,7 @@ const AuditHistory = () => {
                     <TableCell>Reviewed Section</TableCell>
                     <TableCell>Comments</TableCell>
                     <TableCell>Action Item</TableCell>
-                    <TableCell>Project ID</TableCell>
+                    {/* <TableCell>Project ID</TableCell> */}
                     <TableCell>Edit</TableCell>
                     <TableCell>Delete</TableCell>
                   </TableRow>
@@ -281,7 +281,7 @@ const AuditHistory = () => {
                       <TableCell>{history.reviewedSection}</TableCell>
                       <TableCell>{history.comments}</TableCell>
                       <TableCell>{history.actionItem}</TableCell>
-                      <TableCell>{history.project_id}</TableCell>
+                      {/* <TableCell>{history.project_id}</TableCell> */}
                       <TableCell>
                         <Button
                           color="primary"

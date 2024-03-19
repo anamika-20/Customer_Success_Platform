@@ -31,7 +31,7 @@ const SprintDetailComponent = () => {
   const [role, setRole] = useState(null);
   const [sprintDetails, setSprintDetails] = useState([]);
   const [formData, setFormData] = useState({
-    project_id: "",
+    // project_id: "",
     startDate: "",
     endDate: "",
     status: "",
@@ -82,7 +82,7 @@ const SprintDetailComponent = () => {
       const newSprintDetail = await createSprintDetail(formData);
       setSprintDetails([...sprintDetails, newSprintDetail]);
       setFormData({
-        project_id: "",
+        // project_id: "",
         startDate: "",
         endDate: "",
         status: "",
@@ -99,7 +99,7 @@ const SprintDetailComponent = () => {
     );
     setEditItemId(id);
     setEditFormData({
-      project_id: sprintDetailToEdit.project_id,
+      // project_id: sprintDetailToEdit.project_id,
       startDate: sprintDetailToEdit.startDate,
       endDate: sprintDetailToEdit.endDate,
       status: sprintDetailToEdit.status,
@@ -115,7 +115,7 @@ const SprintDetailComponent = () => {
         if (detail._id === editItemId) {
           return {
             ...detail,
-            project_id: editFormData.project_id,
+            // project_id: editFormData.project_id,
             startDate: editFormData.startDate,
             endDate: editFormData.endDate,
             status: editFormData.status,
@@ -154,14 +154,14 @@ const SprintDetailComponent = () => {
               <h2>Sprint Detail</h2>
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
-                  <TextField
+                  {/* <TextField
                     name="project_id"
                     label="Project ID"
                     value={formData.project_id}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
+                  /> */}
                   <TextField
                     name="startDate"
                     label="Start Date"
@@ -212,7 +212,7 @@ const SprintDetailComponent = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Project ID</TableCell>
+                    {/* <TableCell>Project ID</TableCell> */}
                     <TableCell>Start Date</TableCell>
                     <TableCell>End Date</TableCell>
                     <TableCell>Status</TableCell>
@@ -224,7 +224,7 @@ const SprintDetailComponent = () => {
                 <TableBody>
                   {sprintDetails.map((detail) => (
                     <TableRow key={detail._id}>
-                      <TableCell>{detail.project_id}</TableCell>
+                      {/* <TableCell>{detail.project_id}</TableCell> */}
                       <TableCell>{detail.startDate.split("T")[0]}</TableCell>
                       <TableCell>{detail.endDate.split("T")[0]}</TableCell>
                       <TableCell>{detail.status}</TableCell>
@@ -263,7 +263,7 @@ const SprintDetailComponent = () => {
             <DialogTitle>Edit Sprint Detail</DialogTitle>
             <DialogContent>
               <form>
-                <TextField
+                {/* <TextField
                   name="project_id"
                   label="Project ID"
                   value={editFormData.project_id}
@@ -275,7 +275,7 @@ const SprintDetailComponent = () => {
                   }
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                /> */}
                 <TextField
                   name="startDate"
                   label="Start Date"

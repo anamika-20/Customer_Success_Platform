@@ -1,6 +1,7 @@
 // import Project from "../Schemas/Project";
 
 const generateProjectHTML = (projectDoc) => {
+  
   let htmlContent = `<Cannot redeclare block-scoped variable 'generateProjectHtml'.ts(!DOCTYPE html>
     <html lang="en">
       <head>
@@ -37,7 +38,7 @@ const generateProjectHTML = (projectDoc) => {
           </thead>
           <tbody>`;
   // Add data dynamically for approved teams
-  projectDoc[0]?.approved_teams.map((team) => {
+  projectDoc[0]?.approvedteams.map((team) => {
     htmlContent += `
             <tr>
               <td>${team.phase}</td>
@@ -94,7 +95,7 @@ const generateProjectHTML = (projectDoc) => {
           </thead>
           <tbody>`;
   // Add data dynamically for client feedback
-  projectDoc[0]?.client_feedback.map((feedback) => {
+  projectDoc[0]?.clientfeedback.map((feedback) => {
     htmlContent += `
             <tr>
               <td>${feedback.type}</td>
@@ -120,7 +121,7 @@ const generateProjectHTML = (projectDoc) => {
           </thead>
           <tbody>`;
   // Add data dynamically for project updates
-  projectDoc[0]?.project_updates.map((update) => {
+  projectDoc[0]?.projectupdates.map((update) => {
     htmlContent += `
             <tr>
               <td>${update.date}</td>
@@ -149,7 +150,7 @@ const generateProjectHTML = (projectDoc) => {
             <tr>
               <td>${mom.date}</td>
               <td>${mom.duration}</td>
-              <td>${mom.link}</td>
+              <td>${mom.momLink}</td>
               <td>${mom.comment}</td>
             </tr>`;
   });

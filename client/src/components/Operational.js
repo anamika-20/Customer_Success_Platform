@@ -28,14 +28,14 @@ const Operational = () => {
   const [role, setRole] = useState(null);
   const [escalationMatrix, setEscalationMatrix] = useState([]);
   const [formData, setFormData] = useState({
-    project_id: "",
+    // project_id: "",
     level: "",
     name: "",
   });
   const [editingId, setEditingId] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    project_id: "",
+    // project_id: "",
     level: "",
     name: "",
   });
@@ -72,7 +72,7 @@ const Operational = () => {
     try {
       const newEntry = await createOperationalEscalationMatrix(formData);
       setEscalationMatrix([...escalationMatrix, newEntry]);
-      setFormData({ project_id: "", level: "", name: "" });
+      setFormData({  level: "", name: "" });
     } catch (error) {
       console.error("Error adding Operational escalation matrix:", error);
     }
@@ -82,7 +82,7 @@ const Operational = () => {
     try {
       const entryToEdit = escalationMatrix.find((entry) => entry._id === id);
       setEditFormData({
-        project_id: entryToEdit.project_id,
+        // project_id: entryToEdit.project_id,
         level: entryToEdit.level,
         name: entryToEdit.name,
       });
@@ -100,7 +100,7 @@ const Operational = () => {
         entry._id === editingId ? { ...entry, ...editFormData } : entry
       );
       setEscalationMatrix(updatedMatrix);
-      setEditFormData({ project_id: "", level: "", name: "" });
+      setEditFormData({  level: "", name: "" });
       setEditingId(null);
       setEditModalOpen(false);
     } catch (error) {
@@ -129,14 +129,14 @@ const Operational = () => {
           {(role === "projectmanager" || role === "admin") && (
             <Grid item xs={10}>
               <form onSubmit={handleSubmit}>
-                <TextField
+                {/* <TextField
                   name="project_id"
                   label="Project ID"
                   value={formData.project_id}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                /> */}
                 <TextField
                   name="level"
                   label="Level"
@@ -173,7 +173,7 @@ const Operational = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Project ID</TableCell>
+                    {/* <TableCell>Project ID</TableCell> */}
                     <TableCell>Level</TableCell>
                     <TableCell>Name</TableCell>
                     <TableCell>Edit</TableCell>
@@ -183,7 +183,7 @@ const Operational = () => {
                 <TableBody>
                   {escalationMatrix.map((entry) => (
                     <TableRow key={entry._id}>
-                      <TableCell>{entry.project_id}</TableCell>
+                      {/* <TableCell>{entry.project_id}</TableCell> */}
                       <TableCell>{entry.level}</TableCell>
                       <TableCell>{entry.name}</TableCell>
                       <TableCell>
@@ -236,7 +236,7 @@ const Operational = () => {
               Edit Operational Escalation Matrix
             </Typography>
             <form onSubmit={handleSaveEdit}>
-              <TextField
+              {/* <TextField
                 name="project_id"
                 label="Project ID"
                 value={editFormData.project_id}
@@ -248,7 +248,7 @@ const Operational = () => {
                 }
                 fullWidth
                 sx={{ mb: 2 }}
-              />
+              /> */}
               <TextField
                 name="level"
                 label="Level"

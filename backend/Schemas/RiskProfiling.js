@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const riskProfilingSchema = new mongoose.Schema({
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', 
-    required: true
-  },
+  // project_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Project', 
+  //   required: true
+  // },
   riskType: {
     type: String,
     enum: ['Financial', 'Operational', 'Technical', 'HR', 'External'],
