@@ -1,6 +1,5 @@
 import express from "express";
 import AuditHistoryController from "../controllers/auditHistory.js";
-import authenticateToken from "../middlewares/authenticateToken.js";
 
 const router = express.Router();
 

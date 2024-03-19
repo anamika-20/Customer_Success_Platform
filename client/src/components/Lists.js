@@ -22,7 +22,7 @@ const Lists = () => {
         <ListItemText primary="Dashboard" />
       </ListItemButton>
 
-      <ListItemButton onClick={() => navigate("/adduser")}>
+      {/* <ListItemButton onClick={() => navigate("/adduser")}>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
@@ -34,7 +34,7 @@ const Lists = () => {
           <SystemSecurityUpdateGoodIcon />
         </ListItemIcon>
         <ListItemText primary="Project" />
-      </ListItemButton>
+      </ListItemButton> */}
 
       <ListItemButton onClick={() => navigate("/projectupdates")}>
         <ListItemIcon>
@@ -133,8 +133,6 @@ const Lists = () => {
         </ListItemIcon>
         <ListItemText primary="StakeHolders" />
       </ListItemButton>
-
-
     </>
   );
 };

@@ -104,6 +104,7 @@ const Dashboard = () => {
           <Typography>Role: {userRole}</Typography>
         </Grid>
         <Grid item xs={4}>
+          <Typography>Export details as PDF</Typography>
           <form onSubmit={handleSubmit}>
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id="project-id-label">Project ID</InputLabel>
