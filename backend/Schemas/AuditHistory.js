@@ -25,11 +25,11 @@ const AuditHistorySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // project_id: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Project', 
-  //   required: true
-  // }
+  project_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project', 
+    required: true
+  }
 },
   { timestamps: true });
 

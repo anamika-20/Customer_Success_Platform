@@ -173,7 +173,7 @@ const AuditHistory = () => {
       <Layout>
         <Grid container justifyContent="center" spacing={4}>
           {console.log(role)}
-          {(role === "audit" || role === "admin") && (
+          {(role === "auditor" || role === "admin") && (
             <Grid item xs={8}>
               {/* <Typography variant="h4" sx={{ mb: 2 }}>Audit History</Typography> */}
               <h2>Add Audit</h2>
@@ -285,7 +285,7 @@ const AuditHistory = () => {
                       <TableCell>
                         <Button
                           color="primary"
-                          disabled={role !== "audit" && role !== "admin"}
+                          disabled={role !== "auditor" && role !== "admin"}
                           onClick={() => handleEdit(history._id)}
                         >
                           Edit
@@ -293,7 +293,7 @@ const AuditHistory = () => {
                       </TableCell>
                       <TableCell>
                         <Button
-                          disabled={role !== "audit" && role !== "admin"}
+                          disabled={role !== "auditor" && role !== "admin"}
                           color="error"
                           onClick={() => handleDelete(history._id)}
                         >
