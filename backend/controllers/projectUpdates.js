@@ -1,4 +1,4 @@
-import ProjectUpdates from "../schemas/ProjectUpdates.js";
+import ProjectUpdates from "../modals/ProjectUpdates.js";
 
 // Get all ProjectUpdates
 export const getAllProjectUpdates = async (req, res) => {

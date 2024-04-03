@@ -1,5 +1,5 @@
-import AuditHistory from "../Schemas/AuditHistory.js";
-import Stakeholders from "../Schemas/StakeHolders.js";
+import AuditHistory from "../modals/AuditHistory.js";
+import Stakeholders from "../modals/StakeHolders.js";
 import { sendEmail } from "./sendEmail.js";
 
 // Get all Audit History

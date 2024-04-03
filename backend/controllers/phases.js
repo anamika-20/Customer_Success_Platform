@@ -1,4 +1,4 @@
-import Phases from "../Schemas/Phases.js";
+import Phases from "../modals/Phases.js";
 
 // Get all phases/milestones
 export const getAllPhases = async (req, res) => {

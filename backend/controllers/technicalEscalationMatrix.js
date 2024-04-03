@@ -1,4 +1,4 @@
-import TechnicalEscalationMatrix from "../Schemas/TechnicalEscalationMatrix.js";
+import TechnicalEscalationMatrix from "../modals/TechnicalEscalationMatrix.js";
 
 // Get all version histories
 export const getAllTechnicalEscalationMatrix = async (req, res) => {

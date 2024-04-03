@@ -1,4 +1,4 @@
-import ApprovedTeams from "../schemas/ApprovedTeams.js";
+import ApprovedTeams from "../modals/ApprovedTeams.js";
 // import { push as RouterPush } from 'react-router-redux';
 
 // Get all teams

@@ -1,4 +1,4 @@
-import VersionHistory from "../Schemas/VersionHistory.js";
+import VersionHistory from "../modals/VersionHistory.js";
 
 // Get all version histories
 export const getAllVersionHistory = async (req, res) => {

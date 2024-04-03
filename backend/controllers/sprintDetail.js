@@ -1,4 +1,4 @@
-import SprintDetail from "../Schemas/SprintDetail.js";
+import SprintDetail from "../modals/SprintDetail.js";
 
 // Get all sprint details
 export const getAllSprintDetails = async (req, res) => {

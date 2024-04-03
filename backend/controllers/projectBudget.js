@@ -1,4 +1,4 @@
-import ProjectBudget from "../Schemas/ProjectBudget.js";
+import ProjectBudget from "../modals/ProjectBudget.js";
 
 // Get all project budgets
 export const getAllProjectBudget = async (req, res) => {

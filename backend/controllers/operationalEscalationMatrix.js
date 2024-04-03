@@ -1,4 +1,4 @@
-import OperationalEscalationMatrix from "../Schemas/OperationalEscalationMatrix.js";
+import OperationalEscalationMatrix from "../modals/OperationalEscalationMatrix.js";
 
 // Get all version histories
 export const getAllOperationalEscalationMatrix = async (req, res) => {

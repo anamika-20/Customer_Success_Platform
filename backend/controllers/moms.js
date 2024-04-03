@@ -1,4 +1,4 @@
-import Moms from "../schemas/Mom.js";
+import Moms from "../modals/Mom.js";
 
 // Get all Moms
 export const getAllMoms = async (req, res) => {

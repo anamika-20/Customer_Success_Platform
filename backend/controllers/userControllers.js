@@ -1,4 +1,4 @@
-import User from "../Schemas/User.js";
+import User from "../modals/User.js";
 
 export const userDetails = async (req, res) => {
   try {

@@ -1,4 +1,4 @@
-import FinancialEscalationMatrix from "../Schemas/FinancialEscalationMatrix.js";
+import FinancialEscalationMatrix from "../modals/FinancialEscalationMatrix.js";
 
 // Get all version histories
 export const getAllFinancialEscalationMatrix = async (req, res) => {

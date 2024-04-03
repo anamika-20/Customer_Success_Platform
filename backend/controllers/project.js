@@ -1,5 +1,5 @@
-import Project from "../Schemas/Project.js";
-import User from "../Schemas/User.js";
+import Project from "../modals/Project.js";
+import User from "../modals/User.js";
 
 // Get all projects
 export const getAllProjects = async (req, res) => {

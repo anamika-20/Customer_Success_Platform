@@ -1,6 +1,6 @@
 import { launch } from "puppeteer";
 import generateProjectHTML from "./generateProjectHTML.js"; 
-import Project from "../Schemas/Project.js"; 
+import Project from "../modals/Project.js"; 
 
 const downloadFeature = async (req, res) => {
   try {

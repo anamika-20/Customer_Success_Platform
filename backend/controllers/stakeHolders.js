@@ -1,4 +1,4 @@
-import StakeHolders from "../Schemas/StakeHolders.js";
+import StakeHolders from "../modals/StakeHolders.js";
 
 // Get all version histories
 export const getAllStakeHolders = async (req, res) => {

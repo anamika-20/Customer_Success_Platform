@@ -1,4 +1,4 @@
-import RiskProfiling from "../Schemas/RiskProfiling.js"
+import RiskProfiling from "../modals/RiskProfiling.js"
 
 // Get all risk profilings
 export const getAllRiskProfilings = async (req, res) => {

@@ -1,4 +1,4 @@
-import TechStack from "../Schemas/TechStack.js";
+import TechStack from "../modals/TechStack.js";
 
 // Get all tech stacks
 export const getAllTechStack = async (req, res) => {
