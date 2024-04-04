@@ -13,7 +13,7 @@ import {
   TextField,
   Modal,
 } from "@mui/material";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import {
   getAllTechnicalEscalationMatrix,
   createTechnicalEscalationMatrix,
@@ -137,6 +137,7 @@ const Technical = () => {
                   sx={{ mb: 2 }}
                 /> */}
                 <TextField
+                 required={true}
                   name="level"
                   label="Level"
                   value={formData.level}
@@ -145,6 +146,7 @@ const Technical = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="name"
                   label="Name"
                   value={formData.name}
@@ -249,6 +251,7 @@ const Technical = () => {
                 sx={{ mb: 2 }}
               /> */}
               <TextField
+                required={true}
                 name="level"
                 label="Level"
                 value={editFormData.level}
@@ -259,6 +262,7 @@ const Technical = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
+               require={true}
                 name="name"
                 label="Name"
                 value={editFormData.name}

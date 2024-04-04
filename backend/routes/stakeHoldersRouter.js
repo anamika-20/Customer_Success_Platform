@@ -7,10 +7,10 @@ const router = express.Router();
 const {getAllStakeHolders,getStakeHoldersById,createStakeHolders,updateStakeHolders,deleteStakeHolders, } = StakeHoldersController;
 
 // Routes
-router.get("/stakeHolders", getAllStakeHolders);
-router.get("/stakeHolders/:id", getStakeHoldersById);
-router.post("/stakeHolders", createStakeHolders);
-router.patch("/stakeHolders/:id", updateStakeHolders);
-router.delete("/stakeHolders/:id", deleteStakeHolders);
+router.get("/stakeholders", getAllStakeHolders);
+router.get("/stakeholders/:id", getStakeHoldersById);
+router.post("/stakeholders", createStakeHolders);
+router.patch("/stakeholders/:id", updateStakeHolders);
+router.delete("/stakeholders/:id", deleteStakeHolders);
 
 export default router;

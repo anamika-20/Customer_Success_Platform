@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/stakeHolders";
+const baseUrl = "http://localhost:8080/api/stakeholders";
 
 export const getAllStakeholders = async () => {
   try {

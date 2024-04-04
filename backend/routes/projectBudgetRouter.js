@@ -7,10 +7,10 @@ const {getAllProjectBudget,getProjectBudgetById,createProjectBudget,updateProjec
   projectBudgetController;
 
 
-router.get('/projectBudget', getAllProjectBudget);
-router.get('/projectBudget/:id', getProjectBudgetById);
-router.post('/projectBudget', createProjectBudget);
-router.patch('/projectBudget/:id', updateProjectBudget);
-router.delete('/projectBudget/:id', deleteProjectBudget);
+router.get('/budgets', getAllProjectBudget);
+router.get('/budgets/:id', getProjectBudgetById);
+router.post('/budgets', createProjectBudget);
+router.patch('/budgets/:id', updateProjectBudget);
+router.delete('/budgets/:id', deleteProjectBudget);
 
 export default router;

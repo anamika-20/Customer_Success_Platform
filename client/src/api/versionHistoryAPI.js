@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const baseUrl = 'http://localhost:8080/api/versionHistory';
+const baseUrl = 'http://localhost:8080/api/versions';
 // Fetch all version history
 export const getAllVersionHistory = async () => {
     try {

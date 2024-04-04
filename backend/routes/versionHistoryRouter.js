@@ -5,10 +5,10 @@ const router = express.Router();
 const {getAllVersionHistory, getVersionHistoryById, createVersionHistory, updateVersionHistory, deleteVersionHistory  } =
   versionHistoryController;
 
-router.get('/versionHistory', getAllVersionHistory);
-router.get('/versionHistory/:id', getVersionHistoryById);
-router.post('/versionHistory', createVersionHistory);
-router.patch('/versionHistory/:id', updateVersionHistory);
-router.delete('/versionHistory/:id', deleteVersionHistory);
+router.get('/versions', getAllVersionHistory);
+router.get('/versions/:id', getVersionHistoryById);
+router.post('/versions', createVersionHistory);
+router.patch('/versions/:id', updateVersionHistory);
+router.delete('/versions/:id', deleteVersionHistory);
 
 export default router;

@@ -5,10 +5,10 @@ const router = express.Router();
 
 const  { getAllTechStack, getTechStackById, createTechStack,updateTechStack, deleteTechStack } = TechStackController;
 
-router.get('/techStack', getAllTechStack);
-router.get('/techStack/:id', getTechStackById);
-router.post('/techStack', createTechStack);
-router.patch('/techStack/:id', updateTechStack);
-router.delete('/techStack/:id', deleteTechStack);
+router.get('/techstacks', getAllTechStack);
+router.get('/techstacks/:id', getTechStackById);
+router.post('/techstacks', createTechStack);
+router.patch('/techstacks/:id', updateTechStack);
+router.delete('/techstacks/:id', deleteTechStack);
 
 export default router;

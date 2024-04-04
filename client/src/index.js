@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  // <React.StrictMode>
   <Auth0Provider
     domain="dev-3esj1ci31pl5sjji.us.auth0.com"
     clientId="2Nhg3Eyp2oxOGJmlqSaSeS9qpmzJcQSI"
@@ -17,10 +16,7 @@ root.render(
   >
     <App />
   </Auth0Provider>
-  // </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+
 reportWebVitals();

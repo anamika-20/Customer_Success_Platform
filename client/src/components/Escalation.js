@@ -1,7 +1,7 @@
 // Escalation.js
 import React from "react";
 import { Typography, Button, Grid } from "@mui/material";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 
 const Escalation = () => {

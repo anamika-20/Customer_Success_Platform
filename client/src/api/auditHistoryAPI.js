@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/auditHistory";
+const baseUrl = "http://localhost:8080/api/audits";
 
 export const getAllAuditHistory = async () => {
   try {

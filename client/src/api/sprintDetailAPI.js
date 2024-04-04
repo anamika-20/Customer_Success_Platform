@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:8080/api/sprintDetail';
+const baseUrl = 'http://localhost:8080/api/sprints';
 
 export const getAllSprintDetails = async () => {
   try {

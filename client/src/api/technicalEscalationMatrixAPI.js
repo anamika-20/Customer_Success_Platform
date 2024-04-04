@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/technicalEscalationMatrix";
+const baseUrl = "http://localhost:8080/api/technicals";
 
 export const getAllTechnicalEscalationMatrix = async () => {
   try {

@@ -6,10 +6,10 @@ const router = express.Router();
 const {getAllOperationalEscalationMatrix,getOperationalEscalationMatrixById,createOperationalEscalationMatrix,updateOperationalEscalationMatrix,deleteOperationalEscalationMatrix, } = OperationalEscalationMatrixController;
 
 // Routes
-router.get("/operationalEscalationMatrix", getAllOperationalEscalationMatrix);
-router.get("/operationalEscalationMatrix/:id", getOperationalEscalationMatrixById);
-router.post("/operationalEscalationMatrix", createOperationalEscalationMatrix);
-router.patch("/operationalEscalationMatrix/:id", updateOperationalEscalationMatrix);
-router.delete("/operationalEscalationMatrix/:id", deleteOperationalEscalationMatrix);
+router.get("/operationals", getAllOperationalEscalationMatrix);
+router.get("/operationals/:id", getOperationalEscalationMatrixById);
+router.post("/operationals", createOperationalEscalationMatrix);
+router.patch("/operationals/:id", updateOperationalEscalationMatrix);
+router.delete("/operationals/:id", deleteOperationalEscalationMatrix);
 
 export default router;

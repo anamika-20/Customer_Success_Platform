@@ -22,9 +22,9 @@ import {
   updateStakeholder,
   deleteStakeholder,
 } from "../api/stakeHoldersAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 
-const StakeholdersComponent = () => {
+const Stakeholders = () => {
   // State variables
   const [stakeholders, setStakeholders] = useState([]);
   const [formData, setFormData] = useState({
@@ -109,6 +109,7 @@ const StakeholdersComponent = () => {
           <Paper sx={{ p: 2 }}>
             <form onSubmit={handleSubmit}>
               <TextField
+                required={true}
                 name="title"
                 label="Title"
                 value={formData.title}
@@ -117,6 +118,7 @@ const StakeholdersComponent = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
+                required={true}
                 name="name"
                 label="Name"
                 value={formData.name}
@@ -125,6 +127,7 @@ const StakeholdersComponent = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
+                required={true}
                 name="contact"
                 label="Contact"
                 value={formData.contact}
@@ -185,6 +188,7 @@ const StakeholdersComponent = () => {
         <DialogContent>
           <form onSubmit={handleSaveEdit}>
             <TextField
+              required={true}
               name="title"
               label="Title"
               value={editFormData.title}
@@ -195,6 +199,7 @@ const StakeholdersComponent = () => {
               sx={{ mb: 2 }}
             />
             <TextField
+              required={true}
               name="name"
               label="Name"
               value={editFormData.name}
@@ -205,6 +210,7 @@ const StakeholdersComponent = () => {
               sx={{ mb: 2 }}
             />
             <TextField
+              required={true}
               name="contact"
               label="Contact"
               value={editFormData.contact}
@@ -225,4 +231,4 @@ const StakeholdersComponent = () => {
   );
 };
 
-export default StakeholdersComponent;
+export default Stakeholders;

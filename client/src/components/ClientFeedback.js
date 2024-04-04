@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import axios from "axios";
 import {
   Grid,
@@ -19,6 +19,14 @@ import {
   Dialog,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+
+import {
+  fetchFeedback,
+  submitFeedback,
+  editFeedback,
+  deleteFeedback,
+  fetchUserRole,
+} from "../api/clientFeedbackAPI";
 
 const ClientFeedback = () => {
   const { user, isLoading } = useAuth0();
@@ -43,11 +51,8 @@ const ClientFeedback = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/clientfeedback",
-        formData
-      );
-      console.log("Feedback submitted:", response.data);
+      const response = await submitFeedback(formData);
+      console.log("Feedback submitted:", response);
       setFormData({
         feedbackType: "",
         dateReceived: "",
@@ -55,7 +60,7 @@ const ClientFeedback = () => {
         actionTaken: "",
         closureDate: "",
       });
-      setFeedback([...feedback, response.data]);
+      setFeedback([...feedback, response]);
     } catch (error) {
       console.error("Error submitting feedback:", error);
     }
@@ -64,10 +69,8 @@ const ClientFeedback = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/clientfeedback"
-        );
-        setFeedback(response.data);
+        const data = await fetchFeedback();
+        setFeedback(data);
       } catch (error) {
         console.error("Error fetching feedback:", error);
       }
@@ -75,18 +78,20 @@ const ClientFeedback = () => {
 
     fetchData();
   }, []);
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
-    }
-  };
-  if (!isLoading) getRole();
+
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const role = await fetchUserRole(user?.email);
+        if (role === "Does not Exists") setRole(null);
+        else setRole(role);
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    };
+
+    if (!isLoading) getUserRole();
+  }, [isLoading, user]);
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -116,10 +121,7 @@ const ClientFeedback = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await axios.patch(
-        `http://localhost:8080/api/clientfeedback/${editFormData._id}`,
-        editFormData
-      );
+      await editFeedback(editFormData._id, editFormData);
       console.log("Feedback edited:", editFormData);
       setFeedback(
         feedback.map((item) =>
@@ -134,12 +136,7 @@ const ClientFeedback = () => {
 
   const handleDelete = async (_id) => {
     try {
-      if (!_id) {
-        console.error("Feedback _id is undefined or null");
-        return;
-      }
-
-      await axios.delete(`http://localhost:8080/api/clientfeedback/${_id}`);
+      await deleteFeedback(_id);
       console.log("Feedback deleted with _id:", _id);
       setFeedback(feedback.filter((item) => item._id !== _id));
     } catch (error) {
@@ -157,6 +154,7 @@ const ClientFeedback = () => {
             <form onSubmit={handleSubmit}>
               <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
               <TextField
+                required={true}
                 id="feedbackType"
                 name="feedbackType"
                 value={formData.feedbackType}
@@ -166,6 +164,7 @@ const ClientFeedback = () => {
               />
               <InputLabel htmlFor="dateReceived">Date Received</InputLabel>
               <TextField
+                required={true}
                 id="dateReceived"
                 name="dateReceived"
                 type="date"
@@ -178,6 +177,7 @@ const ClientFeedback = () => {
                 Detailed Feedback
               </InputLabel>
               <TextField
+                required={true}
                 id="detailedFeedback"
                 name="detailedFeedback"
                 multiline
@@ -189,6 +189,7 @@ const ClientFeedback = () => {
               />
               <InputLabel htmlFor="actionTaken">Action Taken</InputLabel>
               <TextField
+                required={true}
                 id="actionTaken"
                 name="actionTaken"
                 multiline
@@ -200,6 +201,7 @@ const ClientFeedback = () => {
               />
               <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
               <TextField
+                required={true}
                 id="closureDate"
                 name="closureDate"
                 type="date"
@@ -269,6 +271,7 @@ const ClientFeedback = () => {
                       <DialogContent>
                         <label>FeedBack Type</label>
                         <TextField
+                          required={true}
                           id="feedbackType"
                           name="feedbackType"
                           value={editFormData.feedbackType}
@@ -283,6 +286,7 @@ const ClientFeedback = () => {
                         />
                         <label>Detailed Feedback</label>
                         <TextField
+                          required={true}
                           id="detailedFeedback"
                           name="detailedFeedback"
                           multiline
@@ -299,6 +303,7 @@ const ClientFeedback = () => {
                         />
                         <label>Date Recieved</label>
                         <TextField
+                          required={true}
                           id="dateReceived"
                           type="date"
                           value={
@@ -317,6 +322,7 @@ const ClientFeedback = () => {
                         />
                         <label>Action Taken</label>
                         <TextField
+                          required={true}
                           id="actionTaken"
                           multiline
                           rows={4}
@@ -332,6 +338,7 @@ const ClientFeedback = () => {
                         />
                         <label>Closure Date</label>
                         <TextField
+                          required={true}
                           id="closureDate"
                           type="date"
                           value={

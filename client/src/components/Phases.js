@@ -15,7 +15,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import {
   getAllPhases,
   createPhases,
@@ -132,6 +132,7 @@ const Phases = () => {
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
                   <TextField
+                    required={true}
                     name="title"
                     label="Title"
                     value={formData.title}
@@ -140,6 +141,7 @@ const Phases = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                   required={true}
                     name="startDate"
                     label="Start Date"
                     type="date"
@@ -149,6 +151,7 @@ const Phases = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="completionDate"
                     label="Completion Date"
                     type="date"
@@ -158,6 +161,7 @@ const Phases = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                   required={true}
                     name="status"
                     label="Status"
                     value={formData.status}
@@ -166,6 +170,7 @@ const Phases = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                   required={true}
                     name="comments"
                     label="Comments"
                     multiline
@@ -246,6 +251,7 @@ const Phases = () => {
               <form onSubmit={handleSaveEdit}>
                 {/* Form fields for editing existing phase */}
                 <TextField
+                 required={true}
                   name="title"
                   label="Title"
                   value={editFormData.title}
@@ -256,6 +262,7 @@ const Phases = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="startDate"
                   label="Start Date"
                   type="date"
@@ -270,6 +277,7 @@ const Phases = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="completionDate"
                   label="Completion Date"
                   type="date"
@@ -284,6 +292,7 @@ const Phases = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="status"
                   label="Status"
                   value={editFormData.status}
@@ -294,6 +303,7 @@ const Phases = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="comments"
                   label="Comments"
                   multiline

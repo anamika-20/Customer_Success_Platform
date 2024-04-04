@@ -7,10 +7,10 @@ const router = express.Router();
 const {getAllFinancialEscalationMatrix,getFinancialEscalationMatrixById,createFinancialEscalationMatrix,updateFinancialEscalationMatrix,deleteFinancialEscalationMatrix, } = FinancialEscalationMatrixController;
 
 // Routes
-router.get("/financialEscalationMatrix", getAllFinancialEscalationMatrix);
-router.get("/financialEscalationMatrix/:id", getFinancialEscalationMatrixById);
-router.post("/financialEscalationMatrix", createFinancialEscalationMatrix);
-router.patch("/financialEscalationMatrix/:id", updateFinancialEscalationMatrix);
-router.delete("/financialEscalationMatrix/:id", deleteFinancialEscalationMatrix);
+router.get("/financials", getAllFinancialEscalationMatrix);
+router.get("/financials/:id", getFinancialEscalationMatrixById);
+router.post("/financials", createFinancialEscalationMatrix);
+router.patch("/financials/:id", updateFinancialEscalationMatrix);
+router.delete("/financials/:id", deleteFinancialEscalationMatrix);
 
 export default router;

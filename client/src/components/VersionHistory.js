@@ -27,7 +27,7 @@ import {
   deleteVersionHistory,
   getVersionHistoryById,
 } from "../api/versionHistoryAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { getRole } from "../api/profileApi";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";

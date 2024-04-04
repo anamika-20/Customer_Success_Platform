@@ -13,7 +13,7 @@ import {
   TextField,
   Modal,
 } from "@mui/material";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import {
   getAllFinancialEscalationMatrix,
   createFinancialEscalationMatrix,
@@ -138,6 +138,7 @@ const Financial = () => {
                   sx={{ mb: 2 }}
                 /> */}
                 <TextField
+                  required={true}
                   name="level"
                   label="Level"
                   value={formData.level}
@@ -146,6 +147,7 @@ const Financial = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="name"
                   label="Name"
                   value={formData.name}
@@ -250,6 +252,7 @@ const Financial = () => {
                 sx={{ mb: 2 }}
               /> */}
               <TextField
+              required={true}
                 name="level"
                 label="Level"
                 value={editFormData.level}
@@ -260,6 +263,7 @@ const Financial = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
+              required={true}
                 name="name"
                 label="Name"
                 value={editFormData.name}

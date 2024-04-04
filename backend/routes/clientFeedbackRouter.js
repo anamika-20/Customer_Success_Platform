@@ -14,10 +14,10 @@ const {
 } = clientFeedbackController;
 
 // Routes
-router.get("/clientfeedback",  (getAllClientFeedback));
-router.get("/clientfeedback/:id", getClientFeedbackById);
-router.post("/clientfeedback", createClientFeedback);
-router.patch("/clientfeedback/:id", updateClientFeedback);
-router.delete("/clientfeedback/:id", deleteClientFeedback);
+router.get("/clientfeedbacks",  (getAllClientFeedback));
+router.get("/clientfeedbacks/:id", getClientFeedbackById);
+router.post("/clientfeedbacks", createClientFeedback);
+router.patch("/clientfeedbacks/:id", updateClientFeedback);
+router.delete("/clientfeedbacks/:id", deleteClientFeedback);
 
 export default router;

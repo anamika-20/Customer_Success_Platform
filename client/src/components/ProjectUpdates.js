@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import axios from "axios";
-import { Grid, Paper, TextField, Button, InputLabel } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  TextField,
+  Button,
+  InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAuth0 } from "@auth0/auth0-react";
+import {
+  fetchProjectUpdates,
+  submitProjectUpdate,
+  deleteProjectUpdate,
+  fetchUserRole,
+  updateProjectUpdate,
+} from "../api/projectUpdatesAPI";
 
 const ProjectUpdates = () => {
   const { user, isLoading } = useAuth0();
@@ -14,6 +31,12 @@ const ProjectUpdates = () => {
     date: "",
     generalUpdates: "",
   });
+  const [editData, setEditData] = useState({
+    _id: "",
+    date: "",
+    generalUpdates: "",
+  });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,17 +45,35 @@ const ProjectUpdates = () => {
     });
   };
 
+  const handleEdit = (update) => {
+    setEditData(update);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const updatedUpdate = await updateProjectUpdate(editData._id, editData);
+      setUpdates(
+        updates.map((update) =>
+          update._id === updatedUpdate._id ? updatedUpdate : update
+        )
+      );
+      setEditDialogOpen(false);
+    } catch (error) {
+      console.error("Error editing Update:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/projectupdates",
-        formData
-      );
-      setUpdates([...updates, response.data]);
-      console.log("Updates submitted:", response.data);
-
+      const response = await submitProjectUpdate(formData);
+      setUpdates([...updates, response]);
+      console.log("Updates submitted:", response);
       setFormData({
         date: "",
         generalUpdates: "",
@@ -42,42 +83,39 @@ const ProjectUpdates = () => {
     }
   };
 
-  const fetchProjectUpdates = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/api/projectupdates"
-      );
-      setUpdates(response.data);
-    } catch (error) {
-      console.error("Error fetching Updates:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProjectUpdates();
+    const fetchData = async () => {
+      try {
+        const data = await fetchProjectUpdates();
+        setUpdates(data);
+      } catch (error) {
+        console.error("Error fetching Updates:", error);
+      }
+    };
+    fetchData();
   }, []);
 
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
-    }
-  };
-  if (!isLoading) getRole();
-  //delete
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const role = await fetchUserRole(user?.email);
+        if (role === "Does not Exists") setRole(null);
+        else setRole(role);
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    };
+
+    if (!isLoading) getUserRole();
+  }, [isLoading, user]);
+
   const handleDelete = async (_id) => {
     try {
       if (!_id) {
         console.error("Updates _id is undefined or null");
         return;
       }
-
-      await axios.delete(`http://localhost:8080/api/projectupdates/${_id}`);
+      await deleteProjectUpdate(_id);
       setUpdates(updates.filter((update) => update._id !== _id));
       console.log("Update deleted with _id:", _id);
     } catch (error) {
@@ -95,6 +133,7 @@ const ProjectUpdates = () => {
               <form onSubmit={handleSubmit}>
                 <InputLabel htmlFor="date">Date</InputLabel>
                 <TextField
+                required
                   id="date"
                   name="date"
                   type="date"
@@ -107,6 +146,7 @@ const ProjectUpdates = () => {
                   General Updates
                 </InputLabel>
                 <TextField
+                required
                   id="generalUpdates"
                   name="generalUpdates"
                   multiline
@@ -132,9 +172,8 @@ const ProjectUpdates = () => {
               <div key={index}>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <h3>Date: {update.date.split("T")[0]}</h3>
-                  {console.log(role)}
                   {(role === "projectmanager" || role === "admin") && (
-                    <Button>
+                    <Button onClick={() => handleEdit(update)}>
                       <EditIcon style={{ marginLeft: "10px" }} />
                     </Button>
                   )}
@@ -155,6 +194,57 @@ const ProjectUpdates = () => {
             {updates.length === 0 && <p>No updates yet.</p>}
           </Paper>
         </Grid>
+
+        {/* Edit Dialog */}
+        <Dialog
+          open={editDialogOpen}
+          onClose={handleCloseEditDialog}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>Edit Update</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSaveEdit}>
+              <InputLabel htmlFor="date">Date</InputLabel>
+              <TextField
+                id="date"
+                name="date"
+                type="date"
+                value={editData.date}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    date: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="generalUpdates">General Updates</InputLabel>
+              <TextField
+                id="generalUpdates"
+                name="generalUpdates"
+                multiline
+                rows={4}
+                value={editData.generalUpdates}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    generalUpdates: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <Button variant="contained" type="submit">
+                Save
+              </Button>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditDialog}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
       </Layout>
     )
   );

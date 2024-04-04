@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
-import axios from "axios";
+import Layout from "./Layout";
 import {
   TextField,
   Button,
@@ -15,6 +14,13 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
+import {
+  fetchTeams,
+  saveTeam,
+  updateTeam,
+  deleteTeam,
+  fetchUserRole,
+} from "../api/approvedTeamsAPI";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -29,7 +35,7 @@ const ApprovedTeams = () => {
   ]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editedTeam, setEditedTeam] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  // const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddRow = () => {
     setTableData([
@@ -52,18 +58,18 @@ const ApprovedTeams = () => {
     setOpenDialog(true);
   };
 
-  const handleSave = () => {
-    for (const row of tableData) {
-      if (
-        !row.numberOfResources ||
-        !row.role ||
-        !row.availability ||
-        !row.duration
-      ) {
-        setErrorMessage("Please fill in all fields.");
-        return;
-      }
-    }
+  const handleSave = async () => {
+    // for (const row of tableData) {
+    //   if (
+    //     !row.numberOfResources ||
+    //     !row.role ||
+    //     !row.availability ||
+    //     !row.duration
+    //   ) {
+    //     setErrorMessage("Please fill in all fields.");
+    //     return;
+    //   }
+    // }
 
     const teamResources = tableData.map((row) => ({
       numberOfResources: row.numberOfResources,
@@ -72,80 +78,55 @@ const ApprovedTeams = () => {
       duration: row.duration,
     }));
 
-    if (editedTeam) {
-      axios
-        .patch(`http://localhost:8080/api/approvedteams/${editedTeam._id}`, {
-          PhaseNumber: phaseNumber,
-          teamResources: teamResources,
-        })
-        .then((response) => {
-          console.log("Team updated successfully:", response.data);
-          setOpenDialog(false);
-          setEditedTeam(null);
-          fetchTeams();
-        })
-        .catch((error) => {
-          console.error("Failed to update team:", error);
-        });
-    } else {
-      axios
-        .post("http://localhost:8080/api/approvedteams", {
-          PhaseNumber: phaseNumber,
-          teamResources: teamResources,
-        })
-        .then((response) => {
-          console.log("Team saved successfully:", response.data);
-          setOpenDialog(false);
-          fetchTeams();
-        })
-        .catch((error) => {
-          console.error("Failed to save team:", error);
-        });
+    const team = {
+      PhaseNumber: phaseNumber,
+      teamResources: teamResources,
+    };
+
+    try {
+      if (editedTeam) {
+        await updateTeam(editedTeam._id, team);
+        setOpenDialog(false);
+        setEditedTeam(null);
+      } else {
+        await saveTeam(team);
+        setOpenDialog(false);
+      }
+      fetchTeamsData();
+    } catch (error) {
+      console.error("Error saving team:", error);
     }
   };
 
   const handleDelete = async (_id) => {
     try {
-      if (!_id) {
-        console.error("Team _id is undefined or null");
-        return;
-      }
-
-      await axios.delete(`http://localhost:8080/api/approvedteams/${_id}`);
+      await deleteTeam(_id);
       setTeams(teams.filter((team) => team._id !== _id));
-      console.log("Team deleted with _id:", _id);
     } catch (error) {
-      console.error("Error deleting Team:", error);
+      console.error("Error deleting team:", error);
     }
   };
 
-  const fetchTeams = async () => {
+  const fetchTeamsData = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/approvedteams"
-      );
-      setTeams(response.data);
-      console.log(response.data);
+      const data = await fetchTeams();
+      setTeams(data);
     } catch (error) {
       console.error("Error fetching teams:", error);
     }
   };
 
   useEffect(() => {
-    fetchTeams();
-  }, []);
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
+    fetchTeamsData();
+    if (!isLoading) {
+      const getUserRole = async () => {
+        const role = await fetchUserRole(user?.email);
+        setRole(role);
+      };
+      getUserRole();
     }
-  };
-  if (!isLoading) getRole();
+  }, [isLoading, user]);
+
   return (
     <Layout>
       <Grid item container>
@@ -160,11 +141,11 @@ const ApprovedTeams = () => {
             <DialogTitle>Enter Table Data</DialogTitle>
             <DialogContent>
               <TextField
+                required={true}
                 label="Table Name"
                 variant="outlined"
                 value={phaseNumber}
                 onChange={(e) => setPhaseNumber(e.target.value)}
-                required
                 fullWidth
                 margin="normal"
               />
@@ -182,41 +163,41 @@ const ApprovedTeams = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <TextField
+                          required={true}
                           name="numberOfResources"
                           variant="outlined"
                           value={rowData.numberOfResources}
                           onChange={(e) => handleInputChange(index, e)}
-                          required
                           fullWidth
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
+                          required={true}
                           name="role"
                           variant="outlined"
                           value={rowData.role}
                           onChange={(e) => handleInputChange(index, e)}
-                          required
                           fullWidth
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
+                          required={true}
                           name="availability"
                           variant="outlined"
                           value={rowData.availability}
                           onChange={(e) => handleInputChange(index, e)}
-                          required
                           fullWidth
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
+                          required={true}
                           name="duration"
                           variant="outlined"
                           value={rowData.duration}
                           onChange={(e) => handleInputChange(index, e)}
-                          required
                           fullWidth
                         />
                       </TableCell>
@@ -224,7 +205,7 @@ const ApprovedTeams = () => {
                   ))}
                 </TableBody>
               </Table>
-              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+              {/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
             </DialogContent>
             <DialogActions>
               <Button variant="contained" onClick={handleAddRow}>

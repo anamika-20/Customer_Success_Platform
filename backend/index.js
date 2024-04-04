@@ -1,9 +1,6 @@
 import express from "express";
-// import pkg from "express-openid-connect";
 import cors from "cors";
-// import mongoose, { get } from "mongoose";
 import dotenv from "dotenv";
-// import User from "../backend/Schemas/User.js";
 import connectDB from "./config/db.js";
 import clientFeedbackRouter from "./routes/clientFeedbackRouter.js";
 import momsRouter from "../backend/routes/momsRouter.js";
@@ -30,23 +27,8 @@ dotenv.config();
 connectDB();
 const app = express();
 app.use(express.json());
-
-const corsOptions = {
-  origin: "http://localhost:3000/",
-};
-// // Apply middleware
 app.use(cors());
 
-// const { auth, requiresAuth } = pkg;
-// const config = {
-//   authRequired: false,
-//   auth0Logout: true,
-//   baseURL: "http://localhost:8080",
-//   clientID: "2Nhg3Eyp2oxOGJmlqSaSeS9qpmzJcQSI",
-//   issuerBaseURL: "https://dev-3esj1ci31pl5sjji.us.auth0.com",
-//   // secret: "6b25b374101d391f0ea072d7bd2d908b0f25098893ace5ddca10e2a37630d2db",
-//   secret: "zaaFDXNprscd0Gnq7YAUjCA-WY6qIPe7S_Fa5ItrQgQsP-z1deSHHbl94jqmr_jW",
-// };
 
 // DOWNLOAD ALL CONTENT
 app.get("/download-pdf/:project_id", downloadFeature);

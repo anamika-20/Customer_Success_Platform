@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/operationalEscalationMatrix";
+const baseUrl = "http://localhost:8080/api/operationals";
 
 export const getAllOperationalEscalationMatrix = async () => {
   try {

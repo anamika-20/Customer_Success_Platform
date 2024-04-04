@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:8080/api/riskProfiling';
+const baseUrl = 'http://localhost:8080/api/risks';
 
 export const getAllRiskProfilings = async () => {
   try {

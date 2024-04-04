@@ -21,7 +21,7 @@ import {
   updateProjectBudget,
   deleteProjectBudget,
 } from "../api/projectBudgetAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
@@ -146,6 +146,7 @@ const ProjectBudget = () => {
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
                   <TextField
+                    required={true}
                     name="projectType"
                     label="Project Type"
                     value={formData.projectType}
@@ -154,6 +155,7 @@ const ProjectBudget = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="duration"
                     label="Duration"
                     value={formData.duration}
@@ -162,6 +164,7 @@ const ProjectBudget = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="budgetedHours"
                     label="Budgeted Hours"
                     value={formData.budgetedHours}
@@ -238,6 +241,7 @@ const ProjectBudget = () => {
             <DialogContent>
               <form>
                 <TextField
+                  required={true}
                   name="projectType"
                   label="Project Type"
                   value={editFormData.projectType}
@@ -251,6 +255,7 @@ const ProjectBudget = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="duration"
                   label="Duration"
                   value={editFormData.duration}
@@ -264,6 +269,7 @@ const ProjectBudget = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="budgetedHours"
                   label="Budgeted Hours"
                   value={editFormData.budgetedHours}

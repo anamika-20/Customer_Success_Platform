@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
@@ -42,6 +42,7 @@ const Dashboard = () => {
   const [projectId, setProjectId] = useState("");
   const [projects, setProjects] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     const getProjectNames = async () => {
       try {

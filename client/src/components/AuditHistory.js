@@ -29,7 +29,7 @@ import {
   updateAuditHistory,
   deleteAuditHistory,
 } from "../api/auditHistoryAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const AuditHistory = () => {
@@ -52,7 +52,7 @@ const AuditHistory = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/auditHistory`
+        `http://localhost:8080/api/audits`
       );
       setAuditHistory(response.data);
     } catch (error) {
@@ -180,6 +180,7 @@ const AuditHistory = () => {
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
                   <TextField
+                    required
                     name="date"
                     //   label="Date"
                     type="date"
@@ -189,6 +190,7 @@ const AuditHistory = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required
                     name="reviewedBy"
                     label="Reviewed By"
                     value={formData.reviewedBy}
@@ -197,6 +199,7 @@ const AuditHistory = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required
                     name="status"
                     label="Status"
                     value={formData.status}
@@ -205,6 +208,7 @@ const AuditHistory = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required
                     name="reviewedSection"
                     label="Reviewed Section"
                     value={formData.reviewedSection}
@@ -213,6 +217,7 @@ const AuditHistory = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required
                     name="comments"
                     label="Comments"
                     multiline
@@ -223,6 +228,7 @@ const AuditHistory = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required
                     name="actionItem"
                     label="Action Item"
                     value={formData.actionItem}

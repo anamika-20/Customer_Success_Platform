@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import axios from "axios";
 import {
   Grid,
@@ -19,6 +19,13 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+import {
+  fetchResources,
+  submitResource,
+  updateResource,
+  deleteResource,
+  fetchUserRole,
+} from "../api/resourcesAPI";
 
 const Resources = () => {
   const { user, isLoading } = useAuth0();
@@ -57,13 +64,13 @@ const Resources = () => {
     setEditDialogOpen(false);
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.patch(
-        `http://localhost:8080/api/resources/${editFormData._id}`,
+      const updatedResource = await updateResource(
+        editFormData._id,
         editFormData
       );
-      const updatedResource = response.data;
       setResources(
         resources.map((resource) =>
           resource._id === updatedResource._id ? updatedResource : resource
@@ -78,12 +85,9 @@ const Resources = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/resources",
-        formData
-      );
-      setResources([...resources, response.data]);
-      console.log("Resource submitted:", response.data);
+      const response = await submitResource(formData);
+      setResources([...resources, response]);
+      console.log("Resource submitted:", response);
       setFormData({
         resourceName: "",
         role: "",
@@ -96,33 +100,35 @@ const Resources = () => {
     }
   };
 
-  const fetchResources = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/api/resources");
-      setResources(response.data);
-    } catch (error) {
-      console.error("Error fetching Resources:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchResources();
+        setResources(data);
+      } catch (error) {
+        console.error("Error fetching Resources:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    fetchResources();
-  }, []);
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
-    }
-  };
-  if (!isLoading) getRole();
+    const getUserRole = async () => {
+      try {
+        const userRole = await fetchUserRole(user?.email);
+        if (userRole === "Does not Exists") setRole(null);
+        else setRole(userRole);
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    };
+
+    if (!isLoading) getUserRole();
+  }, [isLoading, user]);
+
   const handleDelete = async (_id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/resources/${_id}`);
+      await deleteResource(_id);
       setResources(resources.filter((resource) => resource._id !== _id));
       console.log("Resource deleted with _id:", _id);
     } catch (error) {
@@ -140,6 +146,7 @@ const Resources = () => {
             <form onSubmit={handleSubmit}>
               <InputLabel htmlFor="resourceName">Resource Name</InputLabel>
               <TextField
+                required={true}
                 id="resourceName"
                 name="resourceName"
                 value={formData.resourceName}
@@ -149,6 +156,7 @@ const Resources = () => {
               />
               <InputLabel htmlFor="role">Role</InputLabel>
               <TextField
+              required={true}
                 id="role"
                 name="role"
                 value={formData.role}
@@ -158,6 +166,7 @@ const Resources = () => {
               />
               <InputLabel htmlFor="startDate">Start Date</InputLabel>
               <TextField
+              required={true}
                 id="startDate"
                 name="startDate"
                 type="date"
@@ -168,6 +177,7 @@ const Resources = () => {
               />
               <InputLabel htmlFor="endDate">End Date</InputLabel>
               <TextField
+              required={true}
                 id="endDate"
                 name="endDate"
                 type="date"
@@ -178,6 +188,7 @@ const Resources = () => {
               />
               <InputLabel htmlFor="comment">Comment</InputLabel>
               <TextField
+              required={true}
                 id="comment"
                 name="comment"
                 multiline
@@ -264,6 +275,7 @@ const Resources = () => {
           <form onSubmit={handleSaveEdit}>
             <InputLabel htmlFor="resourceName">Resource Name</InputLabel>
             <TextField
+            required={true}
               id="resourceName"
               name="resourceName"
               value={editFormData.resourceName}
@@ -278,6 +290,7 @@ const Resources = () => {
             />
             <InputLabel htmlFor="role">Role</InputLabel>
             <TextField
+            required={true}
               id="role"
               name="role"
               value={editFormData.role}
@@ -289,6 +302,7 @@ const Resources = () => {
             />
             <InputLabel htmlFor="startDate">Start Date</InputLabel>
             <TextField
+            required={true}
               id="startDate"
               name="startDate"
               type="date"
@@ -301,6 +315,7 @@ const Resources = () => {
             />
             <InputLabel htmlFor="endDate">End Date</InputLabel>
             <TextField
+            required={true}
               id="endDate"
               name="endDate"
               type="date"
@@ -313,6 +328,7 @@ const Resources = () => {
             />
             <InputLabel htmlFor="comment">Comment</InputLabel>
             <TextField
+            required={true}
               id="comment"
               name="comment"
               multiline

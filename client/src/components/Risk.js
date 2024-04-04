@@ -22,7 +22,7 @@ import {
   updateRiskProfiling,
   deleteRiskProfiling,
 } from "../api/riskAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
@@ -174,6 +174,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   /> */}
                   <TextField
+                    required={true}
                     name="riskType"
                     label="Risk Type"
                     value={formData.riskType}
@@ -182,6 +183,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="description"
                     label="Description"
                     value={formData.description}
@@ -190,6 +192,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="severity"
                     label="Severity"
                     value={formData.severity}
@@ -198,6 +201,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="impact"
                     label="Impact"
                     value={formData.impact}
@@ -206,6 +210,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="remedialSteps"
                     label="Remedial Steps"
                     value={formData.remedialSteps}
@@ -214,6 +219,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="status"
                     label="Status"
                     value={formData.status}
@@ -222,6 +228,7 @@ const Risk = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="closureDate"
                     label="Closure Date"
                     type="date"
@@ -319,6 +326,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 /> */}
                 <TextField
+                  required={true}
                   name="riskType"
                   label="Risk Type"
                   value={editFormData.riskType}
@@ -332,6 +340,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="description"
                   label="Description"
                   value={editFormData.description}
@@ -345,6 +354,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="severity"
                   label="Severity"
                   value={editFormData.severity}
@@ -358,6 +368,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="impact"
                   label="Impact"
                   value={editFormData.impact}
@@ -368,6 +379,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="remedialSteps"
                   label="Remedial Steps"
                   value={editFormData.remedialSteps}
@@ -381,6 +393,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="status"
                   label="Status"
                   value={editFormData.status}
@@ -391,6 +404,7 @@ const Risk = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="closureDate"
                   label="Closure Date"
                   type="date"

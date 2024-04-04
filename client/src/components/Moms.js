@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../Layout";
-import axios from "axios";
+import Layout from "./Layout";
 import {
   Grid,
   Paper,
@@ -19,6 +18,13 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+import {
+  fetchMoms,
+  submitMom,
+  editMom,
+  deleteMom,
+  fetchUserRole,
+} from "../api/momsAPI";
 
 const Moms = () => {
   const { user, isLoading } = useAuth0();
@@ -58,12 +64,9 @@ const Moms = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/moms",
-        formData
-      );
-      setMoms([...moms, response.data]);
-      console.log("MoM submitted:", response.data);
+      const response = await submitMom(formData);
+      setMoms([...moms, response]);
+      console.log("MoM submitted:", response);
       setFormData({
         date: "",
         duration: "",
@@ -77,10 +80,7 @@ const Moms = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await axios.patch(
-        `http://localhost:8080/api/moms/${editFormData._id}`,
-        editFormData
-      );
+      await editMom(editFormData._id, editFormData);
       console.log("MoM edited:", editFormData);
       setEditDialogOpen(false);
       setMoms(
@@ -95,42 +95,39 @@ const Moms = () => {
 
   const handleDelete = async (_id) => {
     try {
-      if (!_id) {
-        console.error("MoM _id is undefined or null");
-        return;
-      }
-
-      await axios.delete(`http://localhost:8080/api/moms/${_id}`);
+      await deleteMom(_id);
+      console.log("MoM deleted with _id:", _id);
       setMoms(moms.filter((mom) => mom._id !== _id));
-      console.log("Feedback deleted with _id:", _id);
     } catch (error) {
-      console.error("Error deleting feedback:", error);
+      console.error("Error deleting MoM:", error);
     }
   };
 
   useEffect(() => {
-    const fetchMoms = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/moms");
-        setMoms(response.data);
+        const data = await fetchMoms();
+        setMoms(data);
       } catch (error) {
         console.error("Error fetching moms:", error);
       }
     };
-    fetchMoms();
+    fetchData();
   }, []);
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
-    }
-  };
-  if (!isLoading) getRole();
+
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const role = await fetchUserRole(user?.email);
+        if (role === "Does not Exists") setRole(null);
+        else setRole(role);
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    };
+
+    if (!isLoading) getUserRole();
+  }, [isLoading, user]);
 
   return (
     <Layout>
@@ -141,6 +138,7 @@ const Moms = () => {
             <form onSubmit={handleSubmit}>
               <InputLabel htmlFor="date">Date</InputLabel>
               <TextField
+                required={true}
                 id="date"
                 name="date"
                 type="date"
@@ -151,6 +149,7 @@ const Moms = () => {
               />
               <InputLabel htmlFor="duration">Duration</InputLabel>
               <TextField
+                required={true}
                 id="duration"
                 name="duration"
                 value={formData.duration}
@@ -160,6 +159,7 @@ const Moms = () => {
               />
               <InputLabel htmlFor="momLink">MoM Link</InputLabel>
               <TextField
+                required={true}
                 id="momLink"
                 name="momLink"
                 value={formData.momLink}
@@ -169,6 +169,7 @@ const Moms = () => {
               />
               <InputLabel htmlFor="comments">Comment</InputLabel>
               <TextField
+              required={true}
                 id="comments"
                 name="comments"
                 multiline
@@ -242,6 +243,7 @@ const Moms = () => {
         <DialogContent>
           <InputLabel htmlFor="date">Date</InputLabel>
           <TextField
+           required={true}
             id="date"
             name="date"
             type="date"
@@ -257,6 +259,7 @@ const Moms = () => {
           />
           <InputLabel htmlFor="duration">Duration</InputLabel>
           <TextField
+           required={true}
             id="duration"
             name="duration"
             value={editFormData.duration}
@@ -271,6 +274,7 @@ const Moms = () => {
           />
           <InputLabel htmlFor="momLink">MoM Link</InputLabel>
           <TextField
+           required={true}
             id="momLink"
             name="momLink"
             value={editFormData.momLink}
@@ -285,6 +289,7 @@ const Moms = () => {
           />
           <InputLabel htmlFor="comments">Comment</InputLabel>
           <TextField
+           required={true}
             id="comments"
             name="comments"
             multiline

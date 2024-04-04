@@ -6,10 +6,10 @@ const router = express.Router();
 const { getAllTeams, getTeamById, createTeam, updateTeam, deleteTeam } =
   ApprovedTeamsController;
 
-router.get("/approvedTeams", getAllTeams);
-router.get("/approvedTeams/:id", getTeamById);
-router.post("/approvedTeams", createTeam);
-router.patch("/approvedTeams/:id", updateTeam);
-router.delete("/approvedTeams/:id", deleteTeam);
+router.get("/approvedteams", getAllTeams);
+router.get("/approvedteams/:id", getTeamById);
+router.post("/approvedteams", createTeam);
+router.patch("/approvedteams/:id", updateTeam);
+router.delete("/approvedteams/:id", deleteTeam);
 
 export default router;

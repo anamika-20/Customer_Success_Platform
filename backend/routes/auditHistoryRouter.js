@@ -13,9 +13,9 @@ const {
 } = AuditHistoryController;
 
 // Routes
-router.get("/auditHistory", getAllAuditHistory);
-router.get("/auditHistory/:id", getAuditHistoryById);
-router.post("/auditHistory", createAuditHistory);
-router.patch("/auditHistory/:id", updateAuditHistory);
-router.delete("/auditHistory/:id", deleteAuditHistory);
+router.get("/audits", getAllAuditHistory);
+router.get("/audits/:id", getAuditHistoryById);
+router.post("/audits", createAuditHistory);
+router.patch("/audits/:id", updateAuditHistory);
+router.delete("/audits/:id", deleteAuditHistory);
 export default router;

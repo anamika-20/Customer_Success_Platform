@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Typography,
 } from "@mui/material";
 import {
   getAllSprintDetails,
@@ -22,11 +21,11 @@ import {
   updateSprintDetail,
   deleteSprintDetail,
 } from "../api/sprintDetailAPI";
-import Layout from "../Layout";
+import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
-const SprintDetailComponent = () => {
+const SprintDetail= () => {
   const { user, isLoading } = useAuth0();
   const [role, setRole] = useState(null);
   const [sprintDetails, setSprintDetails] = useState([]);
@@ -163,6 +162,7 @@ const SprintDetailComponent = () => {
                     sx={{ mb: 2 }}
                   /> */}
                   <TextField
+                    required={true}
                     name="startDate"
                     label="Start Date"
                     type="date"
@@ -172,6 +172,7 @@ const SprintDetailComponent = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="endDate"
                     label="End Date"
                     type="date"
@@ -181,6 +182,7 @@ const SprintDetailComponent = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="status"
                     label="Status"
                     value={formData.status}
@@ -189,6 +191,7 @@ const SprintDetailComponent = () => {
                     sx={{ mb: 2 }}
                   />
                   <TextField
+                    required={true}
                     name="comments"
                     label="Comments"
                     multiline
@@ -277,6 +280,7 @@ const SprintDetailComponent = () => {
                   sx={{ mb: 2 }}
                 /> */}
                 <TextField
+                 required={true}
                   name="startDate"
                   label="Start Date"
                   type="date"
@@ -291,6 +295,7 @@ const SprintDetailComponent = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                 required={true}
                   name="endDate"
                   label="End Date"
                   type="date"
@@ -305,6 +310,7 @@ const SprintDetailComponent = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="status"
                   label="Status"
                   value={editFormData.status}
@@ -315,6 +321,7 @@ const SprintDetailComponent = () => {
                   sx={{ mb: 2 }}
                 />
                 <TextField
+                  required={true}
                   name="comments"
                   label="Comments"
                   multiline
@@ -342,4 +349,4 @@ const SprintDetailComponent = () => {
   );
 };
 
-export default SprintDetailComponent;
+export default SprintDetail;

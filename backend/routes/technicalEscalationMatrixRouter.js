@@ -7,10 +7,10 @@ const router = express.Router();
 const {getAllTechnicalEscalationMatrix,getTechnicalEscalationMatrixById,createTechnicalEscalationMatrix,updateTechnicalEscalationMatrix,deleteTechnicalEscalationMatrix, } = TechnicalEscalationMatrixController;
 
 // Routes
-router.get("/technicalEscalationMatrix", getAllTechnicalEscalationMatrix);
-router.get("/technicalEscalationMatrix/:id", getTechnicalEscalationMatrixById);
-router.post("/technicalEscalationMatrix", createTechnicalEscalationMatrix);
-router.patch("/technicalEscalationMatrix/:id", updateTechnicalEscalationMatrix);
-router.delete("/technicalEscalationMatrix/:id", deleteTechnicalEscalationMatrix);
+router.get("/technicals", getAllTechnicalEscalationMatrix);
+router.get("/technicals/:id", getTechnicalEscalationMatrixById);
+router.post("/technicals", createTechnicalEscalationMatrix);
+router.patch("/technicals/:id", updateTechnicalEscalationMatrix);
+router.delete("/technicals/:id", deleteTechnicalEscalationMatrix);
 
 export default router;

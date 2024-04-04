@@ -6,10 +6,10 @@ const router = express.Router();
 const {getAllSprintDetails,getSprintDetailById,createSprintDetail,updateSprintDetail,deleteSprintDetail, } = SprintDetailController;
 
 // Routes
-router.get("/sprintDetail", getAllSprintDetails);
-router.get("/sprintDetail/:id", getSprintDetailById);
-router.post("/sprintDetail", createSprintDetail);
-router.patch("/sprintDetail/:id", updateSprintDetail);
-router.delete("/sprintDetail/:id", deleteSprintDetail);
+router.get("/sprints", getAllSprintDetails);
+router.get("/sprints/:id", getSprintDetailById);
+router.post("/sprints", createSprintDetail);
+router.patch("/sprints/:id", updateSprintDetail);
+router.delete("/sprints/:id", deleteSprintDetail);
 
 export default router;
