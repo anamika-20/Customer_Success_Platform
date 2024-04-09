@@ -1,104 +1,92 @@
-// import React, { useState } from "react";
-// import TextField from "@mui/material/TextField";
-// import Button from "@mui/material/Button";
-// import Grid from "@mui/material/Grid";
-// import Layout from "../Layout";
+import React, { useContext, useEffect, useState } from "react";
+import Layout from "./Layout";
+import { Grid, Button, Typography } from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import { CardActionArea } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import MultiStepFormModal from "./MultiStepFormModal";
+import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { DataContext } from "../DataContext";
 
-// const ProjectDetails = () => {
-//   const [formData, setFormData] = useState({
-//     project_name: "",
-//     project_desc: "",
-//     project_manager: "",
-//   });
+const ProjectDetails = () => {
+  const { projects, loading, error } = useContext(DataContext);
+  console.log(projects);
+  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
 
-//   const handleChange = (e) => {
-//     setFormData({
-//       ...formData,
-//       [e.target.name]: e.target.value,
-//     });
-//   };
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log(formData);
-//     setFormData({
-//       project_name: "",
-//       project_desc: "",
-//       project_manager: "",
-//     });
-//   };
+  const getRandomImage = () => {
+    const keywords = ["people", "business", "team", "office", "meeting"];
+    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+    return `https://source.unsplash.com/400x300/?${randomKeyword}`;
+  };
+  const handleProject = (id) => {
+    navigate(`/project/${id}`);
+  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  return (
+    <Layout>
+      <Grid container spacing={5} sx={{ p: 2 }}>
+        <Grid container item>
+          <Grid item xs={10}>
+            <Typography className="mb-2">My Projects</Typography>
+            <Grid item xs={4} flex flexDirection={"row"}>
+              {projects &&
+                projects.map((project) => (
+                  <Card
+                    sx={{ maxWidth: 345 }}
+                    onClick={() => {
+                      handleProject(project._id);
+                    }}
+                  >
+                    <CardActionArea>
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={getRandomImage()}
+                        alt="random image"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {project.projectName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {project.projectDescription}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                ))}
+            </Grid>
+          </Grid>
 
-//   return (
-//     <Layout>
-//       <Grid item container>
-//         <Grid item xs={6} sx={{ marginLeft: 5 }}>
-//           <h2>Project Details</h2>
-//           <form onSubmit={handleSubmit}>
-//             <Grid container spacing={2}>
-//               <Grid item xs={12}>
-//                 <TextField
-//                   fullWidth
-//                   id="project_name"
-//                   name="project_name"
-//                   label="Project Name"
-//                   value={formData.project_name}
-//                   onChange={handleChange}
-//                   variant="outlined"
-//                 />
-//               </Grid>
-//               <Grid item xs={12}>
-//                 <TextField
-//                   fullWidth
-//                   id="project_desc"
-//                   name="project_desc"
-//                   label="Project Description"
-//                   value={formData.project_desc}
-//                   onChange={handleChange}
-//                   variant="outlined"
-//                   multiline
-//                   rows={4}
-//                 />
-//               </Grid>
-//               <Grid item xs={12}>
-//                 <TextField
-//                   fullWidth
-//                   id="project_scope"
-//                   name="project_scope"
-//                   label="Project Scope"
-//                   value={formData.project_desc}
-//                   onChange={handleChange}
-//                   variant="outlined"
-//                   multiline
-//                   rows={2}
-//                 />
-//               </Grid>
-//               <Grid item xs={12}>
-//                 <TextField
-//                   fullWidth
-//                   id="project_manager"
-//                   name="project_manager"
-//                   label="Project Manager"
-//                   value={formData.project_manager}
-//                   onChange={handleChange}
-//                   variant="outlined"
-//                 />
-//               </Grid>
-//               <Grid item xs={12}>
-//                 <Button
-//                   type="submit"
-//                   variant="contained"
-//                   color="primary"
-//                   fullWidth
-//                 >
-//                   Submit
-//                 </Button>
-//               </Grid>
-//             </Grid>
-//           </form>
-//         </Grid>
-//       </Grid>
-//     </Layout>
-//   );
-// };
+          <Grid item xs={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenModal}
+            >
+              <AddIcon />
+              Add Project
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
 
-// export default ProjectDetails;
+      <MultiStepFormModal open={openModal} onClose={handleCloseModal} />
+    </Layout>
+  );
+};
+
+export default ProjectDetails;

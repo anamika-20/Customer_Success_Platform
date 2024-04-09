@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Grid,
   Paper,
@@ -14,24 +14,25 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Typography,
+  InputLabel,
 } from "@mui/material";
-import {
-  getAllRiskProfilings,
-  createRiskProfiling,
-  updateRiskProfiling,
-  deleteRiskProfiling,
-} from "../api/riskAPI";
+
 import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { DataContext } from "../DataContext";
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
+import HorizontalList from "./HorizontalList";
 
 const Risk = () => {
-  const { user, isLoading } = useAuth0();
-  const [role, setRole] = useState(null);
+  const { getAccessTokenSilently } = useAuth0();
+  const { id } = useParams();
+
+  const { projects, loading, error, role } = useContext(DataContext);
+  console.log(projects);
   const [riskProfiles, setRiskProfiles] = useState([]);
   const [formData, setFormData] = useState({
-    // project_id: "",
     riskType: "",
     description: "",
     severity: "",
@@ -42,31 +43,17 @@ const Risk = () => {
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editItemId, setEditItemId] = useState(null); // For tracking the item being edited
+  const [editItemId, setEditItemId] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAllRiskProfilings();
-        setRiskProfiles(data);
-      } catch (error) {
-        console.error("Error fetching risk profiles:", error);
+    if (id && projects) {
+      const project = projects.find((project) => project._id === id);
+      if (project) {
+        setRiskProfiles(project.riskProfiling);
       }
-    };
-    fetchData();
-  }, []);
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
     }
-  };
-  if (!isLoading) getRole();
+  }, [id, projects]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -81,8 +68,23 @@ const Risk = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newRiskProfile = await createRiskProfiling(formData);
-      setRiskProfiles([...riskProfiles, newRiskProfile]);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.post(
+        `http://localhost:8080/riskprofiling/${id}/add`,
+        {
+          riskType: formData.riskType,
+          description: formData.description,
+          severity: formData.severity,
+          impact: formData.impact,
+          remedialSteps: formData.remedialSteps,
+          status: formData.status,
+          closureDate: formData.closureDate,
+        }
+      );
+
+      setRiskProfiles([...riskProfiles, response.data]);
       setFormData({
         // project_id: "",
         riskType: "",
@@ -118,7 +120,7 @@ const Risk = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await updateRiskProfiling(editItemId, editFormData);
+      // await updateRiskProfiling(editItemId, editFormData);
       const updatedRiskProfiles = riskProfiles.map((profile) => {
         if (profile._id === editItemId) {
           return {
@@ -144,7 +146,7 @@ const Risk = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteRiskProfiling(id);
+      // await deleteRiskProfiling(id);
       setRiskProfiles(riskProfiles.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Error deleting version history:", error);
@@ -152,20 +154,22 @@ const Risk = () => {
   };
 
   return (
-    !isLoading && (
-      <Layout>
-        <Grid
-          container
-          spacing={2}
-          justifyContent="center"
-          sx={{ marginLeft: "auto", marginRight: "auto" }}
-        >
-          {(role === "projectmanager" || role === "admin") && (
-            <Grid item xs={12}>
-              <h2>Add Risks</h2>
-              <Paper sx={{ p: 2 }}>
-                <form onSubmit={handleSubmit}>
-                  {/* <TextField
+    <Layout>
+      <Grid
+        container
+        spacing={2}
+        justifyContent="center"
+        sx={{ marginLeft: "auto", marginRight: "auto" }}
+      >
+        <Grid item xs={12}>
+          <HorizontalList />
+        </Grid>
+        {(role === "projectmanager" || role === "admin") && (
+          <Grid item xs={12}>
+            <h2>Add Risks</h2>
+            <Paper sx={{ p: 2 }}>
+              <form onSubmit={handleSubmit}>
+                {/* <TextField
                     name="project_id"
                     label="Project ID"
                     value={formData.project_id}
@@ -173,146 +177,148 @@ const Risk = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   /> */}
-                  <TextField
-                    required={true}
-                    name="riskType"
-                    label="Risk Type"
-                    value={formData.riskType}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="description"
-                    label="Description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="severity"
-                    label="Severity"
-                    value={formData.severity}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="impact"
-                    label="Impact"
-                    value={formData.impact}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="remedialSteps"
-                    label="Remedial Steps"
-                    value={formData.remedialSteps}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="status"
-                    label="Status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    required={true}
-                    name="closureDate"
-                    label="Closure Date"
-                    type="date"
-                    value={formData.closureDate}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <Button variant="contained" type="submit">
-                    Add Risk Profile
-                  </Button>
-                </form>
-              </Paper>
-            </Grid>
-          )}
+                <InputLabel htmlFor="riskType">Risk Type</InputLabel>
+                <TextField
+                  required={true}
+                  name="riskType"
+                  value={formData.riskType}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="description">Description</InputLabel>
+                <TextField
+                  required={true}
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="severity">Severity</InputLabel>
+                <TextField
+                  required={true}
+                  name="severity"
+                  value={formData.severity}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="impact">Impact</InputLabel>
+                <TextField
+                  required={true}
+                  name="impact"
+                  value={formData.impact}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="remedialSteps">Remedial Steps</InputLabel>
+                <TextField
+                  required={true}
+                  name="remedialSteps"
+                  value={formData.remedialSteps}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="status">Status</InputLabel>
+                <TextField
+                  required={true}
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
+                <TextField
+                  required={true}
+                  name="closureDate"
+                  type="date"
+                  value={formData.closureDate}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <Button variant="contained" type="submit">
+                  Add Risk Profile
+                </Button>
+              </form>
+            </Paper>
+          </Grid>
+        )}
 
-          <h2>Risks</h2>
-          <Grid item xs={12}>
-            <TableContainer component={Paper} sx={{ mt: 4 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {/* <TableCell>Project ID</TableCell> */}
-                    <TableCell>Risk Type</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Severity</TableCell>
-                    <TableCell>Impact</TableCell>
-                    <TableCell>Remedial Steps</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Closure Date</TableCell>
+        <h2>Risks</h2>
+        <Grid item xs={12}>
+          <TableContainer component={Paper} sx={{ mt: 4 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  {/* <TableCell>Project ID</TableCell> */}
+                  <TableCell>Risk Type</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Severity</TableCell>
+                  <TableCell>Impact</TableCell>
+                  <TableCell>Remedial Steps</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Closure Date</TableCell>
+                  {(role === "projectmanager" || role === "admin") && (
                     <TableCell>Edit</TableCell>
+                  )}
+                  {(role === "projectmanager" || role === "admin") && (
                     <TableCell>Delete</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {riskProfiles.map((profile) => (
-                    <TableRow key={profile._id}>
-                      {/* <TableCell>{profile.project_id}</TableCell> */}
-                      <TableCell>{profile.riskType}</TableCell>
-                      <TableCell>{profile.description}</TableCell>
-                      <TableCell>{profile.severity}</TableCell>
-                      <TableCell>{profile.impact}</TableCell>
-                      <TableCell>{profile.remedialSteps}</TableCell>
-                      <TableCell>{profile.status}</TableCell>
-                      <TableCell>{profile.closureDate.split("T")[0]}</TableCell>
+                  )}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {riskProfiles.map((profile) => (
+                  <TableRow key={profile._id}>
+                    {/* <TableCell>{profile.project_id}</TableCell> */}
+                    <TableCell>{profile?.riskType}</TableCell>
+                    <TableCell>{profile?.description}</TableCell>
+                    <TableCell>{profile?.severity}</TableCell>
+                    <TableCell>{profile?.impact}</TableCell>
+                    <TableCell>{profile?.remedialSteps}</TableCell>
+                    <TableCell>{profile?.status}</TableCell>
+                    <TableCell>{profile?.closureDate?.split("T")[0]}</TableCell>
+                    {(role === "projectmanager" || role === "admin") && (
                       <TableCell>
                         <Button
-                          disabled={
-                            role !== "projectmanager" && role !== "admin"
-                          }
                           color="primary"
                           onClick={() => handleEdit(profile._id)}
                         >
                           Edit
                         </Button>
                       </TableCell>
+                    )}
+                    {(role === "projectmanager" || role === "admin") && (
                       <TableCell>
                         <Button
-                          disabled={
-                            role !== "projectmanager" && role !== "admin"
-                          }
                           color="error"
                           onClick={() => handleDelete(profile._id)}
                         >
                           Delete
                         </Button>
                       </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-          <Dialog
-            open={editDialogOpen}
-            onClose={handleCloseEditDialog}
-            fullWidth
-            maxWidth="md"
-          >
-            <DialogTitle>Edit Risk Profile</DialogTitle>
-            <DialogContent>
-              <form onSubmit={handleSaveEdit}>
-                {/* <TextField
+        <Dialog
+          open={editDialogOpen}
+          onClose={handleCloseEditDialog}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle>Edit Risk Profile</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSaveEdit}>
+              {/* <TextField
                   name="project_id"
                   label="Project ID"
                   value={editFormData.project_id}
@@ -325,109 +331,108 @@ const Risk = () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 /> */}
-                <TextField
-                  required={true}
-                  name="riskType"
-                  label="Risk Type"
-                  value={editFormData.riskType}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      riskType: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required={true}
-                  name="description"
-                  label="Description"
-                  value={editFormData.description}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      description: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required={true}
-                  name="severity"
-                  label="Severity"
-                  value={editFormData.severity}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      severity: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required={true}
-                  name="impact"
-                  label="Impact"
-                  value={editFormData.impact}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, impact: e.target.value })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required={true}
-                  name="remedialSteps"
-                  label="Remedial Steps"
-                  value={editFormData.remedialSteps}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      remedialSteps: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                 required={true}
-                  name="status"
-                  label="Status"
-                  value={editFormData.status}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, status: e.target.value })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  required={true}
-                  name="closureDate"
-                  label="Closure Date"
-                  type="date"
-                  value={editFormData.closureDate}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      closureDate: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-              </form>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseEditDialog}>Cancel</Button>
-              <Button onClick={handleSaveEdit}>Save</Button>
-            </DialogActions>
-          </Dialog>
-        </Grid>
-      </Layout>
-    )
+              <InputLabel htmlFor="type">Type</InputLabel>
+              <TextField
+                required={true}
+                name="riskType"
+                value={editFormData.riskType}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    riskType: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="description">Description</InputLabel>
+              <TextField
+                required={true}
+                name="description"
+                value={editFormData.description}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    description: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="severity">Severity</InputLabel>
+              <TextField
+                required={true}
+                name="severity"
+                value={editFormData.severity}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    severity: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="impact">Impact</InputLabel>
+              <TextField
+                required={true}
+                name="impact"
+                value={editFormData.impact}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, impact: e.target.value })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="remedialSteps">Remedial Steps</InputLabel>
+              <TextField
+                required={true}
+                name="remedialSteps"
+                value={editFormData.remedialSteps}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    remedialSteps: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="status">Status</InputLabel>
+              <TextField
+                required={true}
+                name="status"
+                value={editFormData.status}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, status: e.target.value })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
+              <TextField
+                required={true}
+                name="closureDate"
+                type="date"
+                value={editFormData.closureDate}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    closureDate: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditDialog}>Cancel</Button>
+            <Button onClick={handleSaveEdit}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </Grid>
+    </Layout>
   );
 };
 

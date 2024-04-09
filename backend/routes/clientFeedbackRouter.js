@@ -1,6 +1,5 @@
 import express from "express";
 import clientFeedbackController from "../controllers/clientFeedback.js";
-import checkAdmin from "../middlewares/check-admin.js";
 
 const router = express.Router();
 
@@ -14,7 +13,7 @@ const {
 } = clientFeedbackController;
 
 // Routes
-router.get("/clientfeedbacks",  (getAllClientFeedback));
+router.get("/clientfeedbacks", getAllClientFeedback);
 router.get("/clientfeedbacks/:id", getClientFeedbackById);
 router.post("/clientfeedbacks", createClientFeedback);
 router.patch("/clientfeedbacks/:id", updateClientFeedback);

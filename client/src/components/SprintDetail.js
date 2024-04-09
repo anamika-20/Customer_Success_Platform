@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
 import {
   Grid,
   Paper,
   Table,
   TableBody,
   TableCell,
+  InputLabel,
   TableContainer,
   TableHead,
   TableRow,
@@ -15,22 +17,22 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import {
-  getAllSprintDetails,
-  createSprintDetail,
-  updateSprintDetail,
-  deleteSprintDetail,
-} from "../api/sprintDetailAPI";
+
 import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
+import { DataContext } from "../DataContext";
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
+import HorizontalList from "./HorizontalList";
 
-const SprintDetail= () => {
-  const { user, isLoading } = useAuth0();
-  const [role, setRole] = useState(null);
+const SprintDetail = () => {
+  const { user, isLoading, getAccessTokenSilently } = useAuth0();
+  const { id } = useParams();
+
+  const { projects, loading, error, role } = useContext(DataContext);
+  console.log(projects);
   const [sprintDetails, setSprintDetails] = useState([]);
   const [formData, setFormData] = useState({
-    // project_id: "",
     startDate: "",
     endDate: "",
     status: "",
@@ -38,32 +40,29 @@ const SprintDetail= () => {
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editItemId, setEditItemId] = useState(null); // For tracking the item being edited
+  const [editItemId, setEditItemId] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAllSprintDetails();
-        setSprintDetails(data);
-      } catch (error) {
-        console.error("Error fetching sprint details:", error);
+    if (id && projects) {
+      const project = projects.find((project) => project._id === id);
+      if (project) {
+        setSprintDetails(project.sprints);
       }
-    };
-    fetchData();
-  }, []);
-
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
     }
-  };
-  if (!isLoading) getRole();
+  }, [id, projects]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await getAllSprintDetails();
+  //       setSprintDetails(data);
+  //     } catch (error) {
+  //       console.error("Error fetching sprint details:", error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -78,10 +77,20 @@ const SprintDetail= () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newSprintDetail = await createSprintDetail(formData);
-      setSprintDetails([...sprintDetails, newSprintDetail]);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.post(
+        `http://localhost:8080/sprint/${id}/add`,
+        {
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          comments: formData.comments,
+          status: formData.status,
+        }
+      );
+      setSprintDetails([...sprintDetails, response.data]);
       setFormData({
-        // project_id: "",
         startDate: "",
         endDate: "",
         status: "",
@@ -109,7 +118,7 @@ const SprintDetail= () => {
 
   const handleSaveEdit = async () => {
     try {
-      await updateSprintDetail(editItemId, editFormData);
+      // await updateSprintDetail(editItemId, editFormData);
       const updatedSprintDetails = sprintDetails.map((detail) => {
         if (detail._id === editItemId) {
           return {
@@ -132,7 +141,7 @@ const SprintDetail= () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteSprintDetail(id);
+      // await deleteSprintDetail(id);
       setSprintDetails(sprintDetails.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Error deleting version history:", error);
@@ -148,6 +157,9 @@ const SprintDetail= () => {
           justifyContent="center"
           sx={{ marginLeft: "auto", marginRight: "auto" }}
         >
+          <Grid item xs={12}>
+            <HorizontalList />
+          </Grid>
           {(role === "projectmanager" || role === "admin") && (
             <Grid item xs={12}>
               <h2>Sprint Detail</h2>
@@ -161,39 +173,39 @@ const SprintDetail= () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   /> */}
+                  <InputLabel htmlFor="startDate">Start Date</InputLabel>
                   <TextField
                     required={true}
                     name="startDate"
-                    label="Start Date"
                     type="date"
                     value={formData.startDate}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel htmlFor="endDate">End Date</InputLabel>
                   <TextField
                     required={true}
                     name="endDate"
-                    label="End Date"
                     type="date"
                     value={formData.endDate}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel htmlFor="status">Status</InputLabel>
                   <TextField
                     required={true}
                     name="status"
-                    label="Status"
                     value={formData.status}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel htmlFor="comments">Comments</InputLabel>
                   <TextField
                     required={true}
                     name="comments"
-                    label="Comments"
                     multiline
                     rows={4}
                     value={formData.comments}
@@ -228,10 +240,10 @@ const SprintDetail= () => {
                   {sprintDetails.map((detail) => (
                     <TableRow key={detail._id}>
                       {/* <TableCell>{detail.project_id}</TableCell> */}
-                      <TableCell>{detail.startDate.split("T")[0]}</TableCell>
-                      <TableCell>{detail.endDate.split("T")[0]}</TableCell>
-                      <TableCell>{detail.status}</TableCell>
-                      <TableCell>{detail.comments}</TableCell>
+                      <TableCell>{detail?.startDate?.split("T")[0]}</TableCell>
+                      <TableCell>{detail?.endDate?.split("T")[0]}</TableCell>
+                      <TableCell>{detail?.status}</TableCell>
+                      <TableCell>{detail?.comments}</TableCell>
                       <TableCell>
                         <Button
                           disabled={role !== "admin"}
@@ -279,10 +291,10 @@ const SprintDetail= () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 /> */}
+                <InputLabel htmlFor="startDate">Start Date</InputLabel>
                 <TextField
-                 required={true}
+                  required={true}
                   name="startDate"
-                  label="Start Date"
                   type="date"
                   value={editFormData.startDate}
                   onChange={(e) =>
@@ -294,10 +306,10 @@ const SprintDetail= () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+                <InputLabel htmlFor="endDate">End Date</InputLabel>
                 <TextField
-                 required={true}
+                  required={true}
                   name="endDate"
-                  label="End Date"
                   type="date"
                   value={editFormData.endDate}
                   onChange={(e) =>
@@ -309,10 +321,10 @@ const SprintDetail= () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+                <InputLabel htmlFor="status">Status</InputLabel>
                 <TextField
                   required={true}
                   name="status"
-                  label="Status"
                   value={editFormData.status}
                   onChange={(e) =>
                     setEditFormData({ ...editFormData, status: e.target.value })
@@ -320,10 +332,10 @@ const SprintDetail= () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+                <InputLabel htmlFor="comments">Comments</InputLabel>
                 <TextField
                   required={true}
                   name="comments"
-                  label="Comments"
                   multiline
                   rows={4}
                   value={editFormData.comments}

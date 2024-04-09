@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Layout from "./Layout";
 import {
   Grid,
@@ -18,17 +18,17 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
-import {
-  fetchMoms,
-  submitMom,
-  editMom,
-  deleteMom,
-  fetchUserRole,
-} from "../api/momsAPI";
+import { useNavigate, useParams } from "react-router-dom";
+import { DataContext } from "../DataContext";
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
+import HorizontalList from "./HorizontalList";
 
 const Moms = () => {
-  const { user, isLoading } = useAuth0();
-  const [role, setRole] = useState(null);
+  const { getAccessTokenSilently } = useAuth0();
+  const { id } = useParams();
+
+  const { projects, loading, error, role } = useContext(DataContext);
+  console.log(projects);
   const [moms, setMoms] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -44,6 +44,15 @@ const Moms = () => {
     comments: "",
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (id && projects) {
+      const project = projects.find((project) => project._id === id);
+      if (project) {
+        setMoms(project.moms);
+      }
+    }
+  }, [id, projects]);
 
   const handleChange = (e) => {
     setFormData({
@@ -64,14 +73,25 @@ const Moms = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await submitMom(formData);
-      setMoms([...moms, response]);
-      console.log("MoM submitted:", response);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.post(
+        `http://localhost:8080/moms/${id}/add`,
+        {
+          date: formData.date,
+          duration: formData.duration,
+          momLink: formData.momLink,
+          comments: formData.comments,
+        }
+      );
+
+      setMoms([...moms, response.data]);
       setFormData({
         date: "",
         duration: "",
         momLink: "",
-        comments: "",
+        comment: "",
       });
     } catch (error) {
       console.error("Error submitting MoM:", error);
@@ -80,7 +100,7 @@ const Moms = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await editMom(editFormData._id, editFormData);
+      // await editMom(editFormData._id, editFormData);
       console.log("MoM edited:", editFormData);
       setEditDialogOpen(false);
       setMoms(
@@ -95,7 +115,7 @@ const Moms = () => {
 
   const handleDelete = async (_id) => {
     try {
-      await deleteMom(_id);
+      // await deleteMom(_id);
       console.log("MoM deleted with _id:", _id);
       setMoms(moms.filter((mom) => mom._id !== _id));
     } catch (error) {
@@ -103,213 +123,193 @@ const Moms = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchMoms();
-        setMoms(data);
-      } catch (error) {
-        console.error("Error fetching moms:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const getUserRole = async () => {
-      try {
-        const role = await fetchUserRole(user?.email);
-        if (role === "Does not Exists") setRole(null);
-        else setRole(role);
-      } catch (error) {
-        console.error("Error fetching role:", error);
-      }
-    };
-
-    if (!isLoading) getUserRole();
-  }, [isLoading, user]);
-
   return (
     <Layout>
-      <h2>Minutes of Meeting</h2>
-      {(role === "projectmanager" || role === "admin") && (
+      <Grid container>
         <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <form onSubmit={handleSubmit}>
-              <InputLabel htmlFor="date">Date</InputLabel>
-              <TextField
-                required={true}
-                id="date"
-                name="date"
-                type="date"
-                value={formData.date.split("T")[0]}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <InputLabel htmlFor="duration">Duration</InputLabel>
-              <TextField
-                required={true}
-                id="duration"
-                name="duration"
-                value={formData.duration}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <InputLabel htmlFor="momLink">MoM Link</InputLabel>
-              <TextField
-                required={true}
-                id="momLink"
-                name="momLink"
-                value={formData.momLink}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <InputLabel htmlFor="comments">Comment</InputLabel>
-              <TextField
-              required={true}
-                id="comments"
-                name="comments"
-                multiline
-                rows={4}
-                value={formData.comments}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <Button variant="contained" type="submit">
-                Submit
-              </Button>
-            </form>
-          </Paper>
+          <HorizontalList />
         </Grid>
-      )}
+        <h2>Add Minutes of Meeting</h2>
+        {(role === "projectmanager" || role === "admin") && (
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2 }}>
+              <form onSubmit={handleSubmit}>
+                <InputLabel htmlFor="date">Date</InputLabel>
+                <TextField
+                  required={true}
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={formData.date.split("T")[0]}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="duration">Duration</InputLabel>
+                <TextField
+                  required={true}
+                  id="duration"
+                  name="duration"
+                  value={formData.duration}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="momLink">MoM Link</InputLabel>
+                <TextField
+                  required={true}
+                  id="momLink"
+                  name="momLink"
+                  value={formData.momLink}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <InputLabel htmlFor="comments">Comment</InputLabel>
+                <TextField
+                  required={true}
+                  id="comments"
+                  name="comments"
+                  multiline
+                  rows={4}
+                  value={formData.comments}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+                <Button variant="contained" type="submit">
+                  Submit
+                </Button>
+              </form>
+            </Paper>
+          </Grid>
+        )}
 
-      <Grid item xs={12}>
-        <TableContainer component={Paper} sx={{ mt: 4 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Duration</TableCell>
-                <TableCell>MoM Link</TableCell>
-                <TableCell>Comment</TableCell>
-                <TableCell>Edit</TableCell>
-                <TableCell>Delete</TableCell>
-              </TableRow>
-            </TableHead>
+        <Grid item xs={12}>
+          <TableContainer component={Paper} sx={{ mt: 4 }}>
+            <h2>Minutes of Meeting</h2>
 
-            <TableBody>
-              {moms.map((mom, index) => (
-                <TableRow key={index}>
-                  <TableCell>{mom.date.split("T")[0]}</TableCell>
-                  <TableCell>{mom.duration}</TableCell>
-                  <TableCell>{mom.momLink}</TableCell>
-                  <TableCell>{mom.comments}</TableCell>
-                  <TableCell>
-                    <Button
-                      disabled={role !== "admin"}
-                      color="primary"
-                      onClick={() => handleEdit(mom)}
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      disabled={role !== "admin"}
-                      color="error"
-                      onClick={() => handleDelete(mom._id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>MoM Link</TableCell>
+                  <TableCell>Comment</TableCell>
+                  {role === "admin" && <TableCell>Edit</TableCell>}
+                  {role === "admin" && <TableCell>Delete</TableCell>}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
+              </TableHead>
 
-      <Dialog
-        open={editDialogOpen}
-        onClose={handleCloseEditDialog}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>Edit MoM</DialogTitle>
-        <DialogContent>
-          <InputLabel htmlFor="date">Date</InputLabel>
-          <TextField
-           required={true}
-            id="date"
-            name="date"
-            type="date"
-            value={editFormData.date.split("T")[0]}
-            onChange={(e) =>
-              setEditFormData({
-                ...editFormData,
-                date: e.target.value,
-              })
-            }
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <InputLabel htmlFor="duration">Duration</InputLabel>
-          <TextField
-           required={true}
-            id="duration"
-            name="duration"
-            value={editFormData.duration}
-            onChange={(e) =>
-              setEditFormData({
-                ...editFormData,
-                duration: e.target.value,
-              })
-            }
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <InputLabel htmlFor="momLink">MoM Link</InputLabel>
-          <TextField
-           required={true}
-            id="momLink"
-            name="momLink"
-            value={editFormData.momLink}
-            onChange={(e) =>
-              setEditFormData({
-                ...editFormData,
-                momLink: e.target.value,
-              })
-            }
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <InputLabel htmlFor="comments">Comment</InputLabel>
-          <TextField
-           required={true}
-            id="comments"
-            name="comments"
-            multiline
-            rows={4}
-            value={editFormData.comments}
-            onChange={(e) =>
-              setEditFormData({
-                ...editFormData,
-                comments: e.target.value,
-              })
-            }
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEditDialog}>Cancel</Button>
-          <Button onClick={handleSaveEdit}>Save</Button>
-        </DialogActions>
-      </Dialog>
+              <TableBody>
+                {moms.map((mom, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{mom?.date?.split("T")[0]}</TableCell>
+                    <TableCell>{mom?.duration}</TableCell>
+                    <TableCell>{mom?.momLink}</TableCell>
+                    <TableCell>{mom?.comments}</TableCell>
+                    {role === "admin" && (
+                      <TableCell>
+                        <Button color="primary" onClick={() => handleEdit(mom)}>
+                          Edit
+                        </Button>
+                      </TableCell>
+                    )}
+                    {role === "admin" && (
+                      <TableCell>
+                        <Button
+                          color="error"
+                          onClick={() => handleDelete(mom._id)}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+
+        <Dialog
+          open={editDialogOpen}
+          onClose={handleCloseEditDialog}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>Edit MoM</DialogTitle>
+          <DialogContent>
+            <InputLabel htmlFor="date">Date</InputLabel>
+            <TextField
+              required={true}
+              id="date"
+              name="date"
+              type="date"
+              value={editFormData.date.split("T")[0]}
+              onChange={(e) =>
+                setEditFormData({
+                  ...editFormData,
+                  date: e.target.value,
+                })
+              }
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+            <InputLabel htmlFor="duration">Duration</InputLabel>
+            <TextField
+              required={true}
+              id="duration"
+              name="duration"
+              value={editFormData.duration}
+              onChange={(e) =>
+                setEditFormData({
+                  ...editFormData,
+                  duration: e.target.value,
+                })
+              }
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+            <InputLabel htmlFor="momLink">MoM Link</InputLabel>
+            <TextField
+              required={true}
+              id="momLink"
+              name="momLink"
+              value={editFormData.momLink}
+              onChange={(e) =>
+                setEditFormData({
+                  ...editFormData,
+                  momLink: e.target.value,
+                })
+              }
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+            <InputLabel htmlFor="comments">Comment</InputLabel>
+            <TextField
+              required={true}
+              id="comments"
+              name="comments"
+              multiline
+              rows={4}
+              value={editFormData.comments}
+              onChange={(e) =>
+                setEditFormData({
+                  ...editFormData,
+                  comments: e.target.value,
+                })
+              }
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditDialog}>Cancel</Button>
+            <Button onClick={handleSaveEdit}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </Grid>
     </Layout>
   );
 };

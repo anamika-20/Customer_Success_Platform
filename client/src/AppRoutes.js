@@ -19,30 +19,49 @@ import StakeHolders from "./components/StakeHolders";
 import Technical from "./components/Technical.js";
 import Operational from "./components/Operational.js";
 import Financial from "./components/Financial.js";
+import DownloadDetails from "./components/DownloadDetails.js";
+import OneProjectDetail from "./components/OneProjectDetail.js";
+import { DataProvider } from "./DataContext";
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/adduser" element={<AddUser />} />
-      <Route path="/project" element={<ProjectDetails />} />
-      <Route path="/approvedteams" element={<ApprovedTeams />} />
-      <Route path="/resources" element={<Resources />} />
-      <Route path="/clientfeedback" element={<ClientFeedback />} />
-      <Route path="/moms" element={<Moms />} />
-      <Route path="/projectupdates" element={<ProjectUpdates />} />
-      <Route path="/audithistory" element={<AuditHistory />} />
-      <Route path="/versionhistory" element={<VersionHistory />} />
-      <Route path="/projectbudget" element={<ProjectBudget />} />
-      <Route path="/sprintdetail" element={<SprintDetail />} />
-      <Route path="/risk" element={<Risk />} />
-      <Route path="/escalationmatrices" element={<Escalation />} />
-      <Route path="/technical" element={<Technical />} />
-      <Route path="/financial" element={<Financial />} />
-      <Route path="/operational" element={<Operational />} />
-      <Route path="/phases" element={<Phases />} />
-      <Route path="/stakeholders" element={<StakeHolders />} />
-    </Routes>
+    <DataProvider>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/adduser" element={<AddUser />} />
+        <Route path="/project" element={<ProjectDetails />} />
+        <Route path="/project/:id" element={<OneProjectDetail />} />
+        <Route path="/download" element={<DownloadDetails />} />
+        <Route path="/project/:id/approvedteams" element={<ApprovedTeams />} />
+        <Route path="/project/:id/resources" element={<Resources />} />
+        <Route
+          path="/project/:id/clientfeedback"
+          element={<ClientFeedback />}
+        />
+        <Route path="/project/:id/moms" element={<Moms />} />
+        <Route
+          path="/project/:id/projectupdates"
+          element={<ProjectUpdates />}
+        />
+        <Route path="/project/:id/audithistory" element={<AuditHistory />} />
+        <Route
+          path="/project/:id/versionhistory"
+          element={<VersionHistory />}
+        />
+        <Route path="/projectbudget" element={<ProjectBudget />} />
+        <Route path="/project/:id/sprintdetail" element={<SprintDetail />} />
+        <Route path="/project/:id/risk" element={<Risk />} />
+        <Route
+          path="/project/:id/escalationmatrices"
+          element={<Escalation />}
+        />
+        <Route path="/project/:id/technical" element={<Technical />} />
+        <Route path="/project/:id/financial" element={<Financial />} />
+        <Route path="/project/:id/operational" element={<Operational />} />
+        <Route path="/project/:id/phases" element={<Phases />} />
+        <Route path="/project/:id/stakeholders" element={<StakeHolders />} />
+      </Routes>
+    </DataProvider>
   );
 };
 

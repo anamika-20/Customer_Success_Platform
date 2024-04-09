@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Layout from "./Layout";
 import {
   TextField,
@@ -14,16 +14,18 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
-import {
-  fetchTeams,
-  saveTeam,
-  updateTeam,
-  deleteTeam,
-  fetchUserRole,
-} from "../api/approvedTeamsAPI";
+// import {
+//   fetchTeams,
+//   saveTeam,
+//   updateTeam,
+//   deleteTeam,
+//   fetchUserRole,
+// } from "../api/approvedTeamsAPI";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { DataContext } from "../DataContext";
 
 const ApprovedTeams = () => {
   const { user, isLoading } = useAuth0();
@@ -36,6 +38,9 @@ const ApprovedTeams = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editedTeam, setEditedTeam] = useState(null);
   // const [errorMessage, setErrorMessage] = useState("");
+
+  const { id } = useParams();
+  const { projects, loading, error } = useContext(DataContext);
 
   const handleAddRow = () => {
     setTableData([
@@ -85,11 +90,11 @@ const ApprovedTeams = () => {
 
     try {
       if (editedTeam) {
-        await updateTeam(editedTeam._id, team);
+        // await updateTeam(editedTeam._id, team);
         setOpenDialog(false);
         setEditedTeam(null);
       } else {
-        await saveTeam(team);
+        // await saveTeam(team);
         setOpenDialog(false);
       }
       fetchTeamsData();
@@ -100,7 +105,7 @@ const ApprovedTeams = () => {
 
   const handleDelete = async (_id) => {
     try {
-      await deleteTeam(_id);
+      // await deleteTeam(_id);
       setTeams(teams.filter((team) => team._id !== _id));
     } catch (error) {
       console.error("Error deleting team:", error);
@@ -109,8 +114,8 @@ const ApprovedTeams = () => {
 
   const fetchTeamsData = async () => {
     try {
-      const data = await fetchTeams();
-      setTeams(data);
+      // const data = await fetchTeams();
+      // setTeams(data);
     } catch (error) {
       console.error("Error fetching teams:", error);
     }
@@ -120,7 +125,7 @@ const ApprovedTeams = () => {
     fetchTeamsData();
     if (!isLoading) {
       const getUserRole = async () => {
-        const role = await fetchUserRole(user?.email);
+        // const role = await fetchUserRole(user?.email);
         setRole(role);
       };
       getUserRole();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Grid,
   Paper,
@@ -20,26 +20,26 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import {
-  getAllVersionHistory,
-  createVersionHistory,
-  updateVersionHistory,
-  deleteVersionHistory,
-  getVersionHistoryById,
-} from "../api/versionHistoryAPI";
+
 import Layout from "./Layout";
-import { getRole } from "../api/profileApi";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { DataContext } from "../DataContext";
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
+import HorizontalList from "./HorizontalList";
 
 const VersionHistory = () => {
-  const { user, isLoading } = useAuth0();
-  const [role, setRole] = useState(null);
-  // State for version history data
+  const { getAccessTokenSilently } = useAuth0();
+  const { id } = useParams();
+
+  const { projects, loading, error, role } = useContext(DataContext);
+  console.log(projects);
   const [versionHistory, setVersionHistory] = useState([]);
-  const [projects, setProjects] = useState([]);
+  const [pmList, setPmList] = useState([]);
+  const [auditorList, setAuditorList] = useState([]);
+
   const [formData, setFormData] = useState({
-    versionNumber: "",
     type: "",
     change: "",
     changeReason: "",
@@ -47,46 +47,20 @@ const VersionHistory = () => {
     revisionDate: "",
     approvalDate: "",
     approvedBy: "",
-    // project_id: "",
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  // Fetch version history data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const historyData = await getAllVersionHistory();
-        setVersionHistory(historyData);
-      } catch (error) {
-        console.error("Error fetching version history:", error);
+    if (id && projects) {
+      const project = projects.find((project) => project._id === id);
+      if (project) {
+        setVersionHistory(project.versionHistory);
+        setPmList(project.stakeholders.PM);
+        setAuditorList(project.stakeholders.Auditor);
       }
-    };
-    const getProjectNames = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/api/project`);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
-
-    fetchData();
-    getProjectNames();
-  }, []);
-
-  const getRole = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/user/getRole?email=${user?.email}`
-      );
-      if (response.data.role === "Does not Exists") setRole(null);
-      else setRole(response.data.role);
-    } catch (error) {
-      console.error("Error fetching role:", error);
     }
-  };
-  if (!isLoading) getRole();
+  }, [id, projects]);
 
   const handleChange = (e) => {
     setFormData({
@@ -103,48 +77,98 @@ const VersionHistory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newHistory = await createVersionHistory(formData);
-      setVersionHistory([...versionHistory, newHistory]);
-      setFormData({});
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.post(
+        `http://localhost:8080/versionhistory/${id}/add`,
+        {
+          type: formData.type,
+          change: formData.change,
+          changeReason: formData.changeReason,
+          createdBy: formData.createdBy,
+          revisionDate: formData.revisionDate,
+          approvalDate: formData.approvalDate,
+          approvedBy: formData.approvedBy,
+        }
+      );
+
+      setVersionHistory([...versionHistory, response.data]);
+      setFormData({
+        type: "",
+        change: "",
+        changeReason: "",
+        createdBy: "",
+        revisionDate: "",
+        approvalDate: "",
+        approvedBy: "",
+      });
     } catch (error) {
       console.error("Error creating version history:", error);
     }
   };
 
-  const handleEdit = async (id) => {
-    try {
-      const history = await getVersionHistoryById(id);
-      setEditFormData(history);
-      setEditDialogOpen(true);
-    } catch (error) {
-      console.error("Error fetching version history for editing:", error);
-    }
+  const handleEdit = (history) => {
+    // try {
+    setEditFormData(history);
+    setEditDialogOpen(true);
+    // } catch (error) {
+    //   console.error("Error fetching version history for editing:", error);
+    // }
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    const { _id, ...data } = editFormData;
+
     try {
-      await updateVersionHistory(editFormData._id, editFormData);
-      setEditDialogOpen(false);
-      const updatedHistory = await getAllVersionHistory();
-      setVersionHistory(updatedHistory);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.put(
+        `http://localhost:8080/versionhistory/${id}/${_id}/edit`,
+        data
+      );
+
+      if (response.status === 200) {
+        const updatedVersionHistory = versionHistory.map((history) =>
+          history._id === _id ? response.data : history
+        );
+        setVersionHistory(updatedVersionHistory);
+        setEditDialogOpen(false);
+        console.log("Version updated with _id:", _id);
+      } else {
+        console.error("Error updating Version:", response.data.message);
+      }
     } catch (error) {
       console.error("Error updating version history:", error);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (_id) => {
     try {
-      await deleteVersionHistory(id);
-      setVersionHistory(versionHistory.filter((item) => item._id !== id));
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      await axiosInstance.delete(
+        `http://localhost:8080/versionhistory/${id}/${_id}/delete`
+      );
+      setVersionHistory(
+        versionHistory.filter((resource) => resource._id !== _id)
+      );
+      console.log("version deleted with _id:", _id);
     } catch (error) {
       console.error("Error deleting version history:", error);
     }
   };
 
   return (
-    !isLoading && (
-      <Layout>
-        <Grid container justifyContent="center" spacing={4}>
+    <Layout>
+      <Grid container>
+        <Grid item xs={12}>
+          <HorizontalList />
+        </Grid>
+        <Grid container item justifyContent="center" spacing={4}>
           {(role === "audit" ||
             role === "admin" ||
             role === "projectmanager") && (
@@ -152,88 +176,87 @@ const VersionHistory = () => {
               <h2>Add Version</h2>
               <Paper sx={{ p: 2 }}>
                 <form onSubmit={handleSubmit}>
-                  <TextField
-                    name="versionNumber"
-                    label="Version Number"
-                    value={formData.versionNumber}
+                  <InputLabel id="createdBy-label">Created By</InputLabel>
+                  <Select
+                    labelId="createdBy-label"
+                    id="createdBy"
+                    name="createdBy"
+                    value={formData.createdBy}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
+                  >
+                    {pmList.length > 0 ? (
+                      pmList.map((pm) => (
+                        <MenuItem key={pm._id} value={pm._id}>
+                          {pm.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem value="">No PMs available</MenuItem>
+                    )}
+                  </Select>
+                  <InputLabel id="type">Type</InputLabel>
                   <TextField
                     name="type"
-                    label="Type"
                     value={formData.type}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="change">Change</InputLabel>
                   <TextField
                     name="change"
-                    label="Change"
                     value={formData.change}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="changeReason">Change Reason</InputLabel>
                   <TextField
                     name="changeReason"
-                    label="Change Reason"
                     value={formData.changeReason}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <TextField
-                    name="createdBy"
-                    label="Created By"
-                    value={formData.createdBy}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
+                  <InputLabel id="revisionDate">Revision Date </InputLabel>
                   <TextField
                     name="revisionDate"
-                    label="Revision Date"
                     type="date"
                     value={formData.revisionDate}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="approvalDate">Approval Date </InputLabel>
                   <TextField
                     name="approvalDate"
-                    label="Approval Date"
                     type="date"
                     value={formData.approvalDate}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <TextField
+                  <InputLabel id="approvedBy-label">Approved By</InputLabel>
+                  <Select
+                    id="approvedBy"
                     name="approvedBy"
-                    label="Approved By"
                     value={formData.approvedBy}
                     onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
-                  {/* <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="project-id-label">Project ID</InputLabel>
-                    <Select
-                      labelId="project-id-label"
-                      id="project-id-select"
-                      value={formData.project_id}
-                      onChange={handleChange}
-                      name="project_id"
-                    >
-                      {projects.map((project) => (
-                        <MenuItem key={project._id} value={project.projectName}>
-                          {project.projectName}
+                  >
+                    {auditorList.length > 0 ? (
+                      auditorList.map((auditor) => (
+                        <MenuItem key={auditor._id} value={auditor._id}>
+                          {auditor.name}
                         </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl> */}
+                      ))
+                    ) : (
+                      <MenuItem value="">No Auditors available</MenuItem>
+                    )}
+                  </Select>
                   <Button variant="contained" type="submit">
                     Submit
                   </Button>
@@ -247,7 +270,6 @@ const VersionHistory = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Version Number</TableCell>
                     <TableCell>Type</TableCell>
                     <TableCell>Change</TableCell>
                     <TableCell>Change Reason</TableCell>
@@ -255,7 +277,6 @@ const VersionHistory = () => {
                     <TableCell>Revision Date</TableCell>
                     <TableCell>Approval Date</TableCell>
                     <TableCell>Approved By</TableCell>
-                    {/* <TableCell>Project ID</TableCell> */}
                     <TableCell>Edit</TableCell>
                     <TableCell>Delete</TableCell>
                   </TableRow>
@@ -263,45 +284,41 @@ const VersionHistory = () => {
                 <TableBody>
                   {versionHistory.map((history) => (
                     <TableRow key={history._id}>
-                      <TableCell>{history.versionNumber}</TableCell>
-                      <TableCell>{history.type}</TableCell>
-                      <TableCell>{history.change}</TableCell>
-                      <TableCell>{history.changeReason}</TableCell>
-                      <TableCell>{history.createdBy}</TableCell>
+                      <TableCell>{history?.version?.type}</TableCell>
+                      <TableCell>{history?.version?.change}</TableCell>
+                      <TableCell>{history?.version?.changeReason}</TableCell>
+                      <TableCell>{history?.version?.createdBy}</TableCell>
                       <TableCell>
-                        {history.revisionDate.split("T")[0]}
+                        {history?.version?.revisionDate?.split("T")[0]}
                       </TableCell>
                       <TableCell>
-                        {history.approvalDate.split("T")[0]}
+                        {history?.version?.approvalDate?.split("T")[0]}
                       </TableCell>
-                      <TableCell>{history.approvedBy}</TableCell>
-                      {/* <TableCell>{history.project_id}</TableCell> */}
-                      <TableCell>
-                        <Button
-                          disabled={
-                            role !== "audit" &&
-                            role !== "admin" &&
-                            role !== "projectmanager"
-                          }
-                          color="primary"
-                          onClick={() => handleEdit(history._id)}
-                        >
-                          Edit
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          disabled={
-                            role !== "audit" &&
-                            role !== "admin" &&
-                            role !== "projectmanager"
-                          }
-                          color="error"
-                          onClick={() => handleDelete(history._id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
+                      <TableCell>{history?.version?.approvedBy}</TableCell>
+                      {(role === "auditor" ||
+                        role === "admin" ||
+                        role === "projectmanager") && (
+                        <TableCell>
+                          <Button
+                            color="primary"
+                            onClick={() => handleEdit(history)}
+                          >
+                            Edit
+                          </Button>
+                        </TableCell>
+                      )}
+                      {(role === "auditor" ||
+                        role === "admin" ||
+                        role === "projectmanager") && (
+                        <TableCell>
+                          <Button
+                            color="error"
+                            onClick={() => handleDelete(history._id)}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -317,22 +334,9 @@ const VersionHistory = () => {
               <DialogTitle>Edit Version History</DialogTitle>
               <DialogContent>
                 <form onSubmit={handleSaveEdit}>
-                  <TextField
-                    name="versionNumber"
-                    label="Version Number"
-                    value={editFormData.versionNumber}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        versionNumber: e.target.value,
-                      })
-                    }
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
+                  <InputLabel id="type">Type</InputLabel>
                   <TextField
                     name="type"
-                    label="Type"
                     value={editFormData.type}
                     onChange={(e) =>
                       setEditFormData({ ...editFormData, type: e.target.value })
@@ -340,9 +344,9 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="change">Change</InputLabel>
                   <TextField
                     name="change"
-                    label="Change"
                     value={editFormData.change}
                     onChange={(e) =>
                       setEditFormData({
@@ -353,9 +357,9 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="changeReason">Change Reason</InputLabel>
                   <TextField
                     name="changeReason"
-                    label="Change Reason"
                     value={editFormData.changeReason}
                     onChange={(e) =>
                       setEditFormData({
@@ -366,22 +370,31 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <TextField
+
+                  <InputLabel id="createdBy-label">Created By</InputLabel>
+                  <Select
+                    labelId="createdBy-label"
+                    id="createdBy"
                     name="createdBy"
-                    label="Created By"
                     value={editFormData.createdBy}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        createdBy: e.target.value,
-                      })
-                    }
+                    onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
+                  >
+                    {pmList.length > 0 ? (
+                      pmList.map((pm) => (
+                        <MenuItem key={pm._id} value={pm._id}>
+                          {pm.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem value="">No PMs available</MenuItem>
+                    )}
+                  </Select>
+
+                  <InputLabel id="revisionDate">Revision Date </InputLabel>
                   <TextField
                     name="revisionDate"
-                    label="Revision Date"
                     type="date"
                     value={editFormData.revisionDate}
                     onChange={(e) =>
@@ -393,9 +406,9 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
+                  <InputLabel id="approvalDate">Approval Date </InputLabel>
                   <TextField
                     name="approvalDate"
-                    label="Approval Date"
                     type="date"
                     value={editFormData.approvalDate}
                     onChange={(e) =>
@@ -407,42 +420,25 @@ const VersionHistory = () => {
                     fullWidth
                     sx={{ mb: 2 }}
                   />
-                  <TextField
+                  <InputLabel id="approvedBy-label">Approved By</InputLabel>
+                  <Select
+                    id="approvedBy"
                     name="approvedBy"
-                    label="Approved By"
                     value={editFormData.approvedBy}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        approvedBy: e.target.value,
-                      })
-                    }
+                    onChange={handleChange}
                     fullWidth
                     sx={{ mb: 2 }}
-                  />
-                  {/* <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="edit-project-id-label">
-                      Project ID
-                    </InputLabel>
-                    <Select
-                      labelId="edit-project-id-label"
-                      id="edit-project-id-select"
-                      value={editFormData.project_id}
-                      onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          project_id: e.target.value,
-                        })
-                      }
-                      name="project_id"
-                    >
-                      {projects.map((project) => (
-                        <MenuItem key={project._id} value={project.projectName}>
-                          {project.projectName}
+                  >
+                    {auditorList.length > 0 ? (
+                      auditorList.map((auditor) => (
+                        <MenuItem key={auditor._id} value={auditor._id}>
+                          {auditor.name}
                         </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl> */}
+                      ))
+                    ) : (
+                      <MenuItem value="">No Auditors available</MenuItem>
+                    )}
+                  </Select>
                 </form>
               </DialogContent>
               <DialogActions>
@@ -452,8 +448,8 @@ const VersionHistory = () => {
             </Dialog>
           </Grid>
         </Grid>
-      </Layout>
-    )
+      </Grid>
+    </Layout>
   );
 };
 

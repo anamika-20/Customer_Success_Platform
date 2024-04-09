@@ -3,11 +3,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import GroupsIcon from "@mui/icons-material/Groups";
-import FeedbackIcon from "@mui/icons-material/Feedback";
-import PeopleIcon from "@mui/icons-material/People";
-import SystemSecurityUpdateGoodIcon from "@mui/icons-material/SystemSecurityUpdateGood";
-import LayersIcon from "@mui/icons-material/Layers";
+import FileOpenIcon from "@mui/icons-material/FileOpen";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
 
 const Lists = () => {
@@ -20,6 +17,20 @@ const Lists = () => {
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/project")}>
+        <ListItemIcon>
+          <FileOpenIcon />
+        </ListItemIcon>
+        <ListItemText primary="Projects" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => navigate("/download")}>
+        <ListItemIcon>
+          <DownloadIcon />
+        </ListItemIcon>
+        <ListItemText primary="Download Details" />
       </ListItemButton>
 
       {/* <ListItemButton onClick={() => navigate("/adduser")}>
@@ -36,7 +47,7 @@ const Lists = () => {
         <ListItemText primary="Project" />
       </ListItemButton> */}
 
-      <ListItemButton onClick={() => navigate("/projectupdates")}>
+      {/* <ListItemButton onClick={() => navigate("/projectupdates")}>
         <ListItemIcon>
           <SystemSecurityUpdateGoodIcon />
         </ListItemIcon>
@@ -132,7 +143,7 @@ const Lists = () => {
           <GroupsIcon />
         </ListItemIcon>
         <ListItemText primary="StakeHolders" />
-      </ListItemButton>
+      </ListItemButton> */}
     </>
   );
 };

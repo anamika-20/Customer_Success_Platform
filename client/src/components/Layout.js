@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
@@ -20,6 +20,7 @@ import Lists from "./Lists";
 import { Avatar, Button, StyledBadge, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import HorizontalList from "./HorizontalList";
 
 const drawerWidth = 240;
 
@@ -77,15 +78,6 @@ const Layout = ({ children }) => {
     setOpen(!open);
   };
 
-  // const userDetails = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:8080/user/user-info"); // Make a GET request to fetch all moms
-  //     setmoms(response.data); // Update state with the fetched moms
-  //   } catch (error) {
-  //     console.error("Error fetching moms:", error);
-  //   }
-  // };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
@@ -115,7 +107,7 @@ const Layout = ({ children }) => {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Customer Success Platform
             </Typography>
             <Toolbar
               sx={{
