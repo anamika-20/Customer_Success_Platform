@@ -1,12 +1,12 @@
 import { checkIfStakeHolder } from "../helpers/authHelper.js";
 import Project from "../models/Project.js";
 import User from "../models/User.js";
-import Phase from "../models/Phase.js";
+import VersionHistory from "../models/VersionHistory.js";
 
-//@desc Create a new phase and associate it with a project
-//@route POST /phase/:proj/add
+//@desc Create a new version history and associate it with a project
+//@route POST /versionHistory/:proj/add
 //@access admin, projectMangager
-const addPhase = async (req, res) => {
+const addTeam = async (req, res) => {
   try {
     const projectId = req.params.proj;
     const { email } = req.userDetails;
@@ -23,13 +23,14 @@ const addPhase = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
-    const newPhase = new Phase(req.body);
 
-    await newPhase.save();
+    const newVersionHistory = new VersionHistory(req.body);
 
-    project.phases.push({
-      phaseNumber: project.phases.length + 1,
-      phase: newPhase._id,
+    await newVersionHistory.save();
+
+    project.versionHistory.push({
+      versionNumber: project.versionHistory.length + 1,
+      version: newVersionHistory._id,
     });
 
     await project.save();
@@ -40,10 +41,11 @@ const addPhase = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-//@desc Edit a phase
-//@route PUT /phase/:proj/:id/edit
+
+//@desc Edit a versionHistory
+//@route PUT /versionHistory/:proj/:id/edit
 //@access admin, projectmanager
-const editPhase = async (req, res) => {
+const editTeam = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
     const { email } = req.userDetails;
@@ -61,27 +63,32 @@ const editPhase = async (req, res) => {
       return res.status(404).json({ message: "Project not found." });
     }
 
-    const updatedPhase = await Phase.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const updatedVersionHistory = await VersionHistory.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,
+      }
+    );
 
-    if (!updatedPhase) {
-      return res.status(404).json({ message: "Phase not found." });
+    if (!updatedVersionHistory) {
+      return res.status(404).json({ message: "Version History not found." });
     }
 
-    res
-      .status(200)
-      .json({ message: updatedPhase.title + " edited successfully" });
+    res.status(200).json({
+      message:
+        "Version Type: " + updatedVersionHistory.type + " edited successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-//@desc Delete a phases from project also
-//@route DELETE /phase/:proj/:id/delete
+//@desc Delete a versionHistory from project also
+//@route DELETE /versionHistory/:proj/:id/delete
 //@access admin, projectmanager
-const deletePhase = async (req, res) => {
+const deleteTeam = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
     const { email } = req.userDetails;
@@ -98,37 +105,40 @@ const deletePhase = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
-    // Delete vesrion from Phase collection
-    const deletedPhase = await Phase.findByIdAndDelete(id);
+    // Delete vesrion from VersionHistory collection
+    const deletedVersionHistory = await VersionHistory.findByIdAndDelete(id);
 
-    if (!deletedPhase) {
-      return res.status(404).json({ message: "Phase not found." });
+    if (!deletedVersionHistory) {
+      return res.status(404).json({ message: "VersionHistory not found." });
     }
 
-    // Find the index of the Phase to be removed from the array
-    const index = project.phases.findIndex((v) => v.phase.toString() === id);
+    // Find the index of the VersionHistory to be removed from the array
+    const index = project.versionHistory.findIndex(
+      (v) => v.version.toString() === id
+    );
 
-    // If the Phase is not found in the project's phases array, return 404
+    // If the VersionHistory is not found in the project's versionHistory array, return 404
     if (index === -1) {
       return res
         .status(404)
-        .json({ message: "Phase not found in the project." });
+        .json({ message: "VersionHistory not found in the project." });
     }
 
-    // Remove the Phase from the array
-    project.phases.splice(index, 1);
+    // Remove the VersionHistory from the array
+    project.versionHistory.splice(index, 1);
 
-    // Update the phaseNumber of subsequent Phase objects
-    for (let i = index; i < project.phases.length; i++) {
-      project.phases[i].phaseNumber -= 1;
-      await project.phases[i].save();
+    // Update the versionNumber of subsequent VersionHistory objects
+    for (let i = index; i < project.versionHistory.length; i++) {
+      project.versionHistory[i].versionNumber -= 1;
+      await project.versionHistory[i].save();
     }
 
     // Save the modified project
     await project.save();
 
     return res.status(200).json({
-      message: deletedPhase.title + " deleted successfully",
+      message:
+        "Version Type: " + deletedVersionHistory.type + " deleted successfully",
     });
   } catch (error) {
     console.error(error);
@@ -136,4 +146,4 @@ const deletePhase = async (req, res) => {
   }
 };
 
-export { addPhase, editPhase, deletePhase };
+export { addTeam, editTeam, deleteTeam };

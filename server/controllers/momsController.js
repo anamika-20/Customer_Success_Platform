@@ -37,5 +37,77 @@ const addMoM = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+//@desc Edit a mom
+//@route PUT /moms/:proj/:id/edit
+//@access admin, projectmanager
+const editMoM = async (req, res) => {
+  try {
+    const { proj: projectId, id } = req.params;
+    const { email } = req.userDetails;
+    const user = await User.findOne({ email });
 
-export { addMoM };
+    const isStakeHolder = await checkIfStakeHolder(projectId, user);
+    if (user.role !== "admin" && !isStakeHolder) {
+      return res.status(403).json({
+        message: "You are not authorized to access this project.",
+      });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    const updatedMoM = await MoMs.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if (!updatedMoM) {
+      return res.status(404).json({ message: "MoM not found." });
+    }
+
+    res.status(200).json({ message: updatedMoM.name + " edited successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//@desc Delete a mom from project also
+//@route POST /moms/:proj/:id/delete
+//@access admin, projectmanager
+const deleteMoM = async (req, res) => {
+  try {
+    const { proj: projectId, id } = req.params;
+    const { email } = req.userDetails;
+    const user = await User.findOne({ email });
+
+    const isStakeHolder = await checkIfStakeHolder(projectId, user);
+    if (user.role !== "admin" && !isStakeHolder) {
+      return res.status(403).json({
+        message: "You are not authorized to access this project.",
+      });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+    // Delete mom from MoM collection
+    const deletedMoM = await MoMs.findByIdAndDelete(id);
+
+    if (!deletedMoM) {
+      return res.status(404).json({ message: "MoM not found." });
+    }
+    // Remove mom ID from array of MoMs in Project collection
+    await Project.updateOne({ _id: projectId }, { $pull: { moms: id } });
+    return res
+      .status(200)
+      .json({ message: deletedMoM.name + " deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { addMoM, editMoM, deleteMoM };

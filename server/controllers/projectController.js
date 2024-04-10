@@ -1,6 +1,7 @@
 import { checkIfStakeHolder } from "../helpers/authHelper.js";
 import Project from "../models/Project.js";
 import StakeHolders from "../models/StakeHolders.js";
+import ProjectStack from "../models/ProjectStack.js";
 import User from "../models/User.js";
 
 //@desc Create New Project
@@ -9,15 +10,29 @@ import User from "../models/User.js";
 const addProject = async (req, res) => {
   try {
     const data = req.body;
-
+    const projectStack = {
+      backend: [],
+      frontend: [],
+      mobileApp: [],
+      database: [],
+      infrastructureAndServices: [],
+    };
     const { stakeholders, ...projectData } = data;
 
+    const projectStackDoc = new ProjectStack(projectStack);
     const stakeholdersDoc = new StakeHolders(stakeholders);
+
+    await projectStackDoc.save();
     await stakeholdersDoc.save();
 
+    const projectStackId = projectStackDoc._id;
     const stakeholdersIds = stakeholdersDoc._id;
 
-    const modifiedData = { ...projectData, stakeholders: stakeholdersIds };
+    const modifiedData = {
+      ...projectData,
+      projectStack: projectStackId,
+      stakeholders: stakeholdersIds,
+    };
 
     const newProject = new Project(modifiedData);
     await newProject.save();
@@ -73,16 +88,39 @@ const getProject = async (req, res) => {
 
     const project = await Project.findById(projectId)
       .populate("resources")
-      .populate("sprints")
+      .populate("projectStack")
+      .populate("projectUpdates")
+      .populate("clientFeedback")
+      .populate("moms")
+      .populate("riskProfiling")
+      .populate("phases.phase")
+      .populate("sprints.sprint")
+      .populate({
+        path: "versionHistory.version",
+        model: "VersionHistory",
+        populate: {
+          path: "createdBy approvedBy",
+          model: "User",
+        },
+      })
+      .populate({
+        path: "financialMatrix.name",
+        model: "User",
+      })
+      .populate({
+        path: "technicalMatrix.name",
+        model: "User",
+      })
+      .populate({
+        path: "operationalMatrix.name",
+        model: "User",
+      })
       .populate({
         path: "stakeholders",
         populate: {
           path: "PM Auditor Client",
           model: "User",
         },
-      })
-      .populate({
-        path: "versionHistory.version",
       });
 
     if (!project) {
@@ -118,21 +156,33 @@ const getAllProjects = async (req, res) => {
       user.role !== "admin" ? { stakeholders: { $in: projectIds } } : {};
     const projects = await Project.find(query)
       .populate("resources")
+      .populate("projectStack")
       .populate("projectUpdates")
       .populate("clientFeedback")
       .populate("moms")
       .populate("riskProfiling")
       .populate("phases.phase")
-      // .populate("versionHistory")
+      .populate("sprints.sprint")
       .populate({
         path: "versionHistory.version",
+        model: "VersionHistory",
+        populate: {
+          path: "createdBy approvedBy",
+          model: "User",
+        },
       })
-
       .populate({
-        path: "sprints.sprint",
-        model: "Sprint",
+        path: "financialMatrix.name",
+        model: "User",
       })
-
+      .populate({
+        path: "technicalMatrix.name",
+        model: "User",
+      })
+      .populate({
+        path: "operationalMatrix.name",
+        model: "User",
+      })
       .populate({
         path: "stakeholders",
         populate: {

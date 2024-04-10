@@ -104,6 +104,7 @@ const deleteResource = async (req, res) => {
     }
     // Remove resource ID from array of Resources in Project collection
     await Project.updateOne({ _id: projectId }, { $pull: { resources: id } });
+
     return res
       .status(200)
       .json({ message: deletedResource.name + " deleted successfully" });

@@ -14,6 +14,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Typography,
+  Select,
+  MenuItem,
   DialogActions,
 } from "@mui/material";
 import Layout from "./Layout";
@@ -54,11 +57,11 @@ const Phases = () => {
     }
   }, [id, projects]);
 
-  const handleEdit = (id) => {
-    const selectedPhase = phases.find((phase) => phase._id === id);
-    setEditFormData(selectedPhase);
+  const handleEdit = (phase) => {
+    // const selectedPhase = phases.find((phase) => phase._id === id);
+    setEditFormData(phase);
     setEditDialogOpen(true);
-    setSelectedId(id);
+    // setSelectedId(phase);
   };
   const handleChange = (e) => {
     setFormData({
@@ -66,26 +69,44 @@ const Phases = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    const { _id, ...data } = editFormData;
+
     try {
-      // await updatePhases(selectedId, editFormData);
-      setEditDialogOpen(false);
-      // Instead of refetching all phases, update the specific phase in the state
-      setPhases((prevPhases) =>
-        prevPhases.map((phase) =>
-          phase._id === selectedId ? editFormData : phase
-        )
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.put(
+        `/phase/${id}/${_id}/edit`,
+        data
       );
+
+      if (response.status === 200) {
+        const updatedPhase = phases.map((phase) =>
+          phase._id === _id ? response.data : phase
+        );
+        setPhases(updatedPhase);
+        setEditDialogOpen(false);
+        console.log("Phase updated with _id:", _id);
+      } else {
+        console.error("Error updating Phase:", response.data.message);
+      }
     } catch (error) {
       console.error("Error updating phase:", error);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (_id) => {
     try {
-      // await deletePhases(id);
-      // Filter out the deleted phase from the state
-      setPhases((prevPhases) => prevPhases.filter((phase) => phase._id !== id));
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      await axiosInstance.delete(
+        `http://localhost:8080/phase/${id}/${_id}/delete`
+      );
+      setPhases((phases) => phases.filter((phase) => phase._id !== _id));
+      console.log("Phase deleted with _id:", _id);
     } catch (error) {
       console.error("Error deleting phase:", error);
     }
@@ -137,8 +158,8 @@ const Phases = () => {
         </Grid>
         {(role === "projectmanager" || role === "admin") && (
           <Grid item xs={8}>
-            <h2>Add Phase</h2>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ p: 2, mt: 4 }}>
+              <h2>Add Phase</h2>
               <form onSubmit={handleSubmit}>
                 <InputLabel htmlFor="title">Title</InputLabel>
                 <TextField
@@ -194,14 +215,18 @@ const Phases = () => {
                   sx={{ mb: 2 }}
                 />
                 <InputLabel htmlFor="status">Status Date</InputLabel>
-                <TextField
+                <Select
                   required={true}
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
                   fullWidth
-                  sx={{ mb: 2 }}
-                />
+                >
+                  <MenuItem value="Delayed">Delayed</MenuItem>
+                  <MenuItem value="On-time">On-time</MenuItem>
+                  <MenuItem value="Sign-off Pending">Sign-off Pending</MenuItem>
+                  <MenuItem value="Signed-off">Signed-off</MenuItem>
+                </Select>
                 <InputLabel htmlFor="comments">Comments</InputLabel>
                 <TextField
                   required={true}
@@ -222,22 +247,63 @@ const Phases = () => {
         )}
 
         <Grid item xs={12}>
-          <h2>Phases</h2>
           <TableContainer component={Paper} sx={{ mt: 4 }}>
+            <h2>Phases</h2>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell>Completion Date</TableCell>
-                  <TableCell>Revised Completion Date</TableCell>
-                  <TableCell>Approval Date</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Comments</TableCell>
-                  <TableCell>Edit</TableCell>
-                  <TableCell>Delete</TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Title
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Start Date
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Completion Date
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Revised Completion Date
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Approval Date
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Status
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Comments
+                    </Typography>
+                  </TableCell>
+                  {(role === "projectmanager" || role === "admin") && (
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Edit
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {(role === "projectmanager" || role === "admin") && (
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Delete
+                      </Typography>
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {phases.map((p) => (
                   <TableRow key={p?.phase?._id}>
@@ -258,7 +324,7 @@ const Phases = () => {
                       <TableCell>
                         <Button
                           color="primary"
-                          onClick={() => handleEdit(p?.phase?._id)}
+                          onClick={() => handleEdit(p?.phase)}
                         >
                           Edit
                         </Button>
@@ -291,10 +357,10 @@ const Phases = () => {
           <DialogContent>
             <form onSubmit={handleSaveEdit}>
               {/* Form fields for editing existing phase */}
+              <InputLabel htmlFor="name">Resource Name</InputLabel>
               <TextField
                 required={true}
                 name="title"
-                label="Title"
                 value={editFormData.title}
                 onChange={(e) =>
                   setEditFormData({ ...editFormData, title: e.target.value })
@@ -302,12 +368,12 @@ const Phases = () => {
                 fullWidth
                 sx={{ mb: 2 }}
               />
+              <InputLabel htmlFor="startDate">Start Date</InputLabel>
               <TextField
                 required={true}
                 name="startDate"
-                label="Start Date"
                 type="date"
-                value={editFormData.startDate}
+                value={editFormData.startDate?.split("T")[0]}
                 onChange={(e) =>
                   setEditFormData({
                     ...editFormData,
@@ -317,12 +383,12 @@ const Phases = () => {
                 fullWidth
                 sx={{ mb: 2 }}
               />
+              <InputLabel htmlFor="completionDate">Completion Date</InputLabel>
               <TextField
                 required={true}
                 name="completionDate"
-                label="Completion Date"
                 type="date"
-                value={editFormData.revisedCompletionDate}
+                value={editFormData.revisedCompletionDate?.split("T")[0]}
                 onChange={(e) =>
                   setEditFormData({
                     ...editFormData,
@@ -332,21 +398,30 @@ const Phases = () => {
                 fullWidth
                 sx={{ mb: 2 }}
               />
-              <TextField
+              <InputLabel htmlFor="status">Status</InputLabel>
+              <Select
                 required={true}
                 name="status"
-                label="Status"
                 value={editFormData.status}
                 onChange={(e) =>
-                  setEditFormData({ ...editFormData, status: e.target.value })
+                  setEditFormData({
+                    ...editFormData,
+                    status: e.target.value,
+                  })
                 }
                 fullWidth
                 sx={{ mb: 2 }}
-              />
+              >
+                <MenuItem value="Delayed">Delayed</MenuItem>
+                <MenuItem value="On-time">On-time</MenuItem>
+                <MenuItem value="Sign-off Pending">Sign-off Pending</MenuItem>
+                <MenuItem value="Signed-off">Signed-off</MenuItem>
+              </Select>
+
+              <InputLabel htmlFor="comments">Comments</InputLabel>
               <TextField
                 required={true}
                 name="comments"
-                label="Comments"
                 multiline
                 rows={4}
                 value={editFormData.comments}

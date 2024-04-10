@@ -1,10 +1,10 @@
 import express from "express";
-import checkRole from "../middlewares/checkRole.js";
 import {
-  addRiskProfiling,
-  editRiskProfiling,
-  deleteRiskProfiling,
-} from "../controllers/riskProfilingController.js";
+  addTeam,
+  editTeam,
+  deleteTeam,
+} from "../controllers/teamController.js";
+import checkRole from "../middlewares/checkRole.js";
 
 const router = express.Router();
 
@@ -13,21 +13,21 @@ router.post(
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  addRiskProfiling
+  addTeam
 );
 router.put(
   "/:proj/:id/edit",
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  editRiskProfiling
+  editTeam
 );
 router.delete(
   "/:proj/:id/delete",
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  deleteRiskProfiling
+  deleteTeam
 );
 
 export default router;

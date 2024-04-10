@@ -41,6 +41,9 @@ const addVersionHistory = async (req, res) => {
   }
 };
 
+//@desc Edit a versionHistory
+//@route PUT /versionHistory/:proj/:id/edit
+//@access admin, projectmanager
 const editVersionHistory = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
@@ -68,18 +71,26 @@ const editVersionHistory = async (req, res) => {
     );
 
     if (!updatedVersionHistory) {
-      return res.status(404).json({ message: "Resource not found." });
+      return res.status(404).json({ message: "Version History not found." });
     }
 
     res
       .status(200)
-      .json({ message: updatedVersionHistory.name + " edited successfully" });
+      .json({
+        message:
+          "Version Type: " +
+          updatedVersionHistory.type +
+          " edited successfully",
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+//@desc Delete a versionHistory from project also
+//@route DELETE /versionHistory/:proj/:id/delete
+//@access admin, projectmanager
 const deleteVersionHistory = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
@@ -97,20 +108,41 @@ const deleteVersionHistory = async (req, res) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
     }
-    // Delete resource from VersionHistory collection
+    // Delete vesrion from VersionHistory collection
     const deletedVersionHistory = await VersionHistory.findByIdAndDelete(id);
 
     if (!deletedVersionHistory) {
       return res.status(404).json({ message: "VersionHistory not found." });
     }
-    // Remove resource ID from array of Resources in Project collection
-    await Project.updateOne(
-      { _id: projectId },
-      { $pull: { versionHistory: id } }
+
+    // Find the index of the VersionHistory to be removed from the array
+    const index = project.versionHistory.findIndex(
+      (v) => v.version.toString() === id
     );
-    return res
-      .status(200)
-      .json({ message: deletedVersionHistory.name + " deleted successfully" });
+
+    // If the VersionHistory is not found in the project's versionHistory array, return 404
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ message: "VersionHistory not found in the project." });
+    }
+
+    // Remove the VersionHistory from the array
+    project.versionHistory.splice(index, 1);
+
+    // Update the versionNumber of subsequent VersionHistory objects
+    for (let i = index; i < project.versionHistory.length; i++) {
+      project.versionHistory[i].versionNumber -= 1;
+      await project.versionHistory[i].save();
+    }
+
+    // Save the modified project
+    await project.save();
+
+    return res.status(200).json({
+      message:
+        "Version Type: " + deletedVersionHistory.type + " deleted successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

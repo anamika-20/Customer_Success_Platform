@@ -13,6 +13,7 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import HistoryIcon from "@mui/icons-material/History";
 import SpeedIcon from "@mui/icons-material/Speed";
 import ReportIcon from "@mui/icons-material/Report";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,6 +35,11 @@ const HorizontalList = () => {
       name: "Approved teams",
       icon: <HomeIcon />,
       route: `/project/${id}/approvedteams`,
+    },
+    {
+      name: "Tech Stack",
+      icon: <ListAltIcon />,
+      route: `/project/${id}/techstack`,
     },
     {
       name: "Project Updates",

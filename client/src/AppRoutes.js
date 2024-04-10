@@ -6,7 +6,7 @@ import Resources from "./components/Resources.js";
 import ClientFeedback from "./components/ClientFeedback.js";
 import Moms from "./components/Moms.js";
 import ProjectUpdates from "./components/ProjectUpdates.js";
-import AddUser from "./components/AddUser.js";
+// import AddUser from "./components/AddUser.js";
 import ProjectDetails from "./components/ProjectDetails.js";
 import AuditHistory from "./components/AuditHistory.js";
 import VersionHistory from "./components/VersionHistory.js";
@@ -22,13 +22,14 @@ import Financial from "./components/Financial.js";
 import DownloadDetails from "./components/DownloadDetails.js";
 import OneProjectDetail from "./components/OneProjectDetail.js";
 import { DataProvider } from "./DataContext";
+import TechStack from "./components/TechStack.js";
 
 const AppRoutes = () => {
   return (
     <DataProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/adduser" element={<AddUser />} />
+        {/* <Route path="/adduser" element={<AddUser />} /> */}
         <Route path="/project" element={<ProjectDetails />} />
         <Route path="/project/:id" element={<OneProjectDetail />} />
         <Route path="/download" element={<DownloadDetails />} />
@@ -51,6 +52,7 @@ const AppRoutes = () => {
         <Route path="/projectbudget" element={<ProjectBudget />} />
         <Route path="/project/:id/sprintdetail" element={<SprintDetail />} />
         <Route path="/project/:id/risk" element={<Risk />} />
+        <Route path="/project/:id/techstack" element={<TechStack />} />
         <Route
           path="/project/:id/escalationmatrices"
           element={<Escalation />}

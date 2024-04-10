@@ -17,6 +17,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
+  Select,
+  MenuItem,
   Dialog,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -113,16 +116,28 @@ const ClientFeedback = () => {
     setEditDialogOpen(false);
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    const { _id, ...data } = editFormData;
     try {
-      // await editFeedback(editFormData._id, editFormData);
-      console.log("Feedback edited:", editFormData);
-      setFeedback(
-        feedback.map((item) =>
-          item._id === editFormData._id ? editFormData : item
-        )
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.put(
+        `http://localhost:8080/clientfeedback/${id}/${_id}/edit`,
+        data
       );
-      setEditDialogOpen(false);
+
+      if (response.status === 200) {
+        const updatedfeedback = feedback.map((f) =>
+          f._id === _id ? response.data : f
+        );
+        setFeedback(updatedfeedback);
+        setEditDialogOpen(false);
+        console.log("Feedback updated with _id:", _id);
+      } else {
+        console.error("Error updating Feedback:", response.data.message);
+      }
     } catch (error) {
       console.error("Error editing feedback:", error);
     }
@@ -130,9 +145,14 @@ const ClientFeedback = () => {
 
   const handleDelete = async (_id) => {
     try {
-      // await deleteFeedback(_id);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      await axiosInstance.delete(
+        `http://localhost:8080/clientfeedback/${id}/${_id}/delete`
+      );
+      setFeedback(feedback.filter((f) => f._id !== _id));
       console.log("Feedback deleted with _id:", _id);
-      setFeedback(feedback.filter((item) => item._id !== _id));
     } catch (error) {
       console.error("Error deleting feedback:", error);
     }
@@ -144,244 +164,284 @@ const ClientFeedback = () => {
         <Grid item xs={12}>
           <HorizontalList />
         </Grid>
-        <h2>Client Feedback</h2>
         {/* Form */}
-        {(role === "client" || role === "admin") && (
+        <Grid container item justifyContent="center" spacing={4}>
+          {(role === "client" || role === "admin") && (
+            <Grid item xs={8}>
+              <Paper sx={{ p: 2, mt: 4 }}>
+                <h2>Client Feedback</h2>
+                <form onSubmit={handleSubmit}>
+                  <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
+                  <Select
+                    required={true}
+                    id="feedbackType"
+                    name="feedbackType"
+                    value={formData.feedbackType}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  >
+                    <MenuItem value="Complaint">Complaint</MenuItem>
+                    <MenuItem value="Appreciation">Appreciation</MenuItem>
+                  </Select>
+                  <InputLabel htmlFor="dateReceived">Date Received</InputLabel>
+                  <TextField
+                    required={true}
+                    id="dateReceived"
+                    name="dateReceived"
+                    type="date"
+                    value={formData.dateReceived}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="detailedFeedback">
+                    Detailed Feedback
+                  </InputLabel>
+                  <TextField
+                    required={true}
+                    id="detailedFeedback"
+                    name="detailedFeedback"
+                    multiline
+                    rows={4}
+                    value={formData.detailedFeedback}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="actionTaken">Action Taken</InputLabel>
+                  <TextField
+                    required={true}
+                    id="actionTaken"
+                    name="actionTaken"
+                    multiline
+                    rows={4}
+                    value={formData.actionTaken}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
+                  <TextField
+                    required={true}
+                    id="closureDate"
+                    name="closureDate"
+                    type="date"
+                    value={formData.closureDate}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <Button variant="contained" type="submit">
+                    Submit
+                  </Button>
+                </form>
+              </Paper>
+            </Grid>
+          )}
           <Grid item xs={12}>
-            <Paper sx={{ p: 2 }}>
-              <form onSubmit={handleSubmit}>
-                <InputLabel htmlFor="feedbackType">Feedback Type</InputLabel>
-                <TextField
-                  required={true}
-                  id="feedbackType"
-                  name="feedbackType"
-                  value={formData.feedbackType}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="dateReceived">Date Received</InputLabel>
-                <TextField
-                  required={true}
-                  id="dateReceived"
-                  name="dateReceived"
-                  type="date"
-                  value={formData.dateReceived}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="detailedFeedback">
-                  Detailed Feedback
-                </InputLabel>
-                <TextField
-                  required={true}
-                  id="detailedFeedback"
-                  name="detailedFeedback"
-                  multiline
-                  rows={4}
-                  value={formData.detailedFeedback}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="actionTaken">Action Taken</InputLabel>
-                <TextField
-                  required={true}
-                  id="actionTaken"
-                  name="actionTaken"
-                  multiline
-                  rows={4}
-                  value={formData.actionTaken}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
-                <TextField
-                  required={true}
-                  id="closureDate"
-                  name="closureDate"
-                  type="date"
-                  value={formData.closureDate}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <Button variant="contained" type="submit">
-                  Submit
-                </Button>
-              </form>
-            </Paper>
-          </Grid>
-        )}
-        <Grid item xs={12}>
-          <TableContainer component={Paper} sx={{ mt: 4 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Feedback Type</TableCell>
-                  <TableCell>Date Received</TableCell>
-                  <TableCell>Detailed Feedback</TableCell>
-                  <TableCell>Action Taken</TableCell>
-                  <TableCell>Closure Date</TableCell>
-                  {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Edit</TableCell>
-                  )}
-                  {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Delete</TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              {!feedback || feedback.length === 0 ? (
-                <TableBody>
+            <TableContainer component={Paper} sx={{ mt: 4 }}>
+              <h2>Client Feedbacks</h2>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No feedback
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Feedback Type
+                      </Typography>
                     </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Date Received
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Detailed Feedback
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Action Taken
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Closure Date
+                      </Typography>
+                    </TableCell>
+                    {(role === "projectmanager" || role === "admin") && (
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Edit
+                        </Typography>
+                      </TableCell>
+                    )}
+                    {(role === "projectmanager" || role === "admin") && (
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Delete
+                        </Typography>
+                      </TableCell>
+                    )}
                   </TableRow>
-                </TableBody>
-              ) : (
-                <TableBody>
-                  {feedback.map((feedBackItem, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{feedBackItem?.type}</TableCell>
-                      <TableCell>
-                        {feedBackItem?.dateReceived?.split("T")[0]}
+                </TableHead>
+
+                {!feedback || feedback.length === 0 ? (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        No feedback
                       </TableCell>
-                      <TableCell>{feedBackItem?.detailedFeedback}</TableCell>
-                      <TableCell>{feedBackItem?.actionTaken}</TableCell>
-                      <TableCell>
-                        {feedBackItem?.closureDate?.split("T")[0]}
-                      </TableCell>
-                      {role === "admin" && (
-                        <TableCell>
-                          <Button
-                            color="primary"
-                            onClick={() => handleEdit(feedBackItem)}
-                          >
-                            Edit
-                          </Button>
-                        </TableCell>
-                      )}
-                      {role === "admin" && (
-                        <TableCell>
-                          <Button
-                            color="error"
-                            onClick={() => handleDelete(feedBackItem._id)}
-                          >
-                            Delete
-                          </Button>
-                        </TableCell>
-                      )}
-                      <Dialog
-                        open={editDialogOpen}
-                        onClose={handleCloseEditDialog}
-                        maxWidth="md"
-                        fullWidth
-                      >
-                        <DialogTitle>Edit Feedback</DialogTitle>
-                        <DialogContent>
-                          <label>FeedBack Type</label>
-                          <TextField
-                            required={true}
-                            id="feedbackType"
-                            name="feedbackType"
-                            value={editFormData.feedbackType}
-                            onChange={(e) =>
-                              setEditFormData({
-                                ...editFormData,
-                                feedbackType: e.target.value,
-                              })
-                            }
-                            fullWidth
-                            sx={{ mb: 2 }}
-                          />
-                          <label>Detailed Feedback</label>
-                          <TextField
-                            required={true}
-                            id="detailedFeedback"
-                            name="detailedFeedback"
-                            multiline
-                            rows={4}
-                            value={editFormData.detailedFeedback}
-                            onChange={(e) =>
-                              setEditFormData({
-                                ...editFormData,
-                                detailedFeedback: e.target.value,
-                              })
-                            }
-                            fullWidth
-                            sx={{ mb: 2 }}
-                          />
-                          <label>Date Recieved</label>
-                          <TextField
-                            required={true}
-                            id="dateReceived"
-                            type="date"
-                            value={
-                              editFormData.dateReceived
-                                ? editFormData.dateReceived.split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) =>
-                              setEditFormData({
-                                ...editFormData,
-                                dateReceived: e.target.value,
-                              })
-                            }
-                            fullWidth
-                            sx={{ mb: 2 }}
-                          />
-                          <label>Action Taken</label>
-                          <TextField
-                            required={true}
-                            id="actionTaken"
-                            multiline
-                            rows={4}
-                            value={editFormData.actionTaken}
-                            onChange={(e) =>
-                              setEditFormData({
-                                ...editFormData,
-                                actionTaken: e.target.value,
-                              })
-                            }
-                            fullWidth
-                            sx={{ mb: 2 }}
-                          />
-                          <label>Closure Date</label>
-                          <TextField
-                            required={true}
-                            id="closureDate"
-                            type="date"
-                            value={
-                              editFormData.closureDate
-                                ? editFormData.closureDate.split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) =>
-                              setEditFormData({
-                                ...editFormData,
-                                closureDate: e.target.value,
-                              })
-                            }
-                            fullWidth
-                            sx={{ mb: 2 }}
-                          />
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleCloseEditDialog}>
-                            Cancel
-                          </Button>
-                          <Button onClick={handleSaveEdit}>Save</Button>
-                        </DialogActions>
-                      </Dialog>
                     </TableRow>
-                  ))}
-                </TableBody>
-              )}
-            </Table>
-          </TableContainer>
+                  </TableBody>
+                ) : (
+                  <TableBody>
+                    {feedback.map((feedBackItem, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{feedBackItem?.type}</TableCell>
+                        <TableCell>
+                          {feedBackItem?.dateReceived?.split("T")[0]}
+                        </TableCell>
+                        <TableCell>{feedBackItem?.detailedFeedback}</TableCell>
+                        <TableCell>{feedBackItem?.actionTaken}</TableCell>
+                        <TableCell>
+                          {feedBackItem?.closureDate?.split("T")[0]}
+                        </TableCell>
+                        {role === "admin" && (
+                          <TableCell>
+                            <Button
+                              color="primary"
+                              onClick={() => handleEdit(feedBackItem)}
+                            >
+                              Edit
+                            </Button>
+                          </TableCell>
+                        )}
+                        {role === "admin" && (
+                          <TableCell>
+                            <Button
+                              color="error"
+                              onClick={() => handleDelete(feedBackItem._id)}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        )}
+                        <Dialog
+                          open={editDialogOpen}
+                          onClose={handleCloseEditDialog}
+                          maxWidth="md"
+                          fullWidth
+                        >
+                          <DialogTitle>Edit Feedback</DialogTitle>
+                          <DialogContent>
+                            <label>FeedBack Type</label>
+                            <Select
+                              required={true}
+                              id="feedbackType"
+                              name="feedbackType"
+                              value={editFormData.feedbackType}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  feedbackType: e.target.value,
+                                })
+                              }
+                              fullWidth
+                              sx={{ mb: 2 }}
+                            >
+                              <MenuItem value="Complaint">Complaint</MenuItem>
+                              <MenuItem value="Appreciation">
+                                Appreciation
+                              </MenuItem>
+                            </Select>
+                            <label>Detailed Feedback</label>
+                            <TextField
+                              required={true}
+                              id="detailedFeedback"
+                              name="detailedFeedback"
+                              multiline
+                              rows={4}
+                              value={editFormData.detailedFeedback}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  detailedFeedback: e.target.value,
+                                })
+                              }
+                              fullWidth
+                              sx={{ mb: 2 }}
+                            />
+                            <label>Date Recieved</label>
+                            <TextField
+                              required={true}
+                              id="dateReceived"
+                              type="date"
+                              value={
+                                editFormData.dateReceived
+                                  ? editFormData.dateReceived.split("T")[0]
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  dateReceived: e.target.value,
+                                })
+                              }
+                              fullWidth
+                              sx={{ mb: 2 }}
+                            />
+                            <label>Action Taken</label>
+                            <TextField
+                              required={true}
+                              id="actionTaken"
+                              multiline
+                              rows={4}
+                              value={editFormData.actionTaken}
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  actionTaken: e.target.value,
+                                })
+                              }
+                              fullWidth
+                              sx={{ mb: 2 }}
+                            />
+                            <label>Closure Date</label>
+                            <TextField
+                              required={true}
+                              id="closureDate"
+                              type="date"
+                              value={
+                                editFormData.closureDate
+                                  ? editFormData.closureDate.split("T")[0]
+                                  : ""
+                              }
+                              onChange={(e) =>
+                                setEditFormData({
+                                  ...editFormData,
+                                  closureDate: e.target.value,
+                                })
+                              }
+                              fullWidth
+                              sx={{ mb: 2 }}
+                            />
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={handleCloseEditDialog}>
+                              Cancel
+                            </Button>
+                            <Button onClick={handleSaveEdit}>Save</Button>
+                          </DialogActions>
+                        </Dialog>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
       </Grid>
     </Layout>

@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,7 +29,8 @@ const Resources = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
 
-  const { projects, loading, error, role } = useContext(DataContext);
+  const { projects, loading, error, role, refreshData } =
+    useContext(DataContext);
   console.log(projects);
   const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
@@ -92,6 +94,8 @@ const Resources = () => {
           resource._id === _id ? response.data : resource
         );
         setResources(updatedResources);
+        await refreshData();
+
         setEditDialogOpen(false);
         console.log("Resource updated with _id:", _id);
       } else {
@@ -120,6 +124,8 @@ const Resources = () => {
       );
 
       setResources([...resources, response.data]);
+      await refreshData();
+
       setFormData({
         name: "",
         role: "",
@@ -159,11 +165,10 @@ const Resources = () => {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
 
-      await axiosInstance.delete(
-        `http://localhost:8080/resources/${id}/${_id}/delete`
-      );
+      await axiosInstance.delete(`/resources/${id}/${_id}/delete`);
       setResources(resources.filter((resource) => resource._id !== _id));
       console.log("Resource deleted with _id:", _id);
+      await refreshData();
     } catch (error) {
       console.error("Error deleting resource:", error);
     }
@@ -176,222 +181,258 @@ const Resources = () => {
         <Grid item xs={12}>
           <HorizontalList />
         </Grid>
-        {(role === "projectmanager" || role === "admin") && (
+        <Grid container item justifyContent="center" spacing={4}>
+          {(role === "projectmanager" || role === "admin") && (
+            <Grid item xs={6}>
+              <Paper sx={{ p: 2, mt: 4 }}>
+                <h2>Add Resources</h2>
+                <form onSubmit={handleSubmit}>
+                  <InputLabel htmlFor="name">Resource Name</InputLabel>
+                  <TextField
+                    required={true}
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="role">Role</InputLabel>
+                  <TextField
+                    required={true}
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="startDate">Start Date</InputLabel>
+                  <TextField
+                    required={true}
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    value={formData.startDate.split("T")[0]}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="endDate">End Date</InputLabel>
+                  <TextField
+                    required={true}
+                    id="endDate"
+                    name="endDate"
+                    type="date"
+                    value={formData.endDate.split("T")[0]}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <InputLabel htmlFor="comments">Comment</InputLabel>
+                  <TextField
+                    required={true}
+                    id="comments"
+                    name="comments"
+                    multiline
+                    rows={4}
+                    value={formData.comments}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  <Button variant="contained" type="submit">
+                    Submit
+                  </Button>
+                </form>
+              </Paper>
+            </Grid>
+          )}
           <Grid item xs={12}>
-            <h2>Resources</h2>
-            <Paper sx={{ p: 2 }}>
-              <form onSubmit={handleSubmit}>
-                <InputLabel htmlFor="name">Resource Name</InputLabel>
-                <TextField
-                  required={true}
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="role">Role</InputLabel>
-                <TextField
-                  required={true}
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="startDate">Start Date</InputLabel>
-                <TextField
-                  required={true}
-                  id="startDate"
-                  name="startDate"
-                  type="date"
-                  // value={formData.startDate.split("T")[0]}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="endDate">End Date</InputLabel>
-                <TextField
-                  required={true}
-                  id="endDate"
-                  name="endDate"
-                  type="date"
-                  // value={formData.endDate.split("T")[0]}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <InputLabel htmlFor="comments">Comment</InputLabel>
-                <TextField
-                  required={true}
-                  id="comments"
-                  name="comments"
-                  multiline
-                  rows={4}
-                  value={formData.comments}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <Button variant="contained" type="submit">
-                  Submit
-                </Button>
-              </form>
-            </Paper>
-          </Grid>
-        )}
-        <Grid item xs={12}>
-          <TableContainer component={Paper} sx={{ mt: 4 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Resource Name</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell>End Date</TableCell>
-                  <TableCell>Comment</TableCell>
-                  {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Edit</TableCell>
-                  )}
-                  {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Delete</TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-
-              {!resources || resources.length === 0 ? (
-                <TableBody>
+            <TableContainer component={Paper} sx={{ mt: 4 }}>
+              <h2>Resources</h2>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No Resources have been added
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Resource Name
+                      </Typography>
                     </TableCell>
-                  </TableRow>
-                </TableBody>
-              ) : (
-                <TableBody>
-                  {resources?.map((resource, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{resource?.name}</TableCell>
-                      <TableCell>{resource?.role}</TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Role
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Start Date
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        End Date
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Comment
+                      </Typography>
+                    </TableCell>
+                    {(role === "projectmanager" || role === "admin") && (
                       <TableCell>
-                        {resource?.startDate?.split("T")[0]}
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Edit
+                        </Typography>
                       </TableCell>
-                      <TableCell>{resource?.endDate?.split("T")[0]}</TableCell>
-                      <TableCell>{resource?.comments}</TableCell>
-                      {(role === "projectmanager" || role === "admin") && (
-                        <TableCell>
-                          <Button
-                            color="primary"
-                            onClick={() => handleEdit(resource)}
-                          >
-                            Edit
-                          </Button>
-                        </TableCell>
-                      )}
-                      {(role === "projectmanager" || role === "admin") && (
-                        <TableCell>
-                          <Button
-                            color="error"
-                            onClick={() => handleDelete(resource._id)}
-                          >
-                            Delete
-                          </Button>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              )}
-            </Table>
-          </TableContainer>
-        </Grid>
-      </Grid>
+                    )}
+                    {(role === "projectmanager" || role === "admin") && (
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Delete
+                        </Typography>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                </TableHead>
 
-      <Dialog
-        open={editDialogOpen}
-        onClose={handleCloseEditDialog}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle>Edit Resource</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSaveEdit}>
-            <InputLabel htmlFor="name">Resource Name</InputLabel>
-            <TextField
-              required={true}
-              id="name"
-              name="name"
-              value={editFormData.name}
-              onChange={(e) =>
-                setEditFormData({
-                  ...editFormData,
-                  name: e.target.value,
-                })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="role">Role</InputLabel>
-            <TextField
-              required={true}
-              id="role"
-              name="role"
-              value={editFormData.role}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, role: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="startDate">Start Date</InputLabel>
-            <TextField
-              required={true}
-              id="startDate"
-              name="startDate"
-              type="date"
-              value={editFormData.startDate.split("T")[0]}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, startDate: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="endDate">End Date</InputLabel>
-            <TextField
-              required={true}
-              id="endDate"
-              name="endDate"
-              type="date"
-              value={editFormData.endDate.split("T")[0]}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, endDate: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="comments">Comment</InputLabel>
-            <TextField
-              required={true}
-              id="comments"
-              name="comments"
-              multiline
-              rows={4}
-              value={editFormData.comments}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, comments: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button type="submit">Save</Button>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEditDialog}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+                {!resources || resources.length === 0 ? (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        No Resources have been added
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                ) : (
+                  <TableBody>
+                    {resources?.map((resource, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{resource?.name}</TableCell>
+                        <TableCell>{resource?.role}</TableCell>
+                        <TableCell>
+                          {resource?.startDate?.split("T")[0]}
+                        </TableCell>
+                        <TableCell>
+                          {resource?.endDate?.split("T")[0]}
+                        </TableCell>
+                        <TableCell>{resource?.comments}</TableCell>
+                        {(role === "projectmanager" || role === "admin") && (
+                          <TableCell>
+                            <Button
+                              color="primary"
+                              onClick={() => handleEdit(resource)}
+                            >
+                              Edit
+                            </Button>
+                          </TableCell>
+                        )}
+                        {(role === "projectmanager" || role === "admin") && (
+                          <TableCell>
+                            <Button
+                              color="error"
+                              onClick={() => handleDelete(resource._id)}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+
+        <Dialog
+          open={editDialogOpen}
+          onClose={handleCloseEditDialog}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle>Edit Resource</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSaveEdit}>
+              <InputLabel htmlFor="name">Resource Name</InputLabel>
+              <TextField
+                required={true}
+                id="name"
+                name="name"
+                value={editFormData.name}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    name: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="role">Role</InputLabel>
+              <TextField
+                required={true}
+                id="role"
+                name="role"
+                value={editFormData.role}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, role: e.target.value })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="startDate">Start Date</InputLabel>
+              <TextField
+                required={true}
+                id="startDate"
+                name="startDate"
+                type="date"
+                value={editFormData.startDate.split("T")[0]}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    startDate: e.target.value,
+                  })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="endDate">End Date</InputLabel>
+              <TextField
+                required={true}
+                id="endDate"
+                name="endDate"
+                type="date"
+                value={editFormData.endDate.split("T")[0]}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, endDate: e.target.value })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <InputLabel htmlFor="comments">Comment</InputLabel>
+              <TextField
+                required={true}
+                id="comments"
+                name="comments"
+                multiline
+                rows={4}
+                value={editFormData.comments}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, comments: e.target.value })
+                }
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+              <Button type="submit">Save</Button>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditDialog}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+      </Grid>
     </Layout>
   );
 };

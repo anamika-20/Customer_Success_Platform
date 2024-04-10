@@ -137,11 +137,11 @@ const ApprovedTeams = () => {
       <Grid item container>
         <Grid item xs={10} sx={{ marginLeft: 5 }}>
           <h2>Approved Teams</h2>
-          {(role === "projectmanager" || role === "admin") && (
-            <Button variant="contained" onClick={() => setOpenDialog(true)}>
-              Add Phase Data
-            </Button>
-          )}
+          {/* {(role === "projectmanager" || role === "admin") && ( */}
+          <Button variant="contained" onClick={() => setOpenDialog(true)}>
+            Add Phase Data
+          </Button>
+          {/* )} */}
           <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
             <DialogTitle>Enter Table Data</DialogTitle>
             <DialogContent>
@@ -213,10 +213,16 @@ const ApprovedTeams = () => {
               {/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
             </DialogContent>
             <DialogActions>
-              <Button variant="contained" onClick={handleAddRow}>
+              <Button
+                variant="contained"
+                // onClick={handleAddRow}
+              >
                 Add Row
               </Button>
-              <Button variant="contained" onClick={handleSave}>
+              <Button
+                variant="contained"
+                // onClick={handleSave}
+              >
                 Save
               </Button>
             </DialogActions>
@@ -228,20 +234,20 @@ const ApprovedTeams = () => {
                 <div key={index}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <h2>Phase Number: {team.PhaseNumber}</h2>
-                    {(role === "projectmanager" || role === "admin") && (
-                      <Button onClick={() => handleEdit(team)}>
-                        <EditIcon style={{ marginLeft: "10px" }} />
-                      </Button>
-                    )}
-                    {(role === "projectmanager" || role === "admin") && (
-                      <Button>
-                        <DeleteIcon
-                          style={{ marginLeft: "10px" }}
-                          color="error"
-                          onClick={() => handleDelete(team._id)}
-                        />
-                      </Button>
-                    )}
+                    {/* {(role === "projectmanager" || role === "admin") && ( */}
+                    <Button onClick={() => handleEdit(team)}>
+                      <EditIcon style={{ marginLeft: "10px" }} />
+                    </Button>
+                    {/* )} */}
+                    {/* {(role === "projectmanager" || role === "admin") && ( */}
+                    <Button>
+                      <DeleteIcon
+                        style={{ marginLeft: "10px" }}
+                        color="error"
+                        onClick={() => handleDelete(team._id)}
+                      />
+                    </Button>
+                    {/* )} */}
                   </div>
                   <Table>
                     <TableHead>

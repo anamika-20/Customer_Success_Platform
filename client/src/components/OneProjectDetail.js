@@ -8,14 +8,19 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Box,
 } from "@mui/material";
 import Layout from "./Layout";
 import HorizontalList from "./HorizontalList";
 import { DataContext } from "../DataContext";
+import { useAuth0 } from "@auth0/auth0-react";
+
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
 
 const OneProjectDetail = () => {
   const { id } = useParams();
   const { projects, loading, error } = useContext(DataContext);
+  const { getAccessTokenSilently } = useAuth0();
 
   const [formData, setFormData] = useState({
     projectName: "",
@@ -55,8 +60,18 @@ const OneProjectDetail = () => {
     setIsChanged(true);
   };
 
-  const handleSaveChanges = () => {
-    // Implement your save changes logic here
+  const handleSaveChanges = async (e) => {
+    const project = projects.find((p) => p._id === id);
+    if (project) {
+      try {
+        const token = await getAccessTokenSilently();
+        setAuthHeader(token);
+        await axiosInstance.put(`/project/edit/${id}`, formData);
+        // setIsEditable(false);
+      } catch (error) {
+        console.error("Error creating phase:", error);
+      }
+    }
     setIsChanged(false);
   };
 
@@ -81,110 +96,126 @@ const OneProjectDetail = () => {
   const handleDownloadProject = () => {
     // Implement your download project logic here
   };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
+
   return (
     <Layout>
-      <Grid item xs={12}>
-        <HorizontalList />
-      </Grid>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={handleDownloadProject}
-        style={{ marginRight: "10px" }}
-      >
-        Download Project
-      </Button>
-      <form>
-        <TextField
-          fullWidth
-          label="Project Name"
-          name="projectName"
-          value={formData.projectName}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <FormControl fullWidth variant="outlined" margin="normal">
-          <InputLabel>Project Type</InputLabel>
-          <Select
-            label="Project Type"
-            name="projectType"
-            value={formData.projectType}
-            onChange={handleChange}
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <HorizontalList />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleDownloadProject}
           >
-            <MenuItem value="Monthly">Monthly</MenuItem>
-            <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          fullWidth
-          label="Duration (Months)"
-          name="durationMonths"
-          type="number"
-          value={formData.durationMonths}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <TextField
-          fullWidth
-          label="Budgeted Hours"
-          name="budgetedHours"
-          type="number"
-          value={formData.budgetedHours}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <TextField
-          fullWidth
-          label="Project Description"
-          name="projectDescription"
-          multiline
-          rows={4}
-          value={formData.projectDescription}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <TextField
-          fullWidth
-          label="Scope"
-          name="scope"
-          multiline
-          rows={4}
-          value={formData.scope}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <TextField
-          fullWidth
-          label="Detailed Timeline Reference"
-          name="detailedTimelineReference"
-          multiline
-          rows={4}
-          value={formData.detailedTimelineReference}
-          onChange={handleChange}
-          margin="normal"
-          variant="outlined"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSaveChanges}
-          disabled={!isChanged}
-          style={{ marginRight: "10px" }}
-        >
-          Save Changes
-        </Button>
-
-        <Button variant="contained" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </form>
+            Download Project
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <form>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Project Name"
+                name="projectName"
+                value={formData.projectName}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mb={2}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Project Type</InputLabel>
+                <Select
+                  label="Project Type"
+                  name="projectType"
+                  value={formData.projectType}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Monthly">Monthly</MenuItem>
+                  <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Duration (Months)"
+                name="durationMonths"
+                type="number"
+                value={formData.durationMonths}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Budgeted Hours"
+                name="budgetedHours"
+                type="number"
+                value={formData.budgetedHours}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Project Description"
+                name="projectDescription"
+                multiline
+                rows={4}
+                value={formData.projectDescription}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Scope"
+                name="scope"
+                multiline
+                rows={4}
+                value={formData.scope}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Detailed Timeline Reference"
+                name="detailedTimelineReference"
+                multiline
+                rows={4}
+                value={formData.detailedTimelineReference}
+                onChange={handleChange}
+                variant="outlined"
+              />
+            </Box>
+            <Box mt={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSaveChanges}
+                disabled={!isChanged}
+                style={{ marginRight: "10px" }}
+              >
+                Save Changes
+              </Button>
+              <Button variant="contained" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </Box>
+          </form>
+        </Grid>
+      </Grid>
     </Layout>
   );
 };

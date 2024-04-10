@@ -240,7 +240,7 @@ const VersionHistory = () => {
                   />
                   <InputLabel id="approvedBy-label">Approved By</InputLabel>
                   <Select
-                    id="approvedBy"
+                    id="approvedBy-label"
                     name="approvedBy"
                     value={formData.approvedBy}
                     onChange={handleChange}
@@ -267,41 +267,83 @@ const VersionHistory = () => {
 
           <Grid item xs={12}>
             <TableContainer component={Paper} sx={{ mt: 4 }}>
+              <h2>Version History</h2>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Change</TableCell>
-                    <TableCell>Change Reason</TableCell>
-                    <TableCell>Created By</TableCell>
-                    <TableCell>Revision Date</TableCell>
-                    <TableCell>Approval Date</TableCell>
-                    <TableCell>Approved By</TableCell>
-                    <TableCell>Edit</TableCell>
-                    <TableCell>Delete</TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Type
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Change
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Change Reason
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Created By
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Revision Date
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Approval Date
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Approved By
+                      </Typography>
+                    </TableCell>
+                    {(role === "projectmanager" || role === "admin") && (
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Edit
+                        </Typography>
+                      </TableCell>
+                    )}
+                    {(role === "projectmanager" || role === "admin") && (
+                      <TableCell>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          Delete
+                        </Typography>
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {versionHistory.map((history) => (
                     <TableRow key={history._id}>
-                      <TableCell>{history?.version?.type}</TableCell>
-                      <TableCell>{history?.version?.change}</TableCell>
-                      <TableCell>{history?.version?.changeReason}</TableCell>
-                      <TableCell>{history?.version?.createdBy}</TableCell>
+                      <TableCell>{history.version?.type}</TableCell>
+                      <TableCell>{history.version?.change}</TableCell>
+                      <TableCell>{history.version?.changeReason}</TableCell>
+                      <TableCell>{history.version?.createdBy?.name}</TableCell>
                       <TableCell>
-                        {history?.version?.revisionDate?.split("T")[0]}
+                        {history.version?.revisionDate?.split("T")[0]}
                       </TableCell>
                       <TableCell>
-                        {history?.version?.approvalDate?.split("T")[0]}
+                        {history.version?.approvalDate?.split("T")[0]}
                       </TableCell>
-                      <TableCell>{history?.version?.approvedBy}</TableCell>
+                      <TableCell>{history.version?.approvedBy?.name}</TableCell>
                       {(role === "auditor" ||
                         role === "admin" ||
                         role === "projectmanager") && (
                         <TableCell>
                           <Button
                             color="primary"
-                            onClick={() => handleEdit(history)}
+                            onClick={() => handleEdit(history.version)}
                           >
                             Edit
                           </Button>
@@ -377,7 +419,13 @@ const VersionHistory = () => {
                     id="createdBy"
                     name="createdBy"
                     value={editFormData.createdBy}
-                    onChange={handleChange}
+                    // onChange={handleChange}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        createdBy: e.target.value,
+                      })
+                    }
                     fullWidth
                     sx={{ mb: 2 }}
                   >
@@ -422,10 +470,17 @@ const VersionHistory = () => {
                   />
                   <InputLabel id="approvedBy-label">Approved By</InputLabel>
                   <Select
+                    labelId="approvedBy-label"
                     id="approvedBy"
                     name="approvedBy"
                     value={editFormData.approvedBy}
-                    onChange={handleChange}
+                    // onChange={handleChange}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        approvedBy: e.target.value,
+                      })
+                    }
                     fullWidth
                     sx={{ mb: 2 }}
                   >

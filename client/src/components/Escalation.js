@@ -1,6 +1,5 @@
-// Escalation.js
-import React, { useContext, useEffect } from "react";
-import { Typography, Button, Grid } from "@mui/material";
+import React, { useContext } from "react";
+import { Typography, Button, Grid, Box } from "@mui/material";
 import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,52 +19,47 @@ const Escalation = () => {
     navigate(path);
   };
 
-  // useEffect(() => {
-  //   if (id && projects) {
-  //     const project = projects.find((project) => project._id === id);
-  //     // if (project) {
-  //     //   setResources(project.resources);
-  //     // }
-  //   }
-  // }, [id, projects]);
-
   return (
     <Layout>
-      <Grid container>
-        <Grid item>
-          <HorizontalList />
+      <Box p={4}>
+        <Grid container spacing={4} alignItems="center">
+          <Grid item xs={12}>
+            <HorizontalList />
+          </Grid>
+          <Grid item container spacing={2} justifyContent="center" xs={12}>
+            <Grid item>
+              <Button
+                onClick={() => handleNavigate(`/project/${id}/technical`)}
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Technical Escalation Matrix
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => handleNavigate(`/project/${id}/financial`)}
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Financial Escalation Matrix
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => handleNavigate(`/project/${id}/operational`)}
+                variant="contained"
+                color="primary"
+                size="large"
+              >
+                Operational Escalation Matrix
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
-        <Typography variant="h3">There are 3 Escalation Matrices</Typography>
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item>
-            <Button
-              onClick={() => handleNavigate(`/project/${id}/technical`)}
-              variant="contained"
-              color="primary"
-            >
-              Technical Escalation Matrix
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              onClick={() => handleNavigate(`/project/${id}/financial`)}
-              variant="contained"
-              color="primary"
-            >
-              Financial Escalation Matrix
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              onClick={() => handleNavigate(`/project/${id}/operational`)}
-              variant="contained"
-              color="primary"
-            >
-              Operational Escalation Matrix
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 };

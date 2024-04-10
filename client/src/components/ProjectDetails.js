@@ -38,49 +38,47 @@ const ProjectDetails = () => {
   return (
     <Layout>
       <Grid container spacing={5} sx={{ p: 2 }}>
-        <Grid container item>
-          <Grid item xs={10}>
-            <Typography className="mb-2">My Projects</Typography>
-            <Grid item xs={4} flex flexDirection={"row"}>
-              {projects &&
-                projects.map((project) => (
-                  <Card
-                    sx={{ maxWidth: 345 }}
-                    onClick={() => {
-                      handleProject(project._id);
-                    }}
-                  >
-                    <CardActionArea>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={getRandomImage()}
-                        alt="random image"
-                      />
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                          {project.projectName}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {project.projectDescription}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                ))}
-            </Grid>
-          </Grid>
+        <Grid item xs={12} sx={{ mt: 2 }}>
+          <Button variant="contained" color="primary" onClick={handleOpenModal}>
+            <AddIcon />
+            Add Project
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4">My Projects</Typography>
+        </Grid>
 
-          <Grid item xs={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleOpenModal}
-            >
-              <AddIcon />
-              Add Project
-            </Button>
-          </Grid>
+        <Grid container item spacing={3}>
+          {projects &&
+            projects.map((project) => (
+              <Grid item xs={12} sm={6} md={4} key={project._id}>
+                <Card
+                  sx={{ maxWidth: 345 }}
+                  onClick={() => {
+                    handleProject(project._id);
+                  }}
+                >
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={getRandomImage()}
+                      alt="random image"
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {project.projectName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {project.projectDescription.length > 30
+                          ? `${project.projectDescription.slice(0, 30)}...`
+                          : project.projectDescription}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
       </Grid>
 

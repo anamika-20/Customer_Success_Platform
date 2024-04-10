@@ -1,10 +1,10 @@
 import Project from "../models/Project.js";
-import StakeHolders from "../models/StakeHolders.js";
+import ProjectStack from "../models/ProjectStack.js";
 
-//@desc Update Stakeholders
-//@route PUT /stakeholders/:proj/edit
+//@desc Update Project Stack
+//@route PUT /projectstack/:proj/edit
 //@access admin, projectmanager
-const updateStakeholders = async (req, res) => {
+const updateProjectStack = async (req, res) => {
   try {
     const projectId = req.params.proj;
     const project = await Project.findById(projectId);
@@ -13,18 +13,18 @@ const updateStakeholders = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const stakeHoldersId = project.stakeholders;
-    const updatedStakeHolders = await StakeHolders.findByIdAndUpdate(
-      stakeHoldersId,
+    const projectStackId = project.projectStack;
+    const updatedProjectStack = await ProjectStack.findByIdAndUpdate(
+      projectStackId,
       req.body,
       { new: true }
     );
 
-    res.status(200).json({ updatedStakeHolders });
+    res.status(200).json({ updatedProjectStack });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export { updateStakeholders };
+export { updateProjectStack };
