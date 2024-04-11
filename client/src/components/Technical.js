@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import {
   Grid,
   Paper,
-  Typography,
   Button,
   Table,
   TableContainer,
@@ -14,11 +13,10 @@ import {
   Select,
   MenuItem,
   InputLabel,
-  Modal,
 } from "@mui/material";
 import Layout from "./Layout";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { DataContext } from "../DataContext";
 import axiosInstance, { setAuthHeader } from "../axiosConfig";
 import HorizontalList from "./HorizontalList";
@@ -35,12 +33,6 @@ const Technical = () => {
 
   const [escalationMatrix, setEscalationMatrix] = useState([]);
   const [formData, setFormData] = useState({
-    escalationLevel: "",
-    name: "",
-  });
-  const [editingId, setEditingId] = useState(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({
     escalationLevel: "",
     name: "",
   });
@@ -67,7 +59,6 @@ const Technical = () => {
 
         const response = await axiosInstance.get(`/user`);
         setUsers(response.data);
-        // setIsEditable(false);
       } catch (error) {
         console.error("Error creating phase:", error);
       }
@@ -82,49 +73,17 @@ const Technical = () => {
       try {
         const token = await getAccessTokenSilently();
         setAuthHeader(token);
-        const gg = escalationMatrix;
-        gg.push(formData);
+        const data = escalationMatrix;
+        data.push(formData);
         await axiosInstance.put(`/project/edit/${id}`, {
-          technicalMatrix: gg,
+          technicalMatrix: data,
         });
         await refreshData();
-        // setIsEditable(false);
       } catch (error) {
         console.error("Error creating phase:", error);
       }
     }
-    // setIsChanged(false);
   };
-
-  // const handleEdit = async (id) => {
-  //   try {
-  //     const entryToEdit = escalationMatrix.find((entry) => entry._id === id);
-  //     setEditFormData({
-  //       // project_id: entryToEdit.project_id,
-  //       escalationLevel: entryToEdit.escalationLevel,
-  //       name: entryToEdit.name,
-  //     });
-  //     setEditingId(id);
-  //     setEditModalOpen(true);
-  //   } catch (error) {
-  //     console.error("Error editing technical escalation matrix:", error);
-  //   }
-  // };
-
-  // const handleSaveEdit = async () => {
-  //   try {
-  //     // await updateTechnicalEscalationMatrix(editingId, editFormData);
-  //     // const updatedMatrix = escalationMatrix.map((entry) =>
-  //     // entry._id === editingId ? { ...entry, ...editFormData } : entry
-  //     // );
-  //     // setEscalationMatrix(updatedMatrix);
-  //     setEditFormData({ escalationLevel: "", name: "" });
-  //     setEditingId(null);
-  //     setEditModalOpen(false);
-  //   } catch (error) {
-  //     console.error("Error saving edit:", error);
-  //   }
-  // };
 
   const handleDelete = async (entryId) => {
     try {
@@ -156,14 +115,6 @@ const Technical = () => {
             <Paper sx={{ p: 2, mt: 4 }}>
               <h2>Add Technical Escalation Matrix</h2>
               <form onSubmit={handleSubmit}>
-                {/* <TextField
-                  name="project_id"
-                  label="Project ID"
-                  value={formData.project_id}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                /> */}
                 <InputLabel htmlFor="escalationLevel">Level</InputLabel>
                 <TextField
                   required={true}
@@ -201,12 +152,8 @@ const Technical = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  {/* <TableCell>Project ID</TableCell> */}
                   <TableCell>Level</TableCell>
                   <TableCell>Name</TableCell>
-                  {/* {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Edit</TableCell>
-                  )} */}
                   {(role === "projectmanager" || role === "admin") && (
                     <TableCell>Delete</TableCell>
                   )}
@@ -216,19 +163,9 @@ const Technical = () => {
                 {escalationMatrix ? (
                   escalationMatrix.map((entry) => (
                     <TableRow key={entry._id}>
-                      {/* <TableCell>{entry.project_id}</TableCell> */}
                       <TableCell>{entry.escalationLevel}</TableCell>
                       <TableCell>{entry.name.name}</TableCell>
-                      {/* {(role === "projectmanager" || role === "admin") && (
-                        <TableCell>
-                          <Button
-                            color="primary"
-                            onClick={() => handleEdit(entry._id)}
-                          >
-                            Edit
-                          </Button>
-                        </TableCell>
-                      )} */}
+
                       {(role === "projectmanager" || role === "admin") && (
                         <TableCell>
                           <Button
@@ -251,66 +188,6 @@ const Technical = () => {
           </TableContainer>
         </Grid>
       </Grid>
-      {/* Edit Modal
-      <Modal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        aria-labelledby="edit-modal-title"
-        aria-describedby="edit-modal-description"
-      >
-        <Paper
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" id="edit-modal-title" sx={{ mb: 2 }}>
-            Edit Technical Escalation Matrix
-          </Typography>
-          <form onSubmit={handleSaveEdit}>
-            <TextField
-              required={true}
-              name="level"
-              label="Level"
-              value={editFormData.escalationLevel}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, level: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <InputLabel htmlFor="name">Name</InputLabel>
-            <Select
-              defaultValue={
-                editFormData.name.name + " - " + editFormData.name.role
-              }
-              fullWidth
-              name="name"
-              onChange={(e) => {
-                setEditFormData({ ...editFormData, name: e.target.value });
-              }}
-              variant="outlined"
-              margin="normal"
-            >
-              {users.map((user) => (
-                <MenuItem key={user} value={user}>
-                  {user.name + " - " + user.role}
-                </MenuItem>
-              ))}
-            </Select>
-            <Button variant="contained" type="submit" sx={{ mr: 2 }}>
-              Save
-            </Button>
-            <Button variant="contained" onClick={() => setEditModalOpen(false)}>
-              Cancel
-            </Button>
-          </form>
-        </Paper>
-      </Modal> */}
     </Layout>
   );
 };
