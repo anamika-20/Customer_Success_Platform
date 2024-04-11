@@ -19,6 +19,9 @@ const Escalation = () => {
     navigate(path);
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <Layout>
       <Box p={4}>

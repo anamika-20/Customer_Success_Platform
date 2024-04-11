@@ -12,16 +12,16 @@ const addTeam = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const newVersionHistory = new VersionHistory(req.body);
@@ -51,16 +51,16 @@ const editTeam = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const updatedVersionHistory = await VersionHistory.findByIdAndUpdate(
@@ -94,16 +94,16 @@ const deleteTeam = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     // Delete vesrion from VersionHistory collection
     const deletedVersionHistory = await VersionHistory.findByIdAndDelete(id);

@@ -1,12 +1,12 @@
 import { checkIfStakeHolder } from "../helpers/authHelper.js";
 import Project from "../models/Project.js";
-import RiskProfiling from "../models/RiskProfiling.js";
+import ApprovedTeams from "../models/ApprovedTeams.js";
 import User from "../models/User.js";
 
-//@desc Create a new Risk Profiling and associate it with a project
-//@route POST /riskprofiling/:proj/add
+//@desc Create a new Approved Teams and associate it with a project
+//@route POST /teams/:proj/add
 //@access admin, projectmanager
-const addRiskProfiling = async (req, res) => {
+const addApprovedTeams = async (req, res) => {
   try {
     const projectId = req.params.proj;
     const { email } = req.userDetails;
@@ -23,25 +23,26 @@ const addRiskProfiling = async (req, res) => {
         message: "You are not authorized to access this project.",
       });
     }
-    const newRiskProfiling = new RiskProfiling(req.body);
 
-    await newRiskProfiling.save();
+    const newApprovedTeams = new ApprovedTeams(req.body);
 
-    project.riskProfiling.push(newRiskProfiling._id);
+    await newApprovedTeams.save();
+    if (!project.approvedTeam) project.approvedTeam = [];
+    project.approvedTeam.push(newApprovedTeams._id);
 
     await project.save();
 
-    res.status(201).json(project);
+    res.status(201).json({ message: "Team Added successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-//@desc Edit a riskProfiling
-//@route PUT /riskprofiling/:proj/:id/edit
+//@desc Edit a Approved Teams
+//@route PUT /teams/:proj/:id/edit
 //@access admin, projectmanager
-const editRiskProfiling = async (req, res) => {
+const editApprovedTeams = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
     const { email } = req.userDetails;
@@ -59,7 +60,7 @@ const editRiskProfiling = async (req, res) => {
       });
     }
 
-    const updatedRiskProfiling = await RiskProfiling.findByIdAndUpdate(
+    const updatedApprovedTeams = await ApprovedTeams.findByIdAndUpdate(
       id,
       req.body,
       {
@@ -67,23 +68,23 @@ const editRiskProfiling = async (req, res) => {
       }
     );
 
-    if (!updatedRiskProfiling) {
-      return res.status(404).json({ message: "RiskProfiling not found." });
+    if (!updatedApprovedTeams) {
+      return res.status(404).json({ message: "ApprovedTeams not found." });
     }
 
-    res
-      .status(200)
-      .json({ message: updatedRiskProfiling.name + " edited successfully" });
+    res.status(200).json({
+      message: "Teams edited successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-//@desc Delete a riskprofiling from project also
-//@route POST /riskprofiling/:proj/:id/delete
+//@desc Delete a Approved Teams from project also
+//@route POST /teams/:proj/:id/delete
 //@access admin, projectmanager
-const deleteRiskProfiling = async (req, res) => {
+const deleteApprovedTeams = async (req, res) => {
   try {
     const { proj: projectId, id } = req.params;
     const { email } = req.userDetails;
@@ -100,24 +101,25 @@ const deleteRiskProfiling = async (req, res) => {
         message: "You are not authorized to access this project.",
       });
     }
-    // Delete riskProfiling from RiskProfiling collection
-    const deletedRiskProfiling = await RiskProfiling.findByIdAndDelete(id);
+    // Delete approved team from ApprovedTeams collection
+    const deletedApprovedTeams = await ApprovedTeams.findByIdAndDelete(id);
 
-    if (!deletedRiskProfiling) {
-      return res.status(404).json({ message: "RiskProfiling not found." });
+    if (!deletedApprovedTeams) {
+      return res.status(404).json({ message: "ApprovedTeams not found." });
     }
-    // Remove riskprofiling ID from array of RiskProfilings in Project collection
+    // Remove a pproved team ID from array of ApprovedTeamss in Project collection
     await Project.updateOne(
       { _id: projectId },
-      { $pull: { riskProfiling: id } }
+      { $pull: { approvedTeam: id } }
     );
-    return res
-      .status(200)
-      .json({ message: deletedRiskProfiling.name + " deleted successfully" });
+    return res.status(200).json({
+      message:
+        "Phase " + deletedApprovedTeams.phaseNumber + " deleted successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export { addRiskProfiling, editRiskProfiling, deleteRiskProfiling };
+export { addApprovedTeams, editApprovedTeams, deleteApprovedTeams };

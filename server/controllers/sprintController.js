@@ -12,16 +12,16 @@ const addSprint = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     const newSprint = new Sprint(req.body);
 
@@ -50,16 +50,16 @@ const editSprint = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const updatedSprint = await Sprint.findByIdAndUpdate(id, req.body, {
@@ -88,16 +88,16 @@ const deleteSprint = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     // Delete vesrion from Sprint collection
     const deletedSprint = await Sprint.findByIdAndDelete(id);

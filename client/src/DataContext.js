@@ -39,7 +39,7 @@ export const DataProvider = (props) => {
   };
   return (
     <DataContext.Provider
-      value={{ projects, loading, error, refreshData, role }}
+      value={{ projects, loading, setLoading, error, refreshData, role }}
     >
       {props.children}
     </DataContext.Provider>

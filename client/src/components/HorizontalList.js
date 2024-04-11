@@ -101,9 +101,10 @@ const HorizontalList = () => {
   };
 
   const handleItemClick = (index) => {
-    // Navigate to different pages based on the item clicked
     navigate(items[startIndex + index].route);
   };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>

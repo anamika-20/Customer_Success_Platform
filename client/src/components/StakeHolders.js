@@ -103,10 +103,10 @@ const Stakeholders = () => {
 
   return (
     <Layout>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <h2>Add StakeHolders</h2>
+      <Grid container spacing={3} sx={{ justifyContent: "center" }}>
+        <Grid item xs={8}>
           <Paper sx={{ p: 2 }}>
+            <h2>Add StakeHolders</h2>
             <form onSubmit={handleSubmit}>
               <TextField
                 required={true}
@@ -143,8 +143,8 @@ const Stakeholders = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <h2>List of StakeHolders</h2>
           <TableContainer component={Paper}>
+            <h2>List of StakeHolders</h2>
             <Table>
               <TableHead>
                 <TableRow>

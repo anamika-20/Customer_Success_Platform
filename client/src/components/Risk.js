@@ -15,6 +15,9 @@ import {
   DialogContent,
   DialogActions,
   InputLabel,
+  Typography,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 import Layout from "./Layout";
@@ -29,7 +32,8 @@ const Risk = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
 
-  const { projects, loading, error, role } = useContext(DataContext);
+  const { projects, loading, error, role, refreshData } =
+    useContext(DataContext);
   console.log(projects);
   const [riskProfiles, setRiskProfiles] = useState([]);
   const [formData, setFormData] = useState({
@@ -84,6 +88,7 @@ const Risk = () => {
         }
       );
 
+      await refreshData();
       setRiskProfiles([...riskProfiles, response.data]);
       setFormData({
         // project_id: "",
@@ -100,59 +105,55 @@ const Risk = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    const riskProfileToEdit = riskProfiles.find(
-      (profile) => profile._id === id
-    );
-    setEditItemId(id);
-    setEditFormData({
-      // project_id: riskProfileToEdit.project_id,
-      riskType: riskProfileToEdit.riskType,
-      description: riskProfileToEdit.description,
-      severity: riskProfileToEdit.severity,
-      impact: riskProfileToEdit.impact,
-      remedialSteps: riskProfileToEdit.remedialSteps,
-      status: riskProfileToEdit.status,
-      closureDate: riskProfileToEdit.closureDate,
-    });
+  const handleEdit = (profile) => {
+    setEditFormData(profile);
     setEditDialogOpen(true);
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    const { _id, ...data } = editFormData;
     try {
-      // await updateRiskProfiling(editItemId, editFormData);
-      const updatedRiskProfiles = riskProfiles.map((profile) => {
-        if (profile._id === editItemId) {
-          return {
-            ...profile,
-            // project_id: editFormData.project_id,
-            riskType: editFormData.riskType,
-            description: editFormData.description,
-            severity: editFormData.severity,
-            impact: editFormData.impact,
-            remedialSteps: editFormData.remedialSteps,
-            status: editFormData.status,
-            closureDate: editFormData.closureDate,
-          };
-        }
-        return profile;
-      });
-      setRiskProfiles(updatedRiskProfiles);
-      setEditDialogOpen(false);
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      const response = await axiosInstance.put(
+        `http://localhost:8080/riskprofiling/${id}/${_id}/edit`,
+        data
+      );
+
+      if (response.status === 200) {
+        const updatedRiskProfiles = riskProfiles.map((profile) =>
+          profile._id === _id ? response.data : profile
+        );
+        setRiskProfiles(updatedRiskProfiles);
+        await refreshData();
+        setEditDialogOpen(false);
+        console.log("Resource updated with _id:", _id);
+      } else {
+        console.error("Error updating resource:", response.data.message);
+      }
     } catch (error) {
       console.error("Error updating risk profile:", error);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (_id) => {
     try {
-      // await deleteRiskProfiling(id);
-      setRiskProfiles(riskProfiles.filter((item) => item._id !== id));
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+
+      await axiosInstance.delete(`/riskprofiling/${id}/${_id}/delete`);
+      setRiskProfiles(riskProfiles.filter((resource) => resource._id !== _id));
+      console.log("risk deleted with _id:", _id);
+      await refreshData();
     } catch (error) {
-      console.error("Error deleting version history:", error);
+      console.error("Error deleting risk :", error);
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
   return (
     <Layout>
       <Grid
@@ -165,75 +166,87 @@ const Risk = () => {
           <HorizontalList />
         </Grid>
         {(role === "projectmanager" || role === "admin") && (
-          <Grid item xs={12}>
-            <h2>Add Risks</h2>
+          <Grid item xs={8}>
             <Paper sx={{ p: 2 }}>
+              <h2>Add Risks</h2>
               <form onSubmit={handleSubmit}>
-                {/* <TextField
-                    name="project_id"
-                    label="Project ID"
-                    value={formData.project_id}
-                    onChange={handleChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  /> */}
                 <InputLabel htmlFor="riskType">Risk Type</InputLabel>
-                <TextField
-                  required={true}
+                <Select
+                  required
                   name="riskType"
                   value={formData.riskType}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                >
+                  <MenuItem value="Financial">Financial</MenuItem>
+                  <MenuItem value="Operational">Operational</MenuItem>
+                  <MenuItem value="Technical">Technical</MenuItem>
+                  <MenuItem value="HR">HR</MenuItem>
+                  <MenuItem value="External">External</MenuItem>
+                </Select>
+
                 <InputLabel htmlFor="description">Description</InputLabel>
                 <TextField
-                  required={true}
+                  required
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+
                 <InputLabel htmlFor="severity">Severity</InputLabel>
-                <TextField
-                  required={true}
+                <Select
+                  required
                   name="severity"
                   value={formData.severity}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                >
+                  <MenuItem value="High">High</MenuItem>
+                  <MenuItem value="Medium">Medium</MenuItem>
+                  <MenuItem value="Low">Low</MenuItem>
+                </Select>
+
                 <InputLabel htmlFor="impact">Impact</InputLabel>
-                <TextField
-                  required={true}
+                <Select
+                  required
                   name="impact"
                   value={formData.impact}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
-                />
+                >
+                  <MenuItem value="High">High</MenuItem>
+                  <MenuItem value="Medium">Medium</MenuItem>
+                  <MenuItem value="Low">Low</MenuItem>
+                </Select>
+
                 <InputLabel htmlFor="remedialSteps">Remedial Steps</InputLabel>
                 <TextField
-                  required={true}
+                  required
                   name="remedialSteps"
                   value={formData.remedialSteps}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+
                 <InputLabel htmlFor="status">Status</InputLabel>
                 <TextField
-                  required={true}
+                  required
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+
                 <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
                 <TextField
-                  required={true}
+                  required
                   name="closureDate"
                   type="date"
                   value={formData.closureDate}
@@ -241,6 +254,7 @@ const Risk = () => {
                   fullWidth
                   sx={{ mb: 2 }}
                 />
+
                 <Button variant="contained" type="submit">
                   Add Risk Profile
                 </Button>
@@ -249,25 +263,61 @@ const Risk = () => {
           </Grid>
         )}
 
-        <h2>Risks</h2>
         <Grid item xs={12}>
           <TableContainer component={Paper} sx={{ mt: 4 }}>
+            <h2>Risks</h2>
             <Table>
               <TableHead>
                 <TableRow>
-                  {/* <TableCell>Project ID</TableCell> */}
-                  <TableCell>Risk Type</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Severity</TableCell>
-                  <TableCell>Impact</TableCell>
-                  <TableCell>Remedial Steps</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Closure Date</TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Risk Type
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Description
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Severity
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Impact
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Remedial Steps
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Status
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Closure Date
+                    </Typography>
+                  </TableCell>
+
                   {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Edit</TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Edit
+                      </Typography>
+                    </TableCell>
                   )}
                   {(role === "projectmanager" || role === "admin") && (
-                    <TableCell>Delete</TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Delete
+                      </Typography>
+                    </TableCell>
                   )}
                 </TableRow>
               </TableHead>
@@ -286,7 +336,7 @@ const Risk = () => {
                       <TableCell>
                         <Button
                           color="primary"
-                          onClick={() => handleEdit(profile._id)}
+                          onClick={() => handleEdit(profile)}
                         >
                           Edit
                         </Button>
@@ -318,33 +368,6 @@ const Risk = () => {
           <DialogTitle>Edit Risk Profile</DialogTitle>
           <DialogContent>
             <form onSubmit={handleSaveEdit}>
-              {/* <TextField
-                  name="project_id"
-                  label="Project ID"
-                  value={editFormData.project_id}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      project_id: e.target.value,
-                    })
-                  }
-                  fullWidth
-                  sx={{ mb: 2 }}
-                /> */}
-              <InputLabel htmlFor="type">Type</InputLabel>
-              <TextField
-                required={true}
-                name="riskType"
-                value={editFormData.riskType}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    riskType: e.target.value,
-                  })
-                }
-                fullWidth
-                sx={{ mb: 2 }}
-              />
               <InputLabel htmlFor="description">Description</InputLabel>
               <TextField
                 required={true}
@@ -359,9 +382,10 @@ const Risk = () => {
                 fullWidth
                 sx={{ mb: 2 }}
               />
+
               <InputLabel htmlFor="severity">Severity</InputLabel>
-              <TextField
-                required={true}
+              <Select
+                required
                 name="severity"
                 value={editFormData.severity}
                 onChange={(e) =>
@@ -372,18 +396,31 @@ const Risk = () => {
                 }
                 fullWidth
                 sx={{ mb: 2 }}
-              />
+              >
+                <MenuItem value="High">High</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="Low">Low</MenuItem>
+              </Select>
+
               <InputLabel htmlFor="impact">Impact</InputLabel>
-              <TextField
-                required={true}
+              <Select
+                required
                 name="impact"
                 value={editFormData.impact}
                 onChange={(e) =>
-                  setEditFormData({ ...editFormData, impact: e.target.value })
+                  setEditFormData({
+                    ...editFormData,
+                    impact: e.target.value,
+                  })
                 }
                 fullWidth
                 sx={{ mb: 2 }}
-              />
+              >
+                <MenuItem value="High">High</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="Low">Low</MenuItem>
+              </Select>
+
               <InputLabel htmlFor="remedialSteps">Remedial Steps</InputLabel>
               <TextField
                 required={true}
@@ -398,23 +435,28 @@ const Risk = () => {
                 fullWidth
                 sx={{ mb: 2 }}
               />
+
               <InputLabel htmlFor="status">Status</InputLabel>
               <TextField
                 required={true}
                 name="status"
                 value={editFormData.status}
                 onChange={(e) =>
-                  setEditFormData({ ...editFormData, status: e.target.value })
+                  setEditFormData({
+                    ...editFormData,
+                    status: e.target.value,
+                  })
                 }
                 fullWidth
                 sx={{ mb: 2 }}
               />
+
               <InputLabel htmlFor="closureDate">Closure Date</InputLabel>
               <TextField
                 required={true}
                 name="closureDate"
                 type="date"
-                value={editFormData.closureDate}
+                value={editFormData.closureDate?.split("T")[0]}
                 onChange={(e) =>
                   setEditFormData({
                     ...editFormData,

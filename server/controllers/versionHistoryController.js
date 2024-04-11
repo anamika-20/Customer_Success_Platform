@@ -12,16 +12,16 @@ const addVersionHistory = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     const newVersionHistory = new VersionHistory(req.body);
 
@@ -50,16 +50,16 @@ const editVersionHistory = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const updatedVersionHistory = await VersionHistory.findByIdAndUpdate(
@@ -74,14 +74,10 @@ const editVersionHistory = async (req, res) => {
       return res.status(404).json({ message: "Version History not found." });
     }
 
-    res
-      .status(200)
-      .json({
-        message:
-          "Version Type: " +
-          updatedVersionHistory.type +
-          " edited successfully",
-      });
+    res.status(200).json({
+      message:
+        "Version Type: " + updatedVersionHistory.type + " edited successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -97,16 +93,16 @@ const deleteVersionHistory = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     // Delete vesrion from VersionHistory collection
     const deletedVersionHistory = await VersionHistory.findByIdAndDelete(id);

@@ -93,6 +93,7 @@ const getProject = async (req, res) => {
       .populate("clientFeedback")
       .populate("moms")
       .populate("riskProfiling")
+      .populate("approvedTeam")
       .populate("phases.phase")
       .populate("sprints.sprint")
       .populate({
@@ -154,7 +155,7 @@ const getAllProjects = async (req, res) => {
     });
 
     if (!stakeHolders) {
-      return res.status(404).json({ message: "No projects found" });
+      return res.status(200).json({ message: "No projects found" });
     }
 
     const projectIds = stakeHolders.map((stakeHolder) => stakeHolder._id);
@@ -167,6 +168,7 @@ const getAllProjects = async (req, res) => {
       .populate("projectUpdates")
       .populate("clientFeedback")
       .populate("moms")
+      .populate("approvedTeam")
       .populate("riskProfiling")
       .populate("phases.phase")
       .populate("sprints.sprint")
@@ -207,7 +209,7 @@ const getAllProjects = async (req, res) => {
       });
 
     if (!projects || projects.length === 0) {
-      return res.status(404).json({ message: "No projects found" });
+      return res.status(200).json({ message: "No projects found" });
     }
     res.status(200).json(projects);
   } catch (error) {

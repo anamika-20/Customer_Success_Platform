@@ -7,21 +7,21 @@ const router = express.Router();
 router.post(
   "/:proj/add",
   (req, res, next) => {
-    checkRole(req, res, next, ["admin", "client"]);
+    checkRole(req, res, next, ["admin", "projectmanager"]);
   },
   addMoM
 );
 router.put(
   "/:proj/:id/edit",
   (req, res, next) => {
-    checkRole(req, res, next, ["admin", "projectmanager"]);
+    checkRole(req, res, next, ["admin"]);
   },
   editMoM
 );
 router.delete(
   "/:proj/:id/delete",
   (req, res, next) => {
-    checkRole(req, res, next, ["admin", "projectmanager"]);
+    checkRole(req, res, next, ["admin"]);
   },
   deleteMoM
 );

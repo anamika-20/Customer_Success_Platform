@@ -12,16 +12,16 @@ const addProjectUpdate = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     const newProjectUpdates = new ProjectUpdates(req.body);
 
@@ -47,16 +47,16 @@ const editProjectUpdate = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const updatedProjectUpdate = await ProjectUpdates.findByIdAndUpdate(
@@ -89,16 +89,16 @@ const deleteProjectUpdate = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     // Delete ProjectUpdate from ProjectUpdate collection
     const deletedProjectUpdate = await ProjectUpdates.findByIdAndDelete(id);

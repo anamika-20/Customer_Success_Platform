@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  addTeam,
-  editTeam,
-  deleteTeam,
-} from "../controllers/teamController.js";
+  addApprovedTeams,
+  editApprovedTeams,
+  deleteApprovedTeams,
+} from "../controllers/approvedTeamsController.js";
 import checkRole from "../middlewares/checkRole.js";
 
 const router = express.Router();
@@ -13,21 +13,21 @@ router.post(
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  addTeam
+  addApprovedTeams
 );
 router.put(
   "/:proj/:id/edit",
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  editTeam
+  editApprovedTeams
 );
 router.delete(
   "/:proj/:id/delete",
   (req, res, next) => {
     checkRole(req, res, next, ["admin", "projectmanager"]);
   },
-  deleteTeam
+  deleteApprovedTeams
 );
 
 export default router;

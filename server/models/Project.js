@@ -78,15 +78,12 @@ const projectSchema = new Schema(
       },
     ],
     detailedTimelineReference: { type: String },
-    approvedTeam: {
-      phaseNumber: { type: Number },
-      team: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Team",
-        },
-      ],
-    },
+    approvedTeam: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ApprovedTeams",
+      },
+    ],
     resources: [
       {
         type: Schema.Types.ObjectId,

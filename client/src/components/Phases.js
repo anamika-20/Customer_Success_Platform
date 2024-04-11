@@ -32,7 +32,8 @@ const Phases = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
 
-  const { projects, loading, error, role } = useContext(DataContext);
+  const { projects, loading, error, role, refreshData } =
+    useContext(DataContext);
   console.log(projects);
   const [phases, setPhases] = useState([]);
   const [formData, setFormData] = useState({
@@ -46,7 +47,6 @@ const Phases = () => {
   });
   const [editFormData, setEditFormData] = useState({});
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     if (id && projects) {
@@ -58,10 +58,8 @@ const Phases = () => {
   }, [id, projects]);
 
   const handleEdit = (phase) => {
-    // const selectedPhase = phases.find((phase) => phase._id === id);
     setEditFormData(phase);
     setEditDialogOpen(true);
-    // setSelectedId(phase);
   };
   const handleChange = (e) => {
     setFormData({
@@ -87,6 +85,8 @@ const Phases = () => {
           phase._id === _id ? response.data : phase
         );
         setPhases(updatedPhase);
+        await refreshData();
+
         setEditDialogOpen(false);
         console.log("Phase updated with _id:", _id);
       } else {
@@ -106,6 +106,8 @@ const Phases = () => {
         `http://localhost:8080/phase/${id}/${_id}/delete`
       );
       setPhases((phases) => phases.filter((phase) => phase._id !== _id));
+      await refreshData();
+
       console.log("Phase deleted with _id:", _id);
     } catch (error) {
       console.error("Error deleting phase:", error);
@@ -135,7 +137,7 @@ const Phases = () => {
         }
       );
       setPhases([...phases, response.data]);
-
+      await refreshData();
       setFormData({
         title: "",
         startDate: "",
@@ -149,6 +151,9 @@ const Phases = () => {
       console.error("Error creating phase:", error);
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <Layout>

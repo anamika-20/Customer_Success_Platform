@@ -12,16 +12,16 @@ const addResource = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     const newResource = new Resource(req.body);
 
@@ -47,16 +47,16 @@ const editResource = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
 
     const updatedResource = await Resource.findByIdAndUpdate(id, req.body, {
@@ -85,16 +85,16 @@ const deleteResource = async (req, res) => {
     const { email } = req.userDetails;
     const user = await User.findOne({ email });
 
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
     const isStakeHolder = await checkIfStakeHolder(projectId, user);
     if (user.role !== "admin" && !isStakeHolder) {
       return res.status(403).json({
         message: "You are not authorized to access this project.",
       });
-    }
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found." });
     }
     // Delete resource from Resource collection
     const deletedResource = await Resource.findByIdAndDelete(id);

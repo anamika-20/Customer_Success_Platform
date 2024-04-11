@@ -32,7 +32,7 @@ const AuditHistory = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
 
-  const { projects, loading, error, role, refreshData } =
+  const { projects, loading, setLoading, error, role, refreshData } =
     useContext(DataContext);
   console.log(projects);
   const [auditHistory, setAuditHistory] = useState([]);
@@ -75,7 +75,7 @@ const AuditHistory = () => {
     try {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
-
+      setLoading(true);
       const response = await axiosInstance.post(
         `http://localhost:8080/audithistory/${id}/add`,
         {
@@ -89,6 +89,8 @@ const AuditHistory = () => {
       );
 
       setAuditHistory([...auditHistory, response.data]);
+      setLoading(false);
+
       await refreshData();
 
       setFormData({
@@ -115,6 +117,7 @@ const AuditHistory = () => {
     try {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
+      setLoading(true);
 
       const response = await axiosInstance.put(
         `http://localhost:8080/audithistory/${id}/${_id}/edit`,
@@ -125,6 +128,7 @@ const AuditHistory = () => {
           history._id === _id ? response.data : history
         );
         setAuditHistory(updatedHistory);
+        setLoading(false);
 
         await refreshData();
 
@@ -142,22 +146,25 @@ const AuditHistory = () => {
     try {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
+      setLoading(true);
 
       await axiosInstance.delete(`/audithistory/${id}/${_id}/delete`);
       setAuditHistory(auditHistory.filter((item) => item._id !== _id));
+      setLoading(false);
+
       await refreshData();
     } catch (error) {
       console.error("Error deleting audit history:", error);
     }
   };
-
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={4}>
         <Grid item xs={12}>
           <HorizontalList />
         </Grid>
-        {console.log(role)}
         {(role === "auditor" || role === "admin") && (
           <Grid item xs={8}>
             <h2>Add Audit</h2>
@@ -175,14 +182,6 @@ const AuditHistory = () => {
                   sx={{ mb: 2 }}
                 />
                 <InputLabel htmlFor="reviewedBy">Reviewed By</InputLabel>
-                {/* <TextField
-                  required
-                  name="reviewedBy"
-                  value={formData.reviewedBy}
-                  onChange={handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                /> */}
                 <Select
                   labelId="reviewedBy"
                   id="reviewedBy"
@@ -287,21 +286,24 @@ const AuditHistory = () => {
                       Action Item
                     </Typography>
                   </TableCell>
-
-                  <TableCell>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Edit
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Delete
-                    </Typography>
-                  </TableCell>
+                  {(role === "auditor" || role === "admin") && (
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Edit
+                      </Typography>
+                    </TableCell>
+                  )}
+                  {(role === "auditor" || role === "admin") && (
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Delete
+                      </Typography>
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
 
-              {console.log(auditHistory)}
+              {/* {console.log(auditHistory)} */}
               <TableBody>
                 {auditHistory.map((history) => (
                   <TableRow key={history._id}>

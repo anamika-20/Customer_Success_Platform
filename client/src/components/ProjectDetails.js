@@ -26,7 +26,7 @@ const ProjectDetails = () => {
   };
 
   const getRandomImage = () => {
-    const keywords = ["people", "business", "team", "office", "meeting"];
+    const keywords = ["business", "team", "office", "meeting"];
     const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
     return `https://source.unsplash.com/400x300/?${randomKeyword}`;
   };
@@ -45,11 +45,15 @@ const ProjectDetails = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">My Projects</Typography>
+          <Typography variant="h4">
+            {projects.length > 0
+              ? "My Projects"
+              : "You are not assigned to any projects"}
+          </Typography>
         </Grid>
 
         <Grid container item spacing={3}>
-          {projects &&
+          {projects.length > 0 &&
             projects.map((project) => (
               <Grid item xs={12} sm={6} md={4} key={project._id}>
                 <Card

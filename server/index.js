@@ -35,7 +35,7 @@ app.use("/versionhistory", versionHistoryRoute);
 app.use("/riskprofiling", riskProfilingRoute);
 app.use("/phase", phaseRoute);
 app.use("/sprint", sprintRoute);
-app.use("/team", teamRoute);
+app.use("/teams", teamRoute);
 app.use("/resources", resourcesRoute);
 app.use("/clientfeedback", clientFeedbackRoute);
 app.use("/projectupdates", projectUpdatesRoute);

@@ -31,7 +31,8 @@ const ClientFeedback = () => {
   const { user, isLoading, getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
 
-  const { projects, loading, error, role } = useContext(DataContext);
+  const { projects, loading, error, role, refreshData } =
+    useContext(DataContext);
   console.log(projects);
 
   const [feedback, setFeedback] = useState([]);
@@ -66,16 +67,13 @@ const ClientFeedback = () => {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
 
-      const response = await axiosInstance.post(
-        `http://localhost:8080/clientfeedback/${id}/add`,
-        {
-          type: formData.feedbackType,
-          dateReceived: formData.dateReceived,
-          detailedFeedback: formData.detailedFeedback,
-          actionTaken: formData.actionTaken,
-          closureDate: formData.closureDate,
-        }
-      );
+      const response = await axiosInstance.post(`/clientfeedback/${id}/add`, {
+        type: formData.feedbackType,
+        dateReceived: formData.dateReceived,
+        detailedFeedback: formData.detailedFeedback,
+        actionTaken: formData.actionTaken,
+        closureDate: formData.closureDate,
+      });
 
       setFeedback([...feedback, response.data]);
       setFormData({
@@ -92,7 +90,7 @@ const ClientFeedback = () => {
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    _id: null,
+    // _id: null,
     feedbackType: "",
     dateReceived: "",
     detailedFeedback: "",
@@ -133,6 +131,8 @@ const ClientFeedback = () => {
           f._id === _id ? response.data : f
         );
         setFeedback(updatedfeedback);
+        await refreshData();
+
         setEditDialogOpen(false);
         console.log("Feedback updated with _id:", _id);
       } else {
@@ -152,11 +152,16 @@ const ClientFeedback = () => {
         `http://localhost:8080/clientfeedback/${id}/${_id}/delete`
       );
       setFeedback(feedback.filter((f) => f._id !== _id));
+      await refreshData();
+
       console.log("Feedback deleted with _id:", _id);
     } catch (error) {
       console.error("Error deleting feedback:", error);
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <Layout>

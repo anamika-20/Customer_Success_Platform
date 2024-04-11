@@ -67,6 +67,7 @@ const TechStack = () => {
 
         <Grid item xs={6} justifyContent={"center"}>
           <Paper elevation={3} style={{ padding: "20px" }}>
+            <h2>Tech Stack</h2>
             {isEditable ? (
               <Box display="flex" flexDirection="column" alignItems="center">
                 <WordInput
