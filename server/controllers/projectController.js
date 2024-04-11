@@ -104,6 +104,14 @@ const getProject = async (req, res) => {
         },
       })
       .populate({
+        path: "auditHistory",
+        model: "AuditHistory",
+        populate: {
+          path: "reviewedBy",
+          model: "User",
+        },
+      })
+      .populate({
         path: "financialMatrix.name",
         model: "User",
       })
@@ -122,7 +130,6 @@ const getProject = async (req, res) => {
           model: "User",
         },
       });
-
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
@@ -168,6 +175,14 @@ const getAllProjects = async (req, res) => {
         model: "VersionHistory",
         populate: {
           path: "createdBy approvedBy",
+          model: "User",
+        },
+      })
+      .populate({
+        path: "auditHistory",
+        model: "AuditHistory",
+        populate: {
+          path: "reviewedBy",
           model: "User",
         },
       })

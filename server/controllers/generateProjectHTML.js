@@ -264,8 +264,8 @@ const generateProjectHTML = (projectDoc) => {
                  <tr>
                     <td>${resource.name}</td>
                     <td>${resource.role}</td>
-                    <td>${resource.startDate}</td>
-                    <td>${resource.endDate}</td>
+                    <td>${formateDate(resource.startDate)}</td>
+                    <td>${formateDate(resource.endDate)}</td>
                     <td>${resource.comments}</td>
                 </tr>`
   );
@@ -291,10 +291,10 @@ const generateProjectHTML = (projectDoc) => {
     (feedback) => `
     <tr>
         <td>${feedback.type}</td>
-        <td>${feedback.dateReceived}</td>
+        <td>${formateDate(feedback.dateReceived)}</td>
         <td>${feedback.detailedFeedback}</td>
         <td>${feedback.actionTaken}</td>
-        <td>${feedback.closureDate}</td>
+        <td>${formateDate(feedback.closureDate)}</td>
     </tr>`
   );
   htmlContent += `</tbody>
@@ -317,10 +317,120 @@ const generateProjectHTML = (projectDoc) => {
   htmlContent += projectDoc.moms.map(
     (mom) => `
     <tr>
-        <td>${mom.date}</td>
+        <td>${formateDate(mom.date)}</td>
         <td>${mom.duration}</td>
         <td>${mom.momLink}</td>
         <td>${mom.comments}</td>
+    </tr>`
+  );
+  htmlContent += `</tbody>
+              </table>
+<br/>`;
+
+  // Project Updates
+  htmlContent += `
+ <h3>Project Updates</h3>
+ <table>
+     <thead>
+     <tr>
+        <th>Date</th>
+        <th>General Updates</th>
+     </tr>
+     </thead>
+     <tbody>`;
+  htmlContent += projectDoc.projectUpdates.map(
+    (updates) => `
+    <tr>
+        <td>${formateDate(updates.date)}</td>
+        <td>${updates.generalUpdates}</td>
+    </tr>`
+  );
+  htmlContent += `</tbody>
+              </table>
+<br/>`;
+
+  // Audit History
+  htmlContent += `
+ <h3>Audit History</h3>
+ <table>
+     <thead>
+     <tr>
+        <th>Date</th>
+        <th>Reviewed By</th>
+        <th>Status</th>
+        <th>Reviewed Section</th>
+        <th>Comment Queries</th>
+        <th>Action Item</th>
+     </tr>
+     </thead>
+     <tbody>`;
+  htmlContent += projectDoc.auditHistory.map(
+    (audit) => `
+    <tr>
+        <td>${formateDate(audit.dateOfAudit)}</td>
+        <td>${audit.reviewedBy}</td>
+        <td>${audit.status}</td>
+        <td>${audit.reviewedSection}</td>
+        <td>${audit.commentQueries}</td>
+        <td>${audit.actionItem}</td>
+    </tr>`
+  );
+  htmlContent += `</tbody>
+              </table>
+<br/>`;
+
+  // Sprint
+  htmlContent += `
+ <h3>Sprint</h3>
+ <table>
+     <thead>
+     <tr>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>status</th>
+        <th>Comment</th>
+     </tr>
+     </thead>
+     <tbody>`;
+  htmlContent += projectDoc.sprints.map(
+    (sprint) => `
+    <tr>
+        <td>${formateDate(sprint.sprint?.startDate)}</td>
+        <td>${formateDate(sprint.sprint?.endDate)}</td>
+        <td>${sprint.sprint?.status}</td>
+        <td>${sprint.sprint?.comments}</td>
+    </tr>`
+  );
+  htmlContent += `</tbody>
+              </table>
+<br/>`;
+
+  // VErsion History
+  htmlContent += `
+ <h3>Version History</h3>
+ <table>
+     <thead>
+     <tr>
+        <th>Type</th>
+        <th>Type Change</th>
+        <th>Change Reason</th>
+        <th>Created By</th>
+        <th>Revision Date</th>
+        <th>Approval Date</th>
+        <th>Approved By</th>
+    </tr>
+     </thead>
+     <tbody>`;
+  htmlContent += projectDoc.versionHistory.map(
+    (version) => `
+    <tr>
+        <td>${version.version?.type}</td>
+        <td>${version.version?.change}</td>
+        <td>${version.version?.changeReason}</td>
+        <td>${version.version?.createdBy?.name}</td>
+        <td>${formateDate(version.version?.revisionDate)}</td>
+        <td>${formateDate(version.version?.approvalDate)}</td>
+        <td>${version.version?.approvedBy?.name}</td>
     </tr>`
   );
   htmlContent += `</tbody>

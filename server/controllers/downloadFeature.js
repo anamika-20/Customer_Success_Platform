@@ -12,6 +12,7 @@ const downloadFeature = async (req, res) => {
       .populate("projectUpdates")
       .populate("clientFeedback")
       .populate("moms")
+      .populate("auditHistory")
       .populate("riskProfiling")
       .populate("phases.phase")
       .populate("sprints.sprint")
@@ -42,9 +43,9 @@ const downloadFeature = async (req, res) => {
           model: "User",
         },
       });
-    console.log(
-      "================================" + projectDoc.sprints[0].sprint
-    );
+    // console.log(
+    //   "================================" + projectDoc.sprints[0].sprint
+    // );
     if (!projectDoc) {
       return res.status(409).json({ message: "Project does not exist" });
     }
@@ -68,7 +69,7 @@ const downloadFeature = async (req, res) => {
     await page.setContent(htmlContent);
 
     // Download the PDF
-    // const pdf = await page.pdf({ format: "A4", printBackground: true });
+    const pdf = await page.pdf({ format: "A4", printBackground: true });
 
     // Get the HTML content for preview
     const previewHtml = await page.content();
@@ -77,12 +78,12 @@ const downloadFeature = async (req, res) => {
     await browser.close();
 
     // Send the PDF as a response
-    // res.setHeader("Content-Type", "application/pdf");
-    // res.setHeader(
-    //   "Content-Disposition",
-    //   `attachment; filename=project_details.pdf`
-    // );
-    // res.send(pdf);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=project_details.pdf`
+    );
+    res.send(pdf);
 
     // Send the HTML as a response for preview
     res.setHeader("Content-Type", "text/html");

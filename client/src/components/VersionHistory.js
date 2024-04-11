@@ -109,12 +109,8 @@ const VersionHistory = () => {
   };
 
   const handleEdit = (history) => {
-    // try {
     setEditFormData(history);
     setEditDialogOpen(true);
-    // } catch (error) {
-    //   console.error("Error fetching version history for editing:", error);
-    // }
   };
 
   const handleSaveEdit = async (e) => {

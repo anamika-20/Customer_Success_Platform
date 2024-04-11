@@ -93,8 +93,14 @@ const OneProjectDetail = () => {
     setIsChanged(false);
   };
 
-  const handleDownloadProject = () => {
-    // Implement your download project logic here
+  const handleDownloadProject = async () => {
+    try {
+      const token = await getAccessTokenSilently();
+      setAuthHeader(token);
+      await axiosInstance.get(`/download-pdf/${id}`);
+    } catch {
+      console.log(error);
+    }
   };
 
   if (loading) return <div>Loading...</div>;
