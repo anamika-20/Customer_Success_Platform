@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   Grid,
   Button,
@@ -18,8 +18,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axiosInstance, { setAuthHeader } from "../axiosConfig";
 
 const OneProjectDetail = () => {
+  const [editable, setEditable] = useState(false);
   const { id } = useParams();
-  const { projects, loading, error } = useContext(DataContext);
+  const { projects, loading, error, role } = useContext(DataContext);
   const { getAccessTokenSilently } = useAuth0();
 
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ const OneProjectDetail = () => {
     durationMonths: 0,
     budgetedHours: 0,
     projectDescription: "",
+    // stakeholders: [],
     scope: "",
     detailedTimelineReference: "",
   });
@@ -61,46 +63,21 @@ const OneProjectDetail = () => {
   };
 
   const handleSaveChanges = async (e) => {
-    const project = projects.find((p) => p._id === id);
-    if (project) {
-      try {
-        const token = await getAccessTokenSilently();
-        setAuthHeader(token);
-        await axiosInstance.put(`/project/edit/${id}`, formData);
-        // setIsEditable(false);
-      } catch (error) {
-        console.error("Error creating phase:", error);
-      }
-    }
-    setIsChanged(false);
-  };
-
-  const handleCancel = () => {
-    if (id && projects) {
-      const project = projects.find((project) => project.id === parseInt(id));
-      if (project) {
-        setFormData({
-          projectName: project.projectName,
-          projectType: project.projectType,
-          durationMonths: project.durationMonths,
-          budgetedHours: project.budgetedHours,
-          projectDescription: project.projectDescription,
-          scope: project.scope,
-          detailedTimelineReference: project.detailedTimelineReference,
-        });
-      }
-    }
-    setIsChanged(false);
-  };
-
-  const handleDownloadProject = async () => {
+    e.preventDefault();
     try {
       const token = await getAccessTokenSilently();
       setAuthHeader(token);
-      await axiosInstance.get(`/download-pdf/${id}`);
-    } catch {
-      console.log(error);
+      await axiosInstance.put(`/project/edit/${id}`, formData);
+      console.log(editable);
+      setEditable(false);
+      console.log(editable);
+    } catch (error) {
+      console.error("Error editing Project:", error);
     }
+  };
+
+  const handleCancel = () => {
+    setEditable(false);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -113,16 +90,29 @@ const OneProjectDetail = () => {
           <HorizontalList />
         </Grid>
         <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleDownloadProject}
+          <a
+            href={`http://localhost:8080/downloadpdf/${id}`}
+            target="_blank"
+            rel="noreferrer"
           >
-            Download Project
-          </Button>
+            <Button variant="contained" color="secondary">
+              Download Project
+            </Button>
+          </a>{" "}
+          {(role === "projectmanager" || role === "admin") && !editable && (
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ marginRight: "10px" }}
+              onClick={() => setEditable(true)}
+            >
+              Edit
+            </Button>
+          )}
         </Grid>
+
         <Grid item xs={12}>
-          <form>
+          <form onSubmit={handleSaveChanges}>
             <Box mb={2}>
               <TextField
                 fullWidth
@@ -131,6 +121,7 @@ const OneProjectDetail = () => {
                 value={formData.projectName}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
             <Box mb={2}>
@@ -141,6 +132,7 @@ const OneProjectDetail = () => {
                   name="projectType"
                   value={formData.projectType}
                   onChange={handleChange}
+                  disabled={!editable}
                 >
                   <MenuItem value="Monthly">Monthly</MenuItem>
                   <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
@@ -156,6 +148,7 @@ const OneProjectDetail = () => {
                 value={formData.durationMonths}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
             <Box mb={2}>
@@ -167,6 +160,7 @@ const OneProjectDetail = () => {
                 value={formData.budgetedHours}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
             <Box mb={2}>
@@ -179,6 +173,7 @@ const OneProjectDetail = () => {
                 value={formData.projectDescription}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
             <Box mb={2}>
@@ -191,6 +186,7 @@ const OneProjectDetail = () => {
                 value={formData.scope}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
             <Box mb={2}>
@@ -203,22 +199,71 @@ const OneProjectDetail = () => {
                 value={formData.detailedTimelineReference}
                 onChange={handleChange}
                 variant="outlined"
+                disabled={!editable}
               />
             </Box>
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSaveChanges}
-                disabled={!isChanged}
-                style={{ marginRight: "10px" }}
-              >
-                Save Changes
-              </Button>
-              <Button variant="contained" onClick={handleCancel}>
-                Cancel
-              </Button>
+            <Box mb={2}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>StakeHolder - Auditor</InputLabel>
+                <Select
+                  label="StakeHolder - Auditor"
+                  name="auditor"
+                  value={formData.projectType}
+                  onChange={handleChange}
+                  disabled={!editable}
+                >
+                  <MenuItem value="Monthly">Monthly</MenuItem>
+                  <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
+            <Box mb={2}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Project Type</InputLabel>
+                <Select
+                  label="Project Type"
+                  name="projectType"
+                  value={formData.projectType}
+                  onChange={handleChange}
+                  disabled={!editable}
+                >
+                  <MenuItem value="Monthly">Monthly</MenuItem>
+                  <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mb={2}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Project Type</InputLabel>
+                <Select
+                  label="Project Type"
+                  name="projectType"
+                  value={formData.projectType}
+                  onChange={handleChange}
+                  disabled={!editable}
+                >
+                  <MenuItem value="Monthly">Monthly</MenuItem>
+                  <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            {editable && (
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={!isChanged}
+                  style={{ marginRight: "10px" }}
+                  type="submit"
+                >
+                  Save Changes
+                </Button>
+                <Button variant="contained" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              </Box>
+            )}
           </form>
         </Grid>
       </Grid>

@@ -1,234 +1,207 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
-  Grid,
-  Paper,
-  Typography,
+  Box,
   Button,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  IconButton,
+  Typography,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Select,
+  Grid,
+  MenuItem,
+  Container,
 } from "@mui/material";
-import {
-  getAllStakeholders,
-  createStakeholder,
-  updateStakeholder,
-  deleteStakeholder,
-} from "../api/stakeHoldersAPI";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { DataContext } from "../DataContext";
+import axiosInstance, { setAuthHeader } from "../axiosConfig";
+import HorizontalList from "./HorizontalList";
 import Layout from "./Layout";
 
-const Stakeholders = () => {
-  // State variables
-  const [stakeholders, setStakeholders] = useState([]);
-  const [formData, setFormData] = useState({
-    title: "",
-    name: "",
-    contact: "",
-  });
-  const [editFormData, setEditFormData] = useState({});
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+const StakeHolders = () => {
+  const [stakeholders, setstakeholders] = useState([]);
+  const { getAccessTokenSilently } = useAuth0();
+  const { id } = useParams();
 
-  // Fetch stakeholders data on component mount
+  const { projects, loading, error, role, refreshData } =
+    useContext(DataContext);
+  console.log(projects);
+  const [pmList, setPmList] = useState([]);
+  const [auditorList, setAuditorList] = useState([]);
+  const [clientList, setClientList] = useState([]);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAllStakeholders();
-        setStakeholders(data);
-      } catch (error) {
-        console.error("Error fetching stakeholders:", error);
+    if (id && projects) {
+      const project = projects.find((project) => project._id === id);
+      if (project) {
+        setstakeholders(project.stakeholders);
+        setPmList(project.stakeholders.PM);
+        setAuditorList(project.stakeholders.Auditor);
+        setClientList(project.stakeholders.Clients);
       }
-    };
-    fetchData();
-  }, []);
+    }
+  }, [id, projects]);
 
-  // Handle form input change
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // [
+  //   { id: 1, name: "John Doe" },
+  // ]);
+  // const [auditorList, setauditorList] = useState([
+  //   { id: 1, name: "Emily Brown" },
+  // ]);
+  // const [clientList, setClientList] = useState([
+  //   { id: 1, name: "Sarah Williams" },
+  // ]);
 
-  // Handle edit button click
-  const handleEdit = (id) => {
-    const selectedStakeholder = stakeholders.find(
-      (stakeholder) => stakeholder._id === id
-    );
-    setEditFormData(selectedStakeholder);
-    setEditDialogOpen(true);
-  };
+  const handleStakeholderChange = (type, e) => {
+    const name = e.target.value;
+    const newStakeholder = { id: Date.now(), name };
 
-  // Handle form submission for adding a new stakeholder
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const newStakeholder = await createStakeholder(formData);
-      setStakeholders([...stakeholders, newStakeholder]);
-      setFormData({ title: "", name: "", contact: "" });
-    } catch (error) {
-      console.error("Error creating stakeholder:", error);
+    switch (type) {
+      case "pm":
+        setPmList([...pmList, newStakeholder]);
+        break;
+      case "auditor":
+        setAuditorList([...auditorList, newStakeholder]);
+        break;
+      case "client":
+        setClientList([...clientList, newStakeholder]);
+        break;
+      default:
+        break;
     }
   };
 
-  // Handle form submission for updating an existing stakeholder
-  const handleSaveEdit = async () => {
-    try {
-      await updateStakeholder(editFormData._id, editFormData);
-      setEditDialogOpen(false);
-      const updatedStakeholders = await getAllStakeholders();
-      setStakeholders(updatedStakeholders);
-    } catch (error) {
-      console.error("Error updating stakeholder:", error);
+  const removeStakeholder = (index, type) => {
+    switch (type) {
+      case "pm":
+        const updatedpmList = [...pmList];
+        updatedpmList.splice(index, 1);
+        setPmList(updatedpmList);
+        break;
+      case "auditor":
+        const updatedauditorList = [...auditorList];
+        updatedauditorList.splice(index, 1);
+        setAuditorList(updatedauditorList);
+        break;
+      case "client":
+        const updatedclientList = [...clientList];
+        updatedclientList.splice(index, 1);
+        setClientList(updatedclientList);
+        break;
+      default:
+        break;
     }
   };
 
-  // Handle delete button click
-  const handleDelete = async (id) => {
-    try {
-      await deleteStakeholder(id);
-      setStakeholders(
-        stakeholders.filter((stakeholder) => stakeholder._id !== id)
-      );
-    } catch (error) {
-      console.error("Error deleting stakeholder:", error);
+  const getAvailableStakeholders = (type) => {
+    switch (type) {
+      case "pm":
+        // For this example, returning a static list of available PMs
+        return [
+          { id: 2, name: "Jane Smith" },
+          { id: 3, name: "Alice Johnson" },
+        ];
+      case "auditor":
+        // For this example, returning a static list of available Auditors
+        return [
+          { id: 2, name: "Michael Johnson" },
+          { id: 3, name: "David Brown" },
+        ];
+      case "client":
+        // For this example, returning a static list of available Clients
+        return [
+          { id: 2, name: "David Jones" },
+          { id: 3, name: "Laura Smith" },
+        ];
+      default:
+        return [];
     }
   };
+
+  const renderStakeholderSection = (
+    type,
+    stakeholders,
+    handleChange,
+    availableStakeholders
+  ) => (
+    <Box mt={2}>
+      <Typography variant="subtitle1">{`${
+        type.charAt(0).toUpperCase() + type.slice(1)
+      }s`}</Typography>
+      {stakeholders?.map((stakeholder, index) => (
+        <Box key={index} display="flex" alignItems="center" mt={1}>
+          <TextField
+            fullWidth
+            label={`${type.charAt(0).toUpperCase() + type.slice(1)} ${
+              index + 1
+            }`}
+            value={stakeholder.name}
+            variant="outlined"
+            margin="normal"
+            disabled
+          />
+          <IconButton
+            color="secondary"
+            onClick={() => removeStakeholder(index, type)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ))}
+      <Select
+        fullWidth
+        onChange={(e) => handleChange(type, e)}
+        variant="outlined"
+        margin="normal"
+      >
+        <MenuItem value="" disabled>
+          Select {type.charAt(0).toUpperCase() + type.slice(1)}
+        </MenuItem>
+        {availableStakeholders?.map((stakeholder) => (
+          <MenuItem key={stakeholder.id} value={stakeholder.name}>
+            {stakeholder.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </Box>
+  );
 
   return (
     <Layout>
-      <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-        <Grid item xs={8}>
-          <Paper sx={{ p: 2 }}>
-            <h2>Add StakeHolders</h2>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                required={true}
-                name="title"
-                label="Title"
-                value={formData.title}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                required={true}
-                name="name"
-                label="Name"
-                value={formData.name}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                required={true}
-                name="contact"
-                label="Contact"
-                value={formData.contact}
-                onChange={handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <Button variant="contained" type="submit">
-                Add Stakeholder
-              </Button>
-            </form>
-          </Paper>
-        </Grid>
-
+      <Grid container>
         <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <h2>List of StakeHolders</h2>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Contact</TableCell>
-                  <TableCell>Edit</TableCell>
-                  <TableCell>Delete</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {stakeholders.map((stakeholder) => (
-                  <TableRow key={stakeholder._id}>
-                    <TableCell>{stakeholder.title}</TableCell>
-                    <TableCell>{stakeholder.name}</TableCell>
-                    <TableCell>{stakeholder.contact}</TableCell>
-                    <TableCell>
-                      <Button onClick={() => handleEdit(stakeholder._id)}>
-                        Edit
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button onClick={() => handleDelete(stakeholder._id)}>
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <HorizontalList />
+        </Grid>
+        <Grid container item justifyContent="center" spacing={4}>
+          {(role === "projectmanager" || role === "admin") && (
+            <Container>
+              {/* <Typography variant="h6" gutterBottom>
+                Step 4: Stakeholders
+              </Typography> */}
+
+              {renderStakeholderSection(
+                "pm",
+                pmList,
+                handleStakeholderChange,
+                getAvailableStakeholders("pm")
+              )}
+              {renderStakeholderSection(
+                "client",
+                clientList,
+                handleStakeholderChange,
+                getAvailableStakeholders("client")
+              )}
+              {renderStakeholderSection(
+                "auditor",
+                auditorList,
+                handleStakeholderChange,
+                getAvailableStakeholders("auditor")
+              )}
+            </Container>
+          )}
         </Grid>
       </Grid>
-      <Dialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>Edit Stakeholder</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSaveEdit}>
-            <TextField
-              required={true}
-              name="title"
-              label="Title"
-              value={editFormData.title}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, title: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              required={true}
-              name="name"
-              label="Name"
-              value={editFormData.name}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, name: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              required={true}
-              name="contact"
-              label="Contact"
-              value={editFormData.contact}
-              onChange={(e) =>
-                setEditFormData({ ...editFormData, contact: e.target.value })
-              }
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <DialogActions>
-              <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Save</Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
     </Layout>
   );
 };
 
-export default Stakeholders;
+export default StakeHolders;

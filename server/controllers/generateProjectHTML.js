@@ -59,21 +59,43 @@ const generateProjectHTML = (projectDoc) => {
   htmlContent += `
   <h1>Project Stack</h1>
   <label>Backend:</label>
-  ${projectDoc?.projectStack?.backend.map((tech) => `<span>${tech}</span>`)}
+  ${
+    projectDoc?.projectStack?.backend
+      ? projectDoc?.projectStack?.backend.map((tech) => `<span>${tech}</span>`)
+      : "[ ]"
+  }
   <br/>
   <label>Frontend:</label>
-  ${projectDoc?.projectStack?.frontend.map((tech) => `<span>${tech}</span>`)}
+  ${
+    projectDoc?.projectStack?.frontend
+      ? projectDoc?.projectStack?.frontend.map((tech) => `<span>${tech}</span>`)
+      : "[ ]"
+  }
   <br/>
   <label>Mobile App:</label>
-  ${projectDoc?.projectStack?.mobileApp.map((tech) => `<span>${tech}</span>`)}
+  ${
+    projectDoc?.projectStack?.mobileApp
+      ? projectDoc?.projectStack?.mobileApp.map(
+          (tech) => `<span>${tech}</span>`
+        )
+      : "[ ]"
+  }
   <br/>
   <label>Database:</label>
-  ${projectDoc?.projectStack?.database.map((tech) => `<span>${tech}</span>`)}
+  ${
+    projectDoc?.projectStack?.database
+      ? projectDoc?.projectStack?.database.map((tech) => `<span>${tech}</span>`)
+      : "[ ]"
+  }
   <br/>
   <label>Infrastructure And Services:</label>
-  ${projectDoc?.projectStack?.infrastructureAndServices.map(
-    (tech) => `<span>${tech}</span>`
-  )}
+  ${
+    projectDoc?.projectStack?.infrastructureAndServices
+      ? projectDoc?.projectStack?.infrastructureAndServices.map(
+          (tech) => `<span>${tech}</span>`
+        )
+      : "[ ]"
+  }
   <br/>`;
 
   // Add data dynamically for Escaltion Matrix
@@ -91,7 +113,7 @@ const generateProjectHTML = (projectDoc) => {
     (matrix) => `
                     <tr>
                       <td>${matrix.escalationLevel}</td>
-                      <td>${matrix.name}</td>
+                      <td>${matrix.name.name} &lt;${matrix.name.email}&gt;</td>
                     </tr>`
   );
   htmlContent += `</tbody>
@@ -110,7 +132,7 @@ const generateProjectHTML = (projectDoc) => {
     (matrix) => `
                     <tr>
                       <td>${matrix.escalationLevel}</td>
-                      <td>${matrix.name}</td>
+                      <td>${matrix.name.name} &lt;${matrix.name.email}&gt;</td>
                     </tr>`
   );
   htmlContent += `</tbody>
@@ -130,7 +152,7 @@ const generateProjectHTML = (projectDoc) => {
     (matrix) => `
                     <tr>
                       <td>Level - ${matrix.escalationLevel}</td>
-                      <td>${matrix.name.name}</td>
+                      <td>${matrix.name.name} &lt;${matrix.name.email}&gt;</td>
                     </tr>`
   );
   htmlContent += `</tbody>
@@ -178,7 +200,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Risk Profiling
   htmlContent += `
-    <h3>Risk Profiling</h3>
+    <h1>Risk Profiling</h1>
     <table>
         <thead>
         <tr>
@@ -210,7 +232,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Phases
   htmlContent += `
-    <h3>Phases</h3>
+    <h1>Phases</h1>
     <table>
         <thead>
         <tr>
@@ -244,9 +266,65 @@ const generateProjectHTML = (projectDoc) => {
                  </table>
   <br/>`;
 
+  // Sprint
+  htmlContent += `
+ <h1>Sprint</h1>
+ <table>
+     <thead>
+     <tr>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>status</th>
+        <th>Comment</th>
+     </tr>
+     </thead>
+     <tbody>`;
+  htmlContent += projectDoc.sprints.map(
+    (sprint) => `
+    <tr>
+        <td>${formateDate(sprint.sprint?.startDate)}</td>
+        <td>${formateDate(sprint.sprint?.endDate)}</td>
+        <td>${sprint.sprint?.status}</td>
+        <td>${sprint.sprint?.comments}</td>
+    </tr>`
+  );
+  htmlContent += `</tbody>
+              </table>
+<br/>`;
+
+  // Approved Team
+  htmlContent += `
+<h1>Approved Team</h1>
+${projectDoc?.approvedTeam?.map(
+  (teams) => `<h3>Phase - ${teams.phaseNumber}</h3>
+  <table>
+     <thead>
+     <tr>
+        <th>No. Of resources</th>
+        <th>Role</th>
+        <th>Availability%</th>
+        <th>Duration</th>
+     </tr>
+     </thead>
+     <tbody>
+     ${teams?.details?.map(
+       (team) => `
+      <tr>
+          <td>${team?.numberOfResources}</td>
+          <td>${team?.role}</td>
+          <td>${team?.availability}</td>
+          <td>${team?.duration}</td>
+      </tr>`
+     )}
+    </tbody>
+  </table>
+  <br/>
+  `
+)}`;
+
   // Resources
   htmlContent += `
- <h3>Resources</h3>
+ <h1>Resources</h1>
  <table>
      <thead>
      <tr>
@@ -275,7 +353,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Client Feeedback
   htmlContent += `
- <h3>Client Feedback</h3>
+ <h1>Client Feedback</h1>
  <table>
      <thead>
      <tr>
@@ -303,7 +381,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Minutes of Meeting
   htmlContent += `
- <h3>Minutes of Meeting</h3>
+ <h1>Minutes of Meeting</h1>
  <table>
      <thead>
      <tr>
@@ -329,7 +407,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Project Updates
   htmlContent += `
- <h3>Project Updates</h3>
+ <h1>Project Updates</h1>
  <table>
      <thead>
      <tr>
@@ -351,7 +429,7 @@ const generateProjectHTML = (projectDoc) => {
 
   // Audit History
   htmlContent += `
- <h3>Audit History</h3>
+ <h1>Audit History</h1>
  <table>
      <thead>
      <tr>
@@ -368,7 +446,7 @@ const generateProjectHTML = (projectDoc) => {
     (audit) => `
     <tr>
         <td>${formateDate(audit.dateOfAudit)}</td>
-        <td>${audit.reviewedBy}</td>
+        <td>${audit.reviewedBy.name} &lt;${audit.reviewedBy.email}&gt;</td>    
         <td>${audit.status}</td>
         <td>${audit.reviewedSection}</td>
         <td>${audit.commentQueries}</td>
@@ -379,35 +457,9 @@ const generateProjectHTML = (projectDoc) => {
               </table>
 <br/>`;
 
-  // Sprint
-  htmlContent += `
- <h3>Sprint</h3>
- <table>
-     <thead>
-     <tr>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>status</th>
-        <th>Comment</th>
-     </tr>
-     </thead>
-     <tbody>`;
-  htmlContent += projectDoc.sprints.map(
-    (sprint) => `
-    <tr>
-        <td>${formateDate(sprint.sprint?.startDate)}</td>
-        <td>${formateDate(sprint.sprint?.endDate)}</td>
-        <td>${sprint.sprint?.status}</td>
-        <td>${sprint.sprint?.comments}</td>
-    </tr>`
-  );
-  htmlContent += `</tbody>
-              </table>
-<br/>`;
-
   // VErsion History
   htmlContent += `
- <h3>Version History</h3>
+ <h1>Version History</h1>
  <table>
      <thead>
      <tr>
@@ -436,290 +488,6 @@ const generateProjectHTML = (projectDoc) => {
   htmlContent += `</tbody>
               </table>
 <br/>`;
-
-  //   // Add data dynamically for approved teams
-  //   htmlContent += `<h1>Approved Teams</h1>
-  //               <table>
-  //                 <thead>
-  //                   <tr>
-  //                     <th>Phase</th>
-  //                     <th>No. of Resources</th>
-  //                     <th>Role</th>
-  //                     <th>Availability %</th>
-  //                     <th>Duration</th>
-  //                   </tr>
-  //                 </thead>
-  //                 <tbody>`;
-
-  //   htmlContent += projectDoc.approvedTeam.team
-  //     .map(
-  //       (team) => `
-  //                   <tr>
-  //                     <td>${team.phaseNumber}</td>
-  //                     <td>${team.team.length}</td>
-  //                     <td>${team.team[0]?.role}</td>
-  //                     <td>${team.team[0]?.availability_percentage}</td>
-  //                     <td>${team.team[0]?.duration}</td>
-  //                   </tr>`
-  //     )
-  //     .join("");
-
-  //   // Add data dynamically for resources
-  //   htmlContent += `</tbody>
-  //               </table>
-
-  //               <h1>Resources</h1>
-  //               <table>
-  //                 <thead>
-  //                   <tr>
-  //                     <th>Resource Name</th>
-  //                     <th>Role</th>
-  //                     <th>Start Date</th>
-  //                     <th>End Date</th>
-  //                     <th>Comment</th>
-  //                   </tr>
-  //                 </thead>
-  //                 <tbody>`;
-
-  //   htmlContent += projectDoc.resources
-  //     .map(
-  //       (resource) => `
-  //                   <tr>
-  //                     <td>${resource.name}</td>
-  //                     <td>${resource.role}</td>
-  //                     <td>${resource.start_date}</td>
-  //                     <td>${resource.end_date}</td>
-  //                     <td>${resource.comment}</td>
-  //                   </tr>`
-  //     )
-  //     .join("");
-
-  //   // Add data dynamically for client feedback
-  //   htmlContent += `</tbody>
-  //               </table>
-
-  //               <h1>Client Feedback</h1>
-  //               <table>
-  //                 <thead>
-  //                   <tr>
-  //                     <th>Feedback Type</th>
-  //                     <th>Date Received</th>
-  //                     <th>Detailed Feedback</th>
-  //                     <th>Action Taken</th>
-  //                     <th>Closure Date</th>
-  //                   </tr>
-  //                 </thead>
-  //                 <tbody>`;
-
-  //   htmlContent += projectDoc.clientFeedback
-  //     .map(
-  //       (feedback) => `
-  //                   <tr>
-  //                     <td>${feedback.type}</td>
-  //                     <td>${feedback.dateReceived}</td>
-  //                     <td>${feedback.detailedFeedback}</td>
-  //                     <td>${feedback.actionTaken}</td>
-  //                     <td>${feedback.closureDate}</td>
-  //                   </tr>`
-  //     )
-  //     .join("");
-
-  //   // Add data dynamically for project updates
-  //   htmlContent += `</tbody>
-  //               </table>
-
-  //               <h1>Project Updates</h1>
-  //               <table>
-  //                 <thead>
-  //                   <tr>
-  //                     <th>Date</th>
-  //                     <th>General Updates</th>
-  //                   </tr>
-  //                 </thead>
-  //                 <tbody>`;
-
-  //   htmlContent += projectDoc.projectUpdates
-  //     .map(
-  //       (update) => `
-  //                   <tr>
-  //                     <td>${formateDate(update.date)}</td>
-  //                     <td>${update.generalUpdates}</td>
-  //                   </tr>`
-  //     )
-  //     .join("");
-
-  //   // Add data dynamically for MOMs
-  //   htmlContent += `</tbody>
-  //               </table>
-
-  //               <h1>MOMs of Client Meetings</h1>
-  //               <table>
-  //                 <thead>
-  //                   <tr>
-  //                     <th>Date</th>
-  //                     <th>Duration</th>
-  //                     <th>MOM Link</th>
-  //                     <th>Comment</th>
-  //                   </tr>
-  //                 </thead>
-  //                 <tbody>`;
-
-  //   htmlContent += projectDoc.moms
-  //     .map(
-  //       (mom) => `
-  //                   <tr>
-  //                     <td>${mom.date}</td>
-  //                     <td>${mom.duration}</td>
-  //                     <td>${mom.momLink}</td>
-  //                     <td>${mom.comment}</td>
-  //                   </tr>`
-  //     )
-  //     .join("");
-
-  //   htmlContent += `</tbody>
-  //               </table>
-  //             </body>
-  //           </html>`;
-
-  //   // Add data dynamically for Project Stack
-  //   htmlContent += `</tbody>
-  //  </table>
-
-  //  <h1>Project Stack</h1>
-  //  <table>
-  //    <thead>
-  //      <tr>
-  //        <th>Backend</th>
-  //        <th>Frontend</th>
-  //        <th>Mobile App</th>
-  //        <th>Database</th>
-  //        <th>Infrastructure And Services</th>
-  //      </tr>
-  //    </thead>
-  //    <tbody>`;
-
-  //   htmlContent += projectDoc.projectStack
-  //     .map(
-  //       (stack) => `
-  //      <tr>
-  //        <td>${stack.backend}</td>
-  //        <td>${stack.frontend}</td>
-  //        <td>${stack.mobileApp}</td>
-  //        <td>${stack.database}</td>
-  //        <td>${stack.infrastructureAndServices}</td>
-  //      </tr>`
-  //     )
-  //     .join("");
-
-  //   htmlContent += `</tbody>
-  //  </table>
-  // </body>
-  // </html>`;
-
-  //   // Add data dynamically for Risks
-  //   htmlContent += `</tbody>
-  //  </table>
-
-  //  <h1>Risks</h1>
-  //  <table>
-  //    <thead>
-  //      <tr>
-  //        <th>Type</th>
-  //        <th>Description</th>
-  //        <th>Severity</th>
-  //        <th>Impact</th>
-  //        <th>Remedial Steps</th>
-  //        <th>Status</th>
-  //        <th>Closure Date</th>
-  //      </tr>
-  //    </thead>
-  //    <tbody>`;
-
-  //   htmlContent += projectDoc.riskProfiling
-  //     .map(
-  //       (risk) => `
-  //      <tr>
-  //        <td>${risk.riskType}</td>
-  //        <td>${risk.description}</td>
-  //        <td>${risk.severity}</td>
-  //        <td>${risk.impact}</td>
-  //        <td>${risk.remedialSteps}</td>
-  //        <td>${risk.status}</td>
-  //        <td>${risk.closureDate}</td>
-  //      </tr>`
-  //     )
-  //     .join("");
-
-  //   htmlContent += `</tbody>
-  //  </table>
-  // </body>
-  // </html>`;
-
-  //   // Add data dynamically for Sprints
-  //   htmlContent += `</tbody>
-  //  </table>
-
-  //  <h1>Sprints</h1>
-  //  <table>
-  //    <thead>
-  //      <tr>
-  //        <th>Start Date</th>
-  //        <th>End Date</th>
-  //        <th>status</th>
-  //        <th>Comment</th>
-  //      </tr>
-  //    </thead>
-  //    <tbody>`;
-
-  //   htmlContent += projectDoc.sprints
-  //     .map(
-  //       (mom) => `
-  //      <tr>
-  //        <td>${mom.startDate}</td>
-  //        <td>${mom.endDate}</td>
-  //        <td>${mom.status}</td>
-  //        <td>${mom.comments}</td>
-  //      </tr>`
-  //     )
-  //     .join("");
-
-  //   htmlContent += `</tbody>
-  //  </table>
-  // </body>
-  // </html>`;
-
-  //   // Add data dynamically for MOMs
-  //   htmlContent += `</tbody>
-  //  </table>
-
-  //  <h1>Sprints</h1>
-  //  <table>
-  //    <thead>
-  //      <tr>
-  //        <th>Start Date</th>
-  //        <th>End Date</th>
-  //        <th>status</th>
-  //        <th>Comment</th>
-  //      </tr>
-  //    </thead>
-  //    <tbody>`;
-
-  //   htmlContent += projectDoc.sprints
-  //     .map(
-  //       (mom) => `
-  //      <tr>
-  //        <td>${mom.startDate}</td>
-  //        <td>${mom.endDate}</td>
-  //        <td>${mom.status}</td>
-  //        <td>${mom.comments}</td>
-  //      </tr>`
-  //     )
-  //     .join("");
-
-  //   htmlContent += `</tbody>
-  //  </table>
-  // </body>
-  // </html>`;
 
   htmlContent += `
 </body>

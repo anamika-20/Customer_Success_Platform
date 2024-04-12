@@ -12,7 +12,7 @@ const downloadFeature = async (req, res) => {
       .populate("projectUpdates")
       .populate("clientFeedback")
       .populate("moms")
-      .populate("auditHistory")
+      .populate("approvedTeam")
       .populate("riskProfiling")
       .populate("phases.phase")
       .populate("sprints.sprint")
@@ -21,6 +21,14 @@ const downloadFeature = async (req, res) => {
         model: "VersionHistory",
         populate: {
           path: "createdBy approvedBy",
+          model: "User",
+        },
+      })
+      .populate({
+        path: "auditHistory",
+        model: "AuditHistory",
+        populate: {
+          path: "reviewedBy",
           model: "User",
         },
       })
@@ -72,7 +80,7 @@ const downloadFeature = async (req, res) => {
     const pdf = await page.pdf({ format: "A4", printBackground: true });
 
     // Get the HTML content for preview
-    const previewHtml = await page.content();
+    // const previewHtml = await page.content();
 
     // Close the browser instance
     await browser.close();
@@ -81,13 +89,13 @@ const downloadFeature = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=project_details.pdf`
+      `attachment; filename=${projectDoc?.projectName || "project_details"}.pdf`
     );
     res.send(pdf);
 
     // Send the HTML as a response for preview
-    res.setHeader("Content-Type", "text/html");
-    res.send(previewHtml);
+    // res.setHeader("Content-Type", "text/html");
+    // res.send(previewHtml);
   } catch (error) {
     console.error("Error converting HTML to PDF:", error);
     res.status(500).send("Error converting HTML to PDF");

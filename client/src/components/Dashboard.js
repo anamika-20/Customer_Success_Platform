@@ -8,14 +8,6 @@ const Dashboard = () => {
   const { role } = useContext(DataContext);
   const { isLoading } = useAuth0();
 
-  const rootStyle = {
-    height: "100%",
-    backgroundColor: "#f4f4f4",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
   const paperStyle = {
     padding: "32px",
     textAlign: "center",
@@ -37,19 +29,26 @@ const Dashboard = () => {
       {isLoading ? (
         <div>Loading ...</div>
       ) : (
-        <Box style={rootStyle} sx={{ justifyContent: "center" }}>
-          <Paper elevation={3} style={paperStyle}>
-            <Typography variant="h5" style={titleStyle}>
-              Welcome to the
-            </Typography>
-            <Typography variant="h4" style={titleStyle}>
-              Customer Success Platform
-            </Typography>
-            <Typography variant="subtitle1" style={subTitleStyle}>
-              You are logged in as : {role}
-            </Typography>
-          </Paper>
-        </Box>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80vh", backgroundColor: "#f4f4f4" }}
+        >
+          <Grid item xs={12} sm={8} md={6} lg={4}>
+            <Paper elevation={3} style={paperStyle}>
+              <Typography variant="h5" style={titleStyle}>
+                Welcome to the
+              </Typography>
+              <Typography variant="h4" style={titleStyle}>
+                Customer Success Platform
+              </Typography>
+              <Typography variant="subtitle1" style={subTitleStyle}>
+                You are logged in as : {role}
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
       )}
     </Layout>
   );
