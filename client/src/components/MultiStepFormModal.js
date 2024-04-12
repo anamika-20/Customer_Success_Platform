@@ -269,7 +269,9 @@ const MultiStepFormModal = ({ open, onClose }) => {
 
         {step === 0 && (
           <>
-            <Typography variant="h6">Project Name</Typography>
+            <Typography variant="h6">
+              Project Name(Name Should be unique)
+            </Typography>
             <TextField
               fullWidth
               label="Name"

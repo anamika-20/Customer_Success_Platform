@@ -202,7 +202,7 @@ const OneProjectDetail = () => {
                 disabled={!editable}
               />
             </Box>
-            <Box mb={2}>
+            {/* <Box mb={2}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel>StakeHolder - Auditor</InputLabel>
                 <Select
@@ -246,7 +246,7 @@ const OneProjectDetail = () => {
                   <MenuItem value="Fixed Budget">Fixed Budget</MenuItem>
                 </Select>
               </FormControl>
-            </Box>
+            </Box> */}
 
             {editable && (
               <Box mt={2}>

@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { DataContext } from "../DataContext";
 
 const ProjectDetails = () => {
-  const { projects, loading, error } = useContext(DataContext);
+  const { projects, loading, error, role } = useContext(DataContext);
   console.log(projects);
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
@@ -38,12 +38,18 @@ const ProjectDetails = () => {
   return (
     <Layout>
       <Grid container spacing={5} sx={{ p: 2 }}>
-        <Grid item xs={12} sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleOpenModal}>
-            <AddIcon />
-            Add Project
-          </Button>
-        </Grid>
+        {(role === "admin" || role === "projectmanager") && (
+          <Grid item xs={12} sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenModal}
+            >
+              <AddIcon />
+              Add Project
+            </Button>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Typography variant="h4">
             {projects.length > 0
